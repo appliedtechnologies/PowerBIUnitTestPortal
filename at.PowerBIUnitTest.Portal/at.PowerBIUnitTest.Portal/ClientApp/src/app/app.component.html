@@ -1,0 +1,32 @@
+<dx-load-panel 
+  [visible]="this.showLoading"
+  [showIndicator]="true"
+  [showPane]="true"
+  [shading]="true"
+  [closeOnOutsideClick]="false"
+  shadingColor="rgba(0,0,0,0.4)"
+  [message]="this.loadingMessage">
+</dx-load-panel>
+
+<div id="app-wrapper">
+  <dx-toolbar
+    id="header-toolbar"
+    (onContentReady)="onContentReady($event)"
+    [items]="toolbarContent"> 
+  </dx-toolbar>
+
+  <dx-drawer 
+  template="template"
+  [(opened)]="isDrawerOpen"
+  revealMode="expand">
+  <div *dxTemplate="let data of 'template'" id="drawer-template">
+    <div id="drawer-content">
+        <app-side-navigation-menu></app-side-navigation-menu>     
+    </div>  
+  </div>
+  <div id="router-outlet-wrapper">
+    <router-outlet></router-outlet>
+  </div>
+</dx-drawer>
+</div>
+

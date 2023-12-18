@@ -1,0 +1,78 @@
+
+
+<h1>Hallo das ist auch ein Test</h1>
+
+
+<dx-data-grid
+#grid
+id="gridContainer"
+[rowAlternationEnabled]="false"
+[showRowLines]="true"
+[showBorders]="true"
+[dataSource]="dataSourceUnitTest"
+[allowColumnResizing]="true"
+[columnAutoWidth]="true"
+[width]="'100%'"
+[hoverStateEnabled]="true"
+[selectedRowKeys]="[]"
+
+
+>
+<dxo-search-panel
+    [visible]="true"
+    [highlightCaseSensitive]="false"
+    placeholder="Search..."
+  ></dxo-search-panel>
+  <dxo-paging [pageSize]="20"></dxo-paging>
+  <dxo-pager [visible]="true" [showNavigationButtons]="true"></dxo-pager>
+  <dxo-selection mode="single"></dxo-selection>
+  <dxo-editing mode="form" [allowUpdating]="true" [allowAdding]="true" ></dxo-editing>
+
+<dxi-column dataField="Name" caption="Name"></dxi-column>
+<dxi-column dataField="UserStory" caption="User Story"> </dxi-column>
+<dxi-column dataField="DAX"></dxi-column>
+<dxi-column dataField="Ergebnis"></dxi-column>
+
+
+</dx-data-grid>
+
+<div *ngIf="grid.selectedRowKeys.length">
+  <dx-button
+  text="UnitTest ausführen"
+  type="normal"
+  (onClick)="executeUnitTest()"
+>
+</dx-button>
+<label>
+  <div dataSource="Ergebnis"></div>
+</label>
+</div>
+
+<div
+*ngIf="grid.selectedRowKeys.length">
+<dx-button
+text="Load Workspace"
+type="normal"
+(onClick)="LoadWorkspace($event)"
+>
+</dx-button>
+</div>
+
+<div
+*ngIf="grid.selectedRowKeys.length">
+<dx-button
+text="Load Dataset"
+type="normal"
+(onClick)="LoadDataset($event)"
+>
+</dx-button>
+</div>
+
+<div>
+<p>Das Ergebnis lautet :{{ Ergebnis }}</p>
+</div>
+
+
+
+
+<!--<div style=" width: 100%;" [ngStyle]="{ 'height': (screenHeight-150)+ 'px' }" #reportContainer></div> -->

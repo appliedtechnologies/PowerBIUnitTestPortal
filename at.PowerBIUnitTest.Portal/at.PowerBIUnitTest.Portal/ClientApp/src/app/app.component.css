@@ -1,0 +1,91 @@
+#drawer-template{
+    width: 220px;
+    height: calc(100vh - 46px);
+}
+
+#drawer-content{
+    background-color: #efefef;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+#apptech-logo{
+    margin: 15px 15px 5px;
+}
+
+
+::ng-deep #welcome-user{
+    font-size: 14px;
+    margin-right: 10px;
+}
+
+::ng-deep #header-toolbar.dx-toolbar {
+    background-color: rgba(4,100,148);
+    color: white;
+}
+
+::ng-deep .dx-toolbar {
+    background-color: rgba(191,191,191,.15);
+    padding: 5px 10px;
+}
+
+::ng-deep .dx-drawer-expand.dx-drawer-right .panel-list {
+    float: right;
+}
+
+::ng-deep .options {
+    padding: 20px;
+    background-color: rgba(191, 191, 191, .15);
+}
+
+::ng-deep .caption {
+    font-size: 18px;
+    font-weight: 500;
+}
+
+::ng-deep .option {
+    margin-top: 10px;
+    display: inline-block;
+    margin-right: 50px;
+}
+
+::ng-deep label {
+    font-weight: bold;
+}
+
+::ng-deep #content {
+    height: calc(100% - 46px);
+}
+
+::ng-deep #content h2 {
+    font-size: 26px;
+}
+
+::ng-deep #main-menu .dx-empty-message{
+    color: white;
+}
+
+#router-outlet-wrapper{
+    padding: 10px 20px;
+    flex-grow: 1;
+    height: calc(100vh - 46px);
+    display: flex;
+}
+
+:host ::ng-deep router-outlet + *, :host ::ng-deep .flex-container, :host ::ng-deep dx-data-grid, :host ::ng-deep dx-tree-list{
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    min-height: 0;
+}
+
+::ng-deep .dx-toolbar-menu-container .dx-dropdownmenu-button .dx-button-content .dx-icon{
+    float: right;  
+    padding-left: 10px; 
+    margin: 0; 
+}
+
+::ng-deep .dx-loadpanel-wrapper{
+    z-index: 2000 !important;
+}

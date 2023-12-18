@@ -1,0 +1,36 @@
+
+     <dx-data-grid
+     #grid
+     id="gridContainer2"
+     [rowAlternationEnabled]="true"
+     [showRowLines]="true"
+     [showBorders]="true"
+     [dataSource]="dataSourceUserStory"
+     [allowColumnResizing]="true"
+     [columnAutoWidth]="true"
+     [width]="'100%'"
+     [hoverStateEnabled]="true"
+     [selectedRowKeys]="[]"
+     
+     
+     >
+     <dxo-search-panel
+         [visible]="true"
+         [highlightCaseSensitive]="false"
+         placeholder="Search..."
+       ></dxo-search-panel>
+       <dxo-paging [pageSize]="20"></dxo-paging>
+       <dxo-pager [visible]="true" [showNavigationButtons]="true"></dxo-pager>
+       <dxo-selection mode="single"></dxo-selection>
+       <dxo-editing mode="form" [allowUpdating]="true" [allowAdding]="true" ></dxo-editing>
+     
+     <dxi-column dataField="Id" ></dxi-column>
+     <dxi-column dataField="Beschreibung" > </dxi-column>
+     <dxi-column dataField="Workspace"> </dxi-column>
+     
+     
+     
+     
+     </dx-data-grid>
+ 
+

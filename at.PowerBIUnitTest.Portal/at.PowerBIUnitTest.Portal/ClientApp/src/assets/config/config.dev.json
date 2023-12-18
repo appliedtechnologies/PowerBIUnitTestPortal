@@ -1,0 +1,13 @@
+{
+  "logging": {
+    "console": true
+  },
+  "api": {
+    "url": "/odata"
+  },
+  "azure": {
+    "applicationId": "754d2104-731b-42dd-942b-377a0e50a7db",
+    "roleNameAdmin": "Admin"
+  },
+  "version": "1.0.2307.1114"
+}

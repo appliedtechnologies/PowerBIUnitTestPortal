@@ -1,0 +1,503 @@
+<h1>Übersicht</h1>
+
+<!-- Buttons in der Toolbar -->
+
+<dx-toolbar>
+  <dxi-item location="before">
+    <div *dxTemplate>
+      <dx-button
+        stylingMode="contained"
+        icon="refresh"
+        text="Sync Workspaces"
+        type="normal"
+        [width]="200"
+        (onClick)="LoadWorkspace($event)"
+      >
+      </dx-button>
+    </div>
+  </dxi-item>
+  <dxi-item location="after">
+    <div *dxTemplate>
+      <dx-button
+        stylingMode="contained"
+        icon="runner"
+        text="Execute UnitTests"
+        type="success"
+        [width]="200"
+        (onClick)="executeUnitTestsForSelection($event)"
+      >
+      </dx-button>
+    </div>
+  </dxi-item>
+  <dxi-item location="after">
+    <div *dxTemplate>
+      <dx-button
+        stylingMode="contained"
+        icon="trash"
+        text="Delete UnitTests"
+        type="danger"
+        [width]="200"
+        (onClick)="deleteUnitTestsForSelection($event)"
+      >
+      </dx-button>
+    </div>
+  </dxi-item>
+  <dxi-item location="after">
+    <div *dxTemplate>
+      <dx-button
+        stylingMode="contained"
+        icon="clock"
+        text="Show TestRuns"
+        type="normal"
+        [width]="200"
+        (onClick)="showTestRuns()"
+      >
+      </dx-button>
+    </div>
+  </dxi-item>
+</dx-toolbar> 
+
+<!-- TreeList -->
+  <dx-tree-list 
+    #list
+    id="structures"
+    [dataSource]="structures"
+    itemsExpr="items"
+    dataStructure="tree"
+    [showRowLines]="true"
+    [showBorders]="true"
+    [columnAutoWidth]="true"
+    [hoverStateEnabled]="true"
+    [repaintChangesOnly]="true"
+    (onCellPrepared)="onCellPrepared($event)"
+    (onRowDblClick)="showUnitTestEdit($event)"
+    (onRowPrepared)="onRowPrepared($event)"
+    >
+    <dxo-selection mode="multiple"></dxo-selection> 
+
+    <dxi-column dataField="Typ"></dxi-column>
+    <dxi-column dataField="Name"></dxi-column>
+    <dxi-column dataField="Timestamp" caption="Last Run"></dxi-column>
+    <dxi-column dataField="ExpectedResult"></dxi-column>
+    <dxi-column dataField="LastResult"></dxi-column>
+    <dxi-column dataField="DAX" cssClass="dax-column"></dxi-column>
+    <dxi-column type="buttons" caption="Actions">
+      <dxi-button 
+        icon="runner" 
+        text="Execute UnitTest(s)"
+        type="default"
+        [onClick]="executeUnitTestsForRow"
+      >
+      </dxi-button>
+      <dxi-button 
+        [visible]="isTabularModelRow"
+        icon="add" 
+        text="Add UserStory"
+        type="default"
+        [onClick]="showUserStory"
+      >
+      </dxi-button>
+      <dxi-button 
+        [visible]="isUserStoryRow"
+        icon="add" 
+        text="Add UnitTest"
+        type="default"
+        [onClick]="showUnitTest"
+      >
+      </dxi-button>
+      <dxi-button 
+        [visible]="isUnitTestRow"
+        icon="edit" 
+        text="Edit"
+        type="default"
+        [onClick]="showUnitTestEdit"
+      >
+      </dxi-button>
+      <dxi-button 
+      [visible]="isUserStoryRow"
+      icon="edit" 
+      text="Edit"
+      type="default"
+      [onClick]="showUserStoryEdit"
+    >
+    </dxi-button>
+      <dxi-button 
+        [visible]="isUnitTestRow"
+        icon="trash" 
+        text="Delete"
+        type="default"
+        [onClick]="showDelete"
+      >
+      </dxi-button>
+      <dxi-button 
+      [visible]="isWorkspaceRow"
+      icon="trash" 
+      text="Delete"
+      type="default"
+      [onClick]="deleteWorkspace"
+    >
+    </dxi-button>
+    <dxi-button 
+    [visible]="isWorkspaceRow"
+    icon="clock" 
+    text="Delete"
+    type="default"
+    [onClick]="showTestRunsLocal"
+  >
+  </dxi-button>
+  <dxi-button 
+  [visible]="isTabularModelRow"
+  icon="clock" 
+  text="Delete"
+  type="default"
+  [onClick]="showTestRunsLocal"
+>
+</dxi-button>
+  <dxi-button 
+  [visible]="isUserStoryRow"
+  icon="clock" 
+  text="Delete"
+  type="default"
+  [onClick]="showTestRunsLocal"
+>
+</dxi-button>
+    </dxi-column>
+  </dx-tree-list>
+
+<!--Popups  -->
+
+<dx-popup *ngIf="isPopupVisibleUT"
+  [(visible)]="isPopupVisibleUT"
+  [height]="750"
+  [width]="'80%'"
+>
+<div *dxTemplate="let data of 'content'">
+  <div class="long-title">
+    <h3>UnitTests hinzufügen</h3>
+  </div>
+  <div id="form-container">
+    <dx-form id="form" [colCount]="1" [formData]="unitTestToEdit">
+      <dxi-item
+        dataField="Name"
+        [editorOptions]=""
+      >
+      <dxi-validation-rule
+          type="required">
+      </dxi-validation-rule>
+      </dxi-item>
+      <dxi-item
+        dataField="ResultType"
+        editorType="dxSelectBox"
+        [editorOptions]="{items : ResultTypes,
+        onValueChanged : checkType}"
+        
+       
+      >
+      </dxi-item>
+      <dxi-item
+        dataField="DecimalPlaces"
+        editorType="dxSelectBox"
+        [editorOptions]="{items: decimal}"
+        [visible]="IsTypeFloat"
+        
+      ></dxi-item>
+      <dxi-item
+          dataField="DateTimeFormat"
+          editorType="dxSelectBox"
+          [editorOptions]="{items: DateTimeFormats}"
+          [visible]="IsTypeDate"
+      ></dxi-item>
+      <dxi-item
+      dataField="DateTime lenght"
+      editorType="dxSelectBox"
+      [editorOptions]="{items: DateTimeFormats2}"
+      [visible]="IsTypeDate"
+  ></dxi-item>
+      <dxi-item
+        dataField="FloatSeparators"
+        editorType="dxSelectBox"
+        [editorOptions]="{items: Seperators}"
+        [visible]="IsTypeFloat"
+      ></dxi-item>
+      <dxi-item
+        dataField="ExpectedResult"
+        [editorOptions]=""
+      >
+      <dxi-validation-rule
+          type="required">
+      </dxi-validation-rule>
+      </dxi-item>
+      <dxi-item
+        [label]="{ text: 'UserStory' }"
+        dataField="UserStory"
+        editorType="dxTextBox"
+        [editorOptions]="{ disabled: true}"
+      >
+      </dxi-item>
+      <dxi-item
+        dataField="DAX"
+        editorType="dxTextArea"
+        [editorOptions]="{ height: 250 }"
+        [colSpan]="2"
+      >
+      <dxi-validation-rule
+          type="required">
+      </dxi-validation-rule>
+      </dxi-item>
+      <dxi-item
+        itemType="button"
+        horizontalAlignment="center"
+        [buttonOptions]="{  
+          text: 'Hinzufügen',
+          type: 'success',
+          icon: 'check',
+          onClick: this.addUnitTest.bind(this)}"
+      >
+      </dxi-item>
+     
+    </dx-form>
+  </div>
+</div>
+</dx-popup>
+
+<dx-popup *ngIf="isPopupVisibleUTEdit"
+  [(visible)]="isPopupVisibleUTEdit"
+  [height]="750"
+  [width]="'80%'"
+>
+<div *dxTemplate="let data of 'content'">
+  <div class="long-title">
+    <h3>UnitTests Bearbeiten</h3>
+  </div>
+  <div id="form-container">
+    <dx-form id="form" [colCount]="1" [formData]="unitTestToEdit">
+      <dxi-item 
+        dataField="Id"
+        [editorOptions]="{ disabled: true, value: this.unitTestToEdit.Id}"
+      >
+      </dxi-item>
+      <dxi-item
+        dataField="Name"
+        [editorOptions]="{ value: this.unitTestToEdit.Name}"
+      >
+      <dxi-validation-rule
+          type="required">
+      </dxi-validation-rule>
+      </dxi-item>
+      <dxi-item
+      dataField="ResultType"
+      editorType="dxSelectBox"
+      [editorOptions]="{items : ResultTypes,
+      onValueChanged : checkType,
+      value:  this.unitTestToEdit.ResultType}"
+      
+     
+    >
+    </dxi-item>
+    <dxi-item
+      dataField="DecimalPlaces"
+      editorType="dxSelectBox"
+      [editorOptions]="{items: decimal, value: this.unitTestToEdit.DecimalPlaces}"
+      [visible]="IsTypeFloat"
+      
+    ></dxi-item>
+    <dxi-item
+        dataField="DateTimeFormat"
+        editorType="dxSelectBox"
+        [editorOptions]="{items: DateTimeFormats, value: this.unitTestToEdit.DateTimeFormat}"
+        [visible]="IsTypeDate"
+    ></dxi-item>
+    <dxi-item
+      dataField="DateTime lenght"
+      editorType="dxSelectBox"
+      [editorOptions]="{items: DateTimeFormats2}"
+      [visible]="IsTypeDate"
+  ></dxi-item>
+    <dxi-item
+      dataField="FloatSeparators"
+      editorType="dxSelectBox"
+      [editorOptions]="{items: Seperators, value: this.unitTestToEdit.FloatSeparators}"
+      [visible]="IsTypeFloat"
+    ></dxi-item>
+      <dxi-item
+        dataField="ExpectedResult"
+        [editorOptions]="{ value: this.unitTestToEdit.ExpectedResult}"
+      >
+      <dxi-validation-rule
+          type="required">
+      </dxi-validation-rule>
+      </dxi-item>
+      <dxi-item
+        dataField="DAX"
+        editorType="dxTextArea"
+        [editorOptions]="{ height: '250', value: this.unitTestToEdit.DAX}"
+        [colSpan]="2"
+      >
+      <dxi-validation-rule
+          type="required">
+      </dxi-validation-rule>
+      </dxi-item>
+      <dxi-item
+        itemType="button"
+        horizontalAlignment="center"
+        [buttonOptions]="{  
+          text: 'Speichern',
+          type: 'success',
+          icon: 'save',
+          onClick: this.editUnitTest.bind(this)}"
+      >
+      </dxi-item>
+    </dx-form>
+  </div>
+</div>
+</dx-popup>
+
+<dx-popup *ngIf="isPopupVisibleUS"
+  #UserStory
+  [(visible)]="isPopupVisibleUS"
+  [height]="300"
+  [width]="500"
+>
+<div *dxTemplate="let data of 'content'">
+  <div class="long-title">
+    <h3>UserStory hinzufügen</h3>
+  </div>
+  <div id="form-container">
+    <dx-form id="form" [colCount]="1" [formData]="userStoryToEdit">
+      <dxi-item
+        dataField="Beschreibung"
+        [editorOptions]="{  }"
+      >
+      <dxi-validation-rule
+          type="required">
+      </dxi-validation-rule>
+      </dxi-item>
+      <dxi-item
+        [label]="{ text: 'TabularModel' }"
+        dataField="TabularModel"
+        editorType="dxTextBox"
+        [editorOptions]="{ disabled: true }"
+      >
+      </dxi-item>
+      <dxi-item
+        itemType="button"
+        horizontalAlignment="center"
+        [buttonOptions]="{  
+          text: 'Hinzufügen',
+          type: 'success',
+          icon: 'check',
+          onClick: this.addUserStory.bind(this)}"
+      >
+      </dxi-item>
+    </dx-form>
+  </div>
+</div>
+</dx-popup>
+
+<dx-popup *ngIf="isPopupVisibleUSedit"
+  #UserStory
+  [(visible)]="isPopupVisibleUSedit"
+  [height]="300"
+  [width]="500"
+>
+<div *dxTemplate="let data of 'content'">
+  <div class="long-title">
+    <h3>UserStory bearbeiten</h3>
+  </div>
+  <div id="form-container">
+    <dx-form id="form" [colCount]="1" [formData]="userStoryToEdit">
+      <dxi-item
+        dataField="Beschreibung"
+        [editorOptions]="{ value: this.userStoryToEdit.Beschreibung}"
+      >
+      <dxi-validation-rule
+          type="required">
+      </dxi-validation-rule>
+      </dxi-item>
+      <dxi-item
+        [label]="{ text: 'TabularModel' }"
+        dataField="TabularModel"
+        editorType="dxTextBox"
+        [editorOptions]="{ disabled: true }"
+      >
+      </dxi-item>
+      <dxi-item
+        itemType="button"
+        horizontalAlignment="center"
+        [buttonOptions]="{  
+          text: 'Hinzufügen',
+          type: 'success',
+          icon: 'check',
+          onClick: this.editUserStory.bind(this)}"
+      >
+      </dxi-item>
+    </dx-form>
+  </div>
+</div>
+</dx-popup>
+
+<dx-popup *ngIf="isPopupVisibleTR"
+#TestRuns
+[(visible)]="isPopupVisibleTR"
+[height]="950"
+[width]="850"
+[title]="header"
+>
+<div *dxTemplate="let data of 'content'">
+  <dx-scroll-view width="100%" height="100%">
+  <div class="long-title">
+    <h3>Testläufe</h3>
+  </div>
+  <div id="form-container">
+    
+
+   <dx-tree-list
+   #list
+   id="TestRunsStructures"
+   [dataSource]="TestRunsStructures"
+   itemsExpr="items"
+   dataStructure="tree"
+   [showRowLines]="true"
+   [showBorders]="true"
+   [columnAutoWidth]="true"
+   [hoverStateEnabled]="true"
+   [repaintChangesOnly]="true"
+   
+   
+   >
+   <dxo-selection mode="multiple"></dxo-selection>
+   <dxo-search-panel [visible]="true" [width]= '250' ></dxo-search-panel>
+
+   <dxi-column dataField="Name"></dxi-column>
+    <dxi-column dataField="Result"></dxi-column>
+    <dxi-column dataField="TimeStamp" caption="Last Run"></dxi-column>
+    <dxi-column dataField="Type"></dxi-column>
+    
+    
+   
+  </dx-tree-list>
+  </div>
+</dx-scroll-view>
+</div>
+
+</dx-popup>
+
+<dx-popup 
+  [(visible)]="isPopupVisibleDelete" 
+  [showCloseButton]="true"
+  [width]="300"
+  [height]="400"
+>
+  <div class="popup-content">
+    <div class="long-title">
+      <h3>Soll das ausgewählte Item wirklich gelöscht werden ?</h3>
+    </div>
+    <dx-button 
+      text="Ja"
+      type="success"
+      icon="check"
+      (onClick)="confirmDelete('yes', unitTestToDelete)"
+    >
+    </dx-button>
+  </div>
+</dx-popup>

@@ -1,0 +1,29 @@
+<dx-button
+  text="Login"
+  width="100%"
+  type="success"
+  stylingMode="contained"
+  [visible]="!isLoggedIn"
+  icon="at-icon powercid-icon-benutzer"
+  (onClick)="login()"
+></dx-button>
+
+<dx-button
+  text="Logout"
+  width="100%"
+  type="success"
+  stylingMode="contained"
+  [visible]="isLoggedIn"
+  icon="at-icon powercid-icon-benutzer"
+  (onClick)="logout()"
+></dx-button>
+
+<div *ngIf="isLoggedIn">
+  <div *ngIf="user">
+    <p><strong>First Name: </strong> {{user?.Firstname}}</p>
+    <p><strong>Last Name: </strong> {{user?.Lastname}}</p>
+    <p><strong>Email: </strong> {{user?.Email}}</p>
+    <p><strong>Azure AD Id: </strong> {{user?.MsId}}</p>
+    <p><strong>Roles: </strong> {{roles}}</p>
+  </div>
+</div>
