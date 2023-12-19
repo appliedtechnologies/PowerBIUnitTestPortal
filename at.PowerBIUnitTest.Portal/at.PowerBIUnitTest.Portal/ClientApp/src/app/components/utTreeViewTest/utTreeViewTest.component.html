@@ -161,6 +161,14 @@
   [onClick]="showTestRunsLocal"
 >
 </dxi-button>
+      <dxi-button 
+        [visible]="isUserStoryRow"
+        icon="copy" 
+        text="Copy to other TabularModel/Workspace"
+        type="default"
+        [onClick]="onClickCopyUserStory"
+        >
+      </dxi-button>
     </dxi-column>
   </dx-tree-list>
 

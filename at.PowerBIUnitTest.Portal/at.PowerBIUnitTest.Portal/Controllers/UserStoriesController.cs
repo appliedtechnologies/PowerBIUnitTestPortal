@@ -16,6 +16,7 @@ using Microsoft.AspNetCore.OData.Formatter;
 using Microsoft.AspNet.OData.Routing;
 using Newtonsoft.Json;
 using Microsoft.AspNetCore.OData.Deltas;
+using Microsoft.EntityFrameworkCore;
 
 namespace at.PowerBIUnitTest.Portal.Controllers
 {
@@ -80,6 +81,37 @@ namespace at.PowerBIUnitTest.Portal.Controllers
                 logger.LogError(ex, "An error occured while performing PATCH");
                 throw;
             }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Copy ([FromODataUri] int key, ODataActionParameters parameters)
+        {
+            logger.LogDebug($"Begin: UserStoriesController Copy(key: {key})");
+            /*
+            var solution = await this.dbContext.UserStories.FirstOrDefaultAsync(e => e.Id == key && e.TabularModelNavigation.WorkspaceNavigation..DevelopmentEnvironmentNavigation.TenantNavigation.MsId == this.msIdTenantCurrentUser);
+            if (solution == null)
+                return Forbid();
+
+            if (solution.IsPatch())
+                return BadRequest("Can't apply upgrade for patch solution");
+
+            int targetEnvironmentId = (int)parameters["targetEnvironmentId"];
+            if (ImportExistsOnEnvironment(key, targetEnvironmentId) == false)
+                return BadRequest("Can't skip import before applying an upgrade");
+
+            Data.Models.Action createdAction;
+
+            try
+            {
+                createdAction = await solutionService.AddApplyUpgradeAction(key, targetEnvironmentId, this.msIdCurrentUser);
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+            logger.LogDebug($"End: SolutionsController ApplyUpgrade()");
+            */
+            return Ok();
         }
     }
 

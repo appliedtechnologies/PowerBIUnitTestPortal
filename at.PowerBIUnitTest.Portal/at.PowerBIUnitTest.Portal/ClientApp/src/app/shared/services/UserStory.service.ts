@@ -23,4 +23,16 @@ export class UserStoryService {
     return this.odataService.context["UserStories"];
   }
 
+  public copyToOtherTabularModel(userStoryId: number, targetTabularModelId: number): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
+      this.http
+        .post(`${AppConfig.settings.api.url}/UserStories(${userStoryId})/Copy`, {
+          targetTabularModelId: targetTabularModelId,
+        })
+        .subscribe({
+          next: (data) => resolve(),
+          error: (error) => reject(error),
+        });
+    });
+  }
 }

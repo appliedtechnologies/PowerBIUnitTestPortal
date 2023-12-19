@@ -54,6 +54,9 @@ namespace at.PowerBIUnitTest.Portal
             SaveTestRun.Parameter<string>("Name");
             builder.EntityType<Workspace>().Collection.Action("FilterWorkspace");
 
+            var copyUserStory = builder.EntityType<UserStory>().Action("Copy");
+            copyUserStory.Parameter<int>("targetTabularModelId");
+
             // var executeAction = builder.Function("Execute");
             //executeAction.Parameter<UnitTest>("unitTestToExecute");
             //executeAction.ReturnsFromEntitySet<UnitTest>("UnitTests");

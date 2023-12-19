@@ -93,6 +93,10 @@ import { TestRunStructur } from "src/app/shared/models/TestRunStructur.model";
       })
     }
 
+    public onClickCopyUserStory(e: any): void{
+      alert("Clicked!");
+    }
+
     public showTestRuns()
     {
       this.loadDataForPopUp();
