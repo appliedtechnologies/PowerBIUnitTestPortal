@@ -32,6 +32,7 @@ namespace at.PowerBIUnitTest.Portal.Controllers
 
        
         [EnableQuery(MaxExpansionDepth = 4)]
+        [AllowAnonymous]
         public IQueryable<TabularModel> Get()
         {
             try

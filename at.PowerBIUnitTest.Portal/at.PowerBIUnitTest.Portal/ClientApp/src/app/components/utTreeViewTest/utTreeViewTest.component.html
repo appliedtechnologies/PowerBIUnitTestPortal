@@ -81,7 +81,7 @@
     <dxi-column dataField="ExpectedResult"></dxi-column>
     <dxi-column dataField="LastResult"></dxi-column>
     <dxi-column dataField="DAX" cssClass="dax-column"></dxi-column>
-    <dxi-column type="buttons" caption="Actions">
+    <dxi-column type="buttons" caption="Actions" width="200">
       <dxi-button 
         icon="runner" 
         text="Execute UnitTest(s)"
@@ -166,7 +166,7 @@
         icon="copy" 
         text="Copy to other TabularModel/Workspace"
         type="default"
-        [onClick]="onClickCopyUserStory"
+        [onClick]="showTabModel"
         >
       </dxi-button>
     </dxi-column>
@@ -476,7 +476,7 @@
    <dxo-selection mode="multiple"></dxo-selection>
    <dxo-search-panel [visible]="true" [width]= '250' ></dxo-search-panel>
 
-   <dxi-column dataField="Name"></dxi-column>
+   <dxi-column dataField="Name"></dxi-column> 
     <dxi-column dataField="Result"></dxi-column>
     <dxi-column dataField="TimeStamp" caption="Last Run"></dxi-column>
     <dxi-column dataField="Type"></dxi-column>
@@ -508,4 +508,81 @@
     >
     </dx-button>
   </div>
+</dx-popup>
+
+<!--<dx-popup
+  [(visible)]="isPopupVisibleTB"
+  [title]="Wähle ein TabularModel aus:"
+  [width]="400"
+  [height]="300"
+>
+  <div *dxTemplate="let data of 'content'">
+    <div id="form-container">
+      
+      <div *ngFor="let targetModel of targetTabularModels">
+        <div>{{ targetModel.name }}</div>
+        <dx-button
+          text="Select"
+          type="default"
+          (click)="onTargetTabularModelSelected(targetModel)"
+        ></dx-button>
+      </div>
+    </div>
+  </div>
+</dx-popup>-->
+
+<dx-popup *ngIf="isPopupVisibleTB"
+#TestRuns
+[(visible)]="isPopupVisibleTB"
+[height]="950"
+[width]="850"
+[title]="header"
+>
+<div *dxTemplate="let data of 'content'">
+  <dx-scroll-view width="100%" height="100%">
+  <div class="long-title">
+    <h3>Wähle ein TabularModel aus in das kopiert werden soll:</h3>
+  </div>
+  <div id="form-container">
+    
+
+   <dx-tree-list
+   #list
+   id="TabularModelStructures"
+   [dataSource]="TabularModelStructures"
+   itemsExpr="items"
+   dataStructure="tree"
+   [showRowLines]="true"
+   [showBorders]="true"
+   [columnAutoWidth]="true"
+   [hoverStateEnabled]="true"
+   [repaintChangesOnly]="true"
+   
+   
+   >
+   <dxo-selection mode="single"></dxo-selection>
+   <dxo-search-panel [visible]="true" [width]= '250' ></dxo-search-panel>
+
+   <dxi-column dataField="Name"></dxi-column> 
+    <dxi-column dataField="Workspace"></dxi-column>
+    <dxi-column dataField="DatasetPbId"></dxi-column>
+    <dxi-column type="buttons" caption="Actions">
+    <dxi-button 
+    icon="copy" 
+    text="Einfügen"
+    type="default"
+    [onClick]="onClickCopyUserStory"
+  >
+  </dxi-button>
+</dxi-column>
+    
+    
+    
+   
+  </dx-tree-list>
+  
+  </div>
+</dx-scroll-view>
+</div>
+
 </dx-popup>

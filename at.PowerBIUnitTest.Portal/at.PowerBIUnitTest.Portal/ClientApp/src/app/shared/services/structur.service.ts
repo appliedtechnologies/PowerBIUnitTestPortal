@@ -9,9 +9,12 @@ import { HttpClient } from "@angular/common/http";
 import { ODataService } from './odata.service';
 import { TestRuns } from '../models/TestRuns.model';
 import { TestRunStructur } from '../models/TestRunStructur.model';
+import { TabularModelService } from './TabularModel.service';
 import { History } from '../models/History.model';
 import { UnitTestService } from './UnitTest.service';
 import HierarchicalCollectionWidget from 'devextreme/ui/hierarchical_collection/ui.hierarchical_collection_widget';
+import { TabularModel } from '../models/TabularModel.model';
+import { TabularModelStructure } from '../models/TabularModelStructure';
 var structures: Structur[];
 
 @Injectable()
@@ -62,6 +65,52 @@ export class StructurService {
 
     }
 
+    getTabModels(): Promise<TabularModel[]> {
+         return new Promise<TabularModel[]>((resolve, reject) => {
+            let request = this.http
+                .get<TabularModel[]>(`${AppConfig.settings.api.url}/TabularModels`)
+                .subscribe(
+                    response => {
+                        resolve(response["value"]);
+                    }
+                );
+
+        });
+
+    }
+
+    
+    GetTabModelStructure(TabularModels: TabularModel[]): Promise<TabularModelStructure[]>{
+        return new Promise<TabularModelStructure[]>((resolve, reject) => {
+            var TBstructures: TabularModelStructure[] = [];
+            
+
+            this.getTabModels().then(() => {
+                TabularModels.forEach(TabularModel => {
+
+                  
+                    
+                    var structureTabularModel: TabularModelStructure = {
+                        Name: TabularModel.Name,
+                        DatasetPbId: TabularModel.DatasetPbId,
+                        Workspace: TabularModel.Workspace,
+                        Id: TabularModel.Id,
+
+                        items: [],
+
+                        
+                    };
+ 
+                    
+                    TBstructures.push(structureTabularModel);
+
+                });
+                resolve(TBstructures);
+            });
+    
+        
+        });
+   }
 
    
 

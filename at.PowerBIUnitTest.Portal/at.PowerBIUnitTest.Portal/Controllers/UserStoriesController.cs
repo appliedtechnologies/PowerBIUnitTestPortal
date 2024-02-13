@@ -17,10 +17,12 @@ using Microsoft.AspNet.OData.Routing;
 using Newtonsoft.Json;
 using Microsoft.AspNetCore.OData.Deltas;
 using Microsoft.EntityFrameworkCore;
+using at.PowerBIUnitTest.Portal.Services;
 
 namespace at.PowerBIUnitTest.Portal.Controllers
 {
 
+    [Authorize]
     public class UserStoriesController : BaseController
     {
         private readonly IConfiguration configuration;
@@ -111,8 +113,74 @@ namespace at.PowerBIUnitTest.Portal.Controllers
             }
             logger.LogDebug($"End: SolutionsController ApplyUpgrade()");
             */
+            
+            
             return Ok();
         }
+
+[HttpPost]
+public async Task<IActionResult> Copy2 ([FromODataUri] int key, ODataActionParameters parameters)
+{
+    try
+    {
+        int targetTabularModelId = (int)parameters["targetTabularModelId1"];
+        int targetWorkspaceId = (int)parameters["targetWorkspaceId1"];
+        int originalUserStoryId = (int)parameters["userStoryId1"];
+
+        // 1. UserStory kopieren
+        var originalUserStory = await dbContext.UserStories
+            .Include(us => us.UnitTests)  // Include, um die verknüpften UnitTests abzurufen
+            .FirstOrDefaultAsync(us => us.Id == originalUserStoryId);
+
+        if (originalUserStory == null)
+        {
+            return NotFound();
+        }
+
+        var copiedUserStory = new UserStory
+        {
+            Beschreibung = originalUserStory.Beschreibung,
+            TabularModel = targetTabularModelId,
+        };
+
+        dbContext.UserStories.Add(copiedUserStory);
+        dbContext.SaveChanges();
+
+        // 2. UnitTests kopieren
+        foreach (var originalUnitTest in originalUserStory.UnitTests)
+        {
+            var copiedUnitTest = new UnitTest
+            {
+                // Kopieren Sie alle erforderlichen Eigenschaften des UnitTests
+                // ... 
+
+                // Aktualisieren Sie die Beziehung zur kopierten UserStory
+                Name = originalUnitTest.Name,
+                DAX = originalUnitTest.DAX,
+                ExpectedResult = originalUnitTest.ExpectedResult,
+                ResultType = originalUnitTest.ResultType,
+                DateTimeFormat = originalUnitTest.DateTimeFormat,
+                DecimalPlaces = originalUnitTest.DecimalPlaces,
+                FloatSeparators = originalUnitTest.FloatSeparators,
+                Timestamp = originalUnitTest.Timestamp,
+                UserStory = copiedUserStory.Id,
+            };
+
+            dbContext.UnitTests.Add(copiedUnitTest);
+        }
+
+        dbContext.SaveChanges();
+
+        logger.LogDebug($"End: UserStoriesController Copy()");
+        return Ok();
+    }
+    catch (Exception ex)
+    {
+        logger.LogError(ex, "An error occurred while copying UserStory");
+        throw;
+    }
+}
+
     }
 
 
