@@ -80,29 +80,35 @@ export class StructurService {
     }
 
     
-    GetTabModelStructure(TabularModels: TabularModel[]): Promise<TabularModelStructure[]>{
+    GetTabModelStructure(Workspaces: Workspace[]): Promise<TabularModelStructure[]>{
         return new Promise<TabularModelStructure[]>((resolve, reject) => {
             var TBstructures: TabularModelStructure[] = [];
             
 
-            this.getTabModels().then(() => {
-                TabularModels.forEach(TabularModel => {
+            this.getWorkspaces2().then((filter) => {
+                Workspaces.forEach(Workspace => {
+                    if (filter.some(p => p.WorkspacePbId === Workspace.WorkspacePbId.valueOf())) {
+
 
                   
+                    Workspace.TabularModels.forEach(TabularModel => {
+                        var structureTabularModel: TabularModelStructure = {
+                            Name: TabularModel.Name,
+                            DatasetPbId: TabularModel.DatasetPbId,
+                            Workspace: TabularModel.Workspace,
+                            Id: TabularModel.Id,
+    
+                            items: [],
+    
+                            
+                        };
+                        TBstructures.push(structureTabularModel);
+                    })
                     
-                    var structureTabularModel: TabularModelStructure = {
-                        Name: TabularModel.Name,
-                        DatasetPbId: TabularModel.DatasetPbId,
-                        Workspace: TabularModel.Workspace,
-                        Id: TabularModel.Id,
-
-                        items: [],
-
-                        
-                    };
  
                     
-                    TBstructures.push(structureTabularModel);
+                    
+                }
 
                 });
                 resolve(TBstructures);

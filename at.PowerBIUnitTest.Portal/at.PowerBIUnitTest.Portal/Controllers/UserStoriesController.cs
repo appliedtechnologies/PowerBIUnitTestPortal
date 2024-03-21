@@ -128,7 +128,7 @@ public async Task<IActionResult> Copy2 ([FromODataUri] int key, ODataActionParam
         int originalUserStoryId = (int)parameters["userStoryId1"];
 
         // 1. UserStory kopieren
-        var originalUserStory = await dbContext.UserStories
+        var originalUserStory = await base.dbContext.UserStories
             .Include(us => us.UnitTests)  // Include, um die verknüpften UnitTests abzurufen
             .FirstOrDefaultAsync(us => us.Id == originalUserStoryId);
 
@@ -143,8 +143,8 @@ public async Task<IActionResult> Copy2 ([FromODataUri] int key, ODataActionParam
             TabularModel = targetTabularModelId,
         };
 
-        dbContext.UserStories.Add(copiedUserStory);
-        dbContext.SaveChanges();
+        base.dbContext.UserStories.Add(copiedUserStory);
+        base.dbContext.SaveChanges();
 
         // 2. UnitTests kopieren
         foreach (var originalUnitTest in originalUserStory.UnitTests)

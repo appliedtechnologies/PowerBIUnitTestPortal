@@ -101,8 +101,8 @@ import { TabularModelStructure } from "src/app/shared/models/TabularModelStructu
     }
 
     public loadDataForPopUpTabModel(): void{
-      this.StructurService.getTabModels().then((TabularModels: TabularModel[]) => {
-        this.StructurService.GetTabModelStructure(TabularModels).then((TBstructure) => {
+      this.WorkspaceService.getWorkspaces().then((Workspaces: Workspace[]) => {
+        this.StructurService.GetTabModelStructure(Workspaces).then((TBstructure) => {
           this.TabularModelStructures = TBstructure;
         })
       })

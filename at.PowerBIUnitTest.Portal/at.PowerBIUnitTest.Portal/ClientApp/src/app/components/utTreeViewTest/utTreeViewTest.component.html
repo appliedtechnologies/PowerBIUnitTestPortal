@@ -55,6 +55,7 @@
       </dx-button>
     </div>
   </dxi-item>
+  
 </dx-toolbar> 
 
 <!-- TreeList -->
@@ -72,8 +73,12 @@
     (onCellPrepared)="onCellPrepared($event)"
     (onRowDblClick)="showUnitTestEdit($event)"
     (onRowPrepared)="onRowPrepared($event)"
+    
     >
     <dxo-selection mode="multiple"></dxo-selection> 
+    <dxo-scrolling  mode="standard"></dxo-scrolling>
+    <dxo-search-panel [visible]="true" [width]= '250' ></dxo-search-panel>
+    
 
     <dxi-column dataField="Typ"></dxi-column>
     <dxi-column dataField="Name"></dxi-column>
@@ -536,7 +541,7 @@
 [(visible)]="isPopupVisibleTB"
 [height]="950"
 [width]="850"
-[title]="header"
+[title]=
 >
 <div *dxTemplate="let data of 'content'">
   <dx-scroll-view width="100%" height="100%">
