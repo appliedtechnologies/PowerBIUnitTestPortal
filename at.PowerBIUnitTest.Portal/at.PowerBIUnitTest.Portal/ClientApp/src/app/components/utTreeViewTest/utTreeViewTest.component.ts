@@ -13,6 +13,7 @@ import { TabularModel } from "src/app/shared/models/TabularModel.model";
 import { DxTreeListComponent } from "devextreme-angular";
 import { TestRuns } from "src/app/shared/models/TestRuns.model";
 import { TestRunStructur } from "src/app/shared/models/TestRunStructur.model";
+import { TabularModelStructure } from "src/app/shared/models/TabularModelStructure";
 
 
 @Component({
@@ -23,15 +24,18 @@ import { TestRunStructur } from "src/app/shared/models/TestRunStructur.model";
   export class utTreeViewTestComponent{
     public structures: Structur[];
     public TestRunsStructures: TestRunStructur[];
+    public TabularModelStructures: TabularModelStructure[];
 
     public unitTestToEdit: UnitTest;
     public unitTestToDelete: UnitTest;
     public userStoryToEdit: UserStory;
+    public userStoryToCopy: UserStory;
 
     public isPopupVisibleUTEdit: boolean = false;
     public isPopupVisibleUT: boolean = false;
     public isPopupVisibleUS: boolean = false;
     public isPopupVisibleTR: boolean = false;
+    public isPopupVisibleTB: boolean = false;
     public isPopupVisibleUSedit: boolean = false;
     public isPopupVisibleDelete: boolean = false;
     public searchText: string = ''; // Property to hold the search text
@@ -70,9 +74,12 @@ import { TestRunStructur } from "src/app/shared/models/TestRunStructur.model";
       this.showDelete = this.showDelete.bind(this);
       this.deleteWorkspace = this.deleteWorkspace.bind(this);
       this.loadDataForPopUp = this.loadDataForPopUp.bind(this);
+      this.loadDataForPopUpTabModel = this.loadDataForPopUpTabModel.bind(this);
       this.showTestRuns = this.showTestRuns.bind(this);
+      this.showTabModel = this.showTabModel.bind(this);
       this.showTestRunsLocal = this.showTestRunsLocal.bind(this);
-
+      this.onClickCopyUserStory = this.onClickCopyUserStory.bind(this);
+      
     }
 
     public loadData(): void {
@@ -91,6 +98,43 @@ import { TestRunStructur } from "src/app/shared/models/TestRunStructur.model";
           this.TestRunsStructures = TRstructure;
         })
       })
+    }
+
+    public loadDataForPopUpTabModel(): void{
+      this.WorkspaceService.getWorkspaces().then((Workspaces: Workspace[]) => {
+        this.StructurService.GetTabModelStructure(Workspaces).then((TBstructure) => {
+          this.TabularModelStructures = TBstructure;
+        })
+      })
+      
+    }
+
+    public onClickCopyUserStory(e: any): void{
+      
+
+      const userStoryId = this.userStoryToCopy.Id;
+  const targetTabularModelId = e.row.data.Id;
+  const targetWorkspaceId = e.row.data.Workspace;
+
+  this.UserStoryService.copyToOtherTabularModel(userStoryId, targetTabularModelId, targetWorkspaceId)
+    .then(() => {
+      notify("UserStory wurde kopiert", "success", 2000);
+      // Fügen Sie hier die gewünschten Aktualisierungen oder Benachrichtigungen hinzu
+    })
+    .catch((error) => {
+      console.error("Fehler beim Kopieren der UserStory", error);
+      // Hier können Sie Fehlerbehandlung oder Benachrichtigungen hinzufügen
+    });
+    this.isPopupVisibleTB = false;
+    }
+
+    public showTabModel(e: any)
+    {
+      this.loadDataForPopUpTabModel();
+      this.userStoryToCopy = new UserStory();
+      this.userStoryToCopy.Id = e.row.data.Id;
+      this.isPopupVisibleTB = true;
+      
     }
 
     public showTestRuns()
