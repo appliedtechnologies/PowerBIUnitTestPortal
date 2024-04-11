@@ -33,7 +33,7 @@ namespace at.PowerBIUnitTest.Portal.Controllers
             this.logger = logger;
         }
 
-       
+
         [EnableQuery]
         public IQueryable<UserStory> Get()
         {
@@ -47,13 +47,13 @@ namespace at.PowerBIUnitTest.Portal.Controllers
         {
             try
             {
-            logger.LogDebug($"Begin: UserStoriesController Post()");
-            var newUserStory = base.dbContext.Add(userStory);
-            base.dbContext.SaveChanges();
-            logger.LogDebug($"End: UserStoriesController Post()");
-            return newUserStory.Entity;
+                logger.LogDebug($"Begin: UserStoriesController Post()");
+                var newUserStory = base.dbContext.Add(userStory);
+                base.dbContext.SaveChanges();
+                logger.LogDebug($"End: UserStoriesController Post()");
+                return newUserStory.Entity;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 logger.LogError(ex, "An error occured while adding a User Story");
                 throw;
@@ -86,7 +86,7 @@ namespace at.PowerBIUnitTest.Portal.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Copy ([FromODataUri] int key, ODataActionParameters parameters)
+        public async Task<IActionResult> Copy([FromODataUri] int key, ODataActionParameters parameters)
         {
             logger.LogDebug($"Begin: UserStoriesController Copy(key: {key})");
             /*
@@ -113,73 +113,73 @@ namespace at.PowerBIUnitTest.Portal.Controllers
             }
             logger.LogDebug($"End: SolutionsController ApplyUpgrade()");
             */
-            
-            
+
+
             return Ok();
         }
 
-[HttpPost]
-public async Task<IActionResult> Copy2 ([FromODataUri] int key, ODataActionParameters parameters)
-{
-    try
-    {
-        int targetTabularModelId = (int)parameters["targetTabularModelId1"];
-        int targetWorkspaceId = (int)parameters["targetWorkspaceId1"];
-        int originalUserStoryId = (int)parameters["userStoryId1"];
+    //     [HttpPost]
+    //     public async Task<IActionResult> Copy2([FromODataUri] int key, ODataActionParameters parameters)
+    //     {
+    //         try
+    //         {
+    //             int targetTabularModelId = (int)parameters["targetTabularModelId1"];
+    //             int targetWorkspaceId = (int)parameters["targetWorkspaceId1"];
+    //             int originalUserStoryId = (int)parameters["userStoryId1"];
 
-        // 1. UserStory kopieren
-        var originalUserStory = await base.dbContext.UserStories
-            .Include(us => us.UnitTests)  // Include, um die verknüpften UnitTests abzurufen
-            .FirstOrDefaultAsync(us => us.Id == originalUserStoryId);
+    //             // 1. UserStory kopieren
+    //             var originalUserStory = await base.dbContext.UserStories
+    //                 .Include(us => us.UnitTests)  // Include, um die verknüpften UnitTests abzurufen
+    //                 .FirstOrDefaultAsync(us => us.Id == originalUserStoryId);
 
-        if (originalUserStory == null)
-        {
-            return NotFound();
-        }
+    //             if (originalUserStory == null)
+    //             {
+    //                 return NotFound();
+    //             }
 
-        var copiedUserStory = new UserStory
-        {
-            Beschreibung = originalUserStory.Beschreibung,
-            TabularModel = targetTabularModelId,
-        };
+    //             var copiedUserStory = new UserStory
+    //             {
+    //                 Beschreibung = originalUserStory.Beschreibung,
+    //                 TabularModel = targetTabularModelId,
+    //             };
 
-        base.dbContext.UserStories.Add(copiedUserStory);
-        base.dbContext.SaveChanges();
+    //             base.dbContext.UserStories.Add(copiedUserStory);
+    //             base.dbContext.SaveChanges();
 
-        // 2. UnitTests kopieren
-        foreach (var originalUnitTest in originalUserStory.UnitTests)
-        {
-            var copiedUnitTest = new UnitTest
-            {
-                // Kopieren Sie alle erforderlichen Eigenschaften des UnitTests
-                // ... 
+    //             // 2. UnitTests kopieren
+    //             foreach (var originalUnitTest in originalUserStory.UnitTests)
+    //             {
+    //                 var copiedUnitTest = new UnitTest
+    //                 {
+    //                     // Kopieren Sie alle erforderlichen Eigenschaften des UnitTests
+    //                     // ... 
 
-                // Aktualisieren Sie die Beziehung zur kopierten UserStory
-                Name = originalUnitTest.Name,
-                DAX = originalUnitTest.DAX,
-                ExpectedResult = originalUnitTest.ExpectedResult,
-                ResultType = originalUnitTest.ResultType,
-                DateTimeFormat = originalUnitTest.DateTimeFormat,
-                DecimalPlaces = originalUnitTest.DecimalPlaces,
-                FloatSeparators = originalUnitTest.FloatSeparators,
-                Timestamp = originalUnitTest.Timestamp,
-                UserStory = copiedUserStory.Id,
-            };
+    //                     // Aktualisieren Sie die Beziehung zur kopierten UserStory
+    //                     Name = originalUnitTest.Name,
+    //                     DAX = originalUnitTest.DAX,
+    //                     ExpectedResult = originalUnitTest.ExpectedResult,
+    //                     ResultType = originalUnitTest.ResultType,
+    //                     DateTimeFormat = originalUnitTest.DateTimeFormat,
+    //                     DecimalPlaces = originalUnitTest.DecimalPlaces,
+    //                     FloatSeparators = originalUnitTest.FloatSeparators,
+    //                     Timestamp = originalUnitTest.Timestamp,
+    //                     UserStory = copiedUserStory.Id,
+    //                 };
 
-            dbContext.UnitTests.Add(copiedUnitTest);
-        }
+    //                 dbContext.UnitTests.Add(copiedUnitTest);
+    //             }
 
-        dbContext.SaveChanges();
+    //             dbContext.SaveChanges();
 
-        logger.LogDebug($"End: UserStoriesController Copy()");
-        return Ok();
-    }
-    catch (Exception ex)
-    {
-        logger.LogError(ex, "An error occurred while copying UserStory");
-        throw;
-    }
-}
+    //             logger.LogDebug($"End: UserStoriesController Copy()");
+    //             return Ok();
+    //         }
+    //         catch (Exception ex)
+    //         {
+    //             logger.LogError(ex, "An error occurred while copying UserStory");
+    //             throw;
+    //         }
+    //     }
 
     }
 

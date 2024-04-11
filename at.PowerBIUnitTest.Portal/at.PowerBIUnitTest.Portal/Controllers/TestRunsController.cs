@@ -20,10 +20,10 @@ namespace at.PowerBIUnitTest.Portal.Controllers
         // GET: odata/TestRuns
         [EnableQuery]
         [AllowAnonymous]
-        public IQueryable<TestRuns> Get()
+        public IQueryable<TestRunCollection> Get()
         {
             logger.LogDebug($"Begin & End: TestRunssController Get()");
-            return base.dbContext.TestRuns;
+            return base.dbContext.TestRunCollections;
         }
     }
 }

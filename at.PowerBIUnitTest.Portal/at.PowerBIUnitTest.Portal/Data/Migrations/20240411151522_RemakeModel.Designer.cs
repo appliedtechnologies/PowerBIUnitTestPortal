@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using at.PowerBIUnitTest.Portal.Data.Models;
 
@@ -11,9 +12,10 @@ using at.PowerBIUnitTest.Portal.Data.Models;
 namespace at.PowerBIUnitTest.Portal.Data.Migrations
 {
     [DbContext(typeof(PortalDbContext))]
-    partial class PortalDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240411151522_RemakeModel")]
+    partial class RemakeModel
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -22,6 +24,65 @@ namespace at.PowerBIUnitTest.Portal.Data.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
+
+            modelBuilder.Entity("at.PowerBIUnitTest.Portal.Data.Models.History", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<int>("CreatedBy")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ExpectedRun")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)")
+                        .HasColumnName("Expected Result");
+
+                    b.Property<string>("LastRun")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)")
+                        .HasColumnName("LastRun");
+
+                    b.Property<int>("ModifiedBy")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("ModifiedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("Result")
+                        .HasColumnType("bit")
+                        .HasColumnName("WasPassed");
+
+                    b.Property<int>("TestRun")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("TimeStamp")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("TimeStamp");
+
+                    b.Property<int>("UnitTest")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedBy");
+
+                    b.HasIndex("ModifiedBy");
+
+                    b.HasIndex("TestRun");
+
+                    b.HasIndex("UnitTest");
+
+                    b.ToTable("TestRun", (string)null);
+                });
 
             modelBuilder.Entity("at.PowerBIUnitTest.Portal.Data.Models.ResultType", b =>
                 {
@@ -75,7 +136,7 @@ namespace at.PowerBIUnitTest.Portal.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
-                    b.Property<Guid>("MsId")
+                    b.Property<Guid>("DatasetPbId")
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("Ms Id");
 
@@ -116,7 +177,7 @@ namespace at.PowerBIUnitTest.Portal.Data.Migrations
                     b.ToTable("Tenant", (string)null);
                 });
 
-            modelBuilder.Entity("at.PowerBIUnitTest.Portal.Data.Models.TestRun", b =>
+            modelBuilder.Entity("at.PowerBIUnitTest.Portal.Data.Models.TestRuns", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -124,75 +185,16 @@ namespace at.PowerBIUnitTest.Portal.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
-                    b.Property<int?>("CreatedBy")
+                    b.Property<int>("CreatedBy")
                         .HasColumnType("int");
 
-                    b.Property<DateTime?>("CreatedOn")
+                    b.Property<DateTime>("CreatedOn")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("ExpectedResult")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)")
-                        .HasColumnName("Expected Result");
-
-                    b.Property<int?>("ModifiedBy")
+                    b.Property<int>("ModifiedBy")
                         .HasColumnType("int");
 
-                    b.Property<DateTime?>("ModifiedOn")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Result")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)")
-                        .HasColumnName("Result");
-
-                    b.Property<int>("TestRunCollection")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("TimeStamp")
-                        .HasColumnType("datetime2")
-                        .HasColumnName("TimeStamp");
-
-                    b.Property<int>("UnitTest")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("WasPassed")
-                        .HasColumnType("bit")
-                        .HasColumnName("WasPassed");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CreatedBy");
-
-                    b.HasIndex("ModifiedBy");
-
-                    b.HasIndex("TestRunCollection");
-
-                    b.HasIndex("UnitTest");
-
-                    b.ToTable("TestRun", (string)null);
-                });
-
-            modelBuilder.Entity("at.PowerBIUnitTest.Portal.Data.Models.TestRunCollection", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<int?>("CreatedBy")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("CreatedOn")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int?>("ModifiedBy")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("ModifiedOn")
+                    b.Property<DateTime>("ModifiedOn")
                         .HasColumnType("datetime2");
 
                     b.Property<DateTime>("TimeStamp")
@@ -223,10 +225,10 @@ namespace at.PowerBIUnitTest.Portal.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
-                    b.Property<int?>("CreatedBy")
+                    b.Property<int>("CreatedBy")
                         .HasColumnType("int");
 
-                    b.Property<DateTime?>("CreatedOn")
+                    b.Property<DateTime>("CreatedOn")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("DAX")
@@ -258,10 +260,10 @@ namespace at.PowerBIUnitTest.Portal.Data.Migrations
                         .HasColumnType("nvarchar(255)")
                         .HasColumnName("FloatSeparators");
 
-                    b.Property<int?>("ModifiedBy")
+                    b.Property<int>("ModifiedBy")
                         .HasColumnType("int");
 
-                    b.Property<DateTime?>("ModifiedOn")
+                    b.Property<DateTime>("ModifiedOn")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Name")
@@ -270,7 +272,7 @@ namespace at.PowerBIUnitTest.Portal.Data.Migrations
                         .HasColumnType("nvarchar(255)")
                         .HasColumnName("Name");
 
-                    b.Property<int?>("ResultType")
+                    b.Property<int>("ResultType")
                         .HasColumnType("int");
 
                     b.Property<int>("UserStory")
@@ -336,22 +338,22 @@ namespace at.PowerBIUnitTest.Portal.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
-                    b.Property<int?>("CreatedBy")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("CreatedOn")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Description")
+                    b.Property<string>("Beschreibung")
                         .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)")
                         .HasColumnName("Description");
 
-                    b.Property<int?>("ModifiedBy")
+                    b.Property<int>("CreatedBy")
                         .HasColumnType("int");
 
-                    b.Property<DateTime?>("ModifiedOn")
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("ModifiedBy")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("ModifiedOn")
                         .HasColumnType("datetime2");
 
                     b.Property<int>("TabularModel")
@@ -376,52 +378,43 @@ namespace at.PowerBIUnitTest.Portal.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
-                    b.Property<Guid>("MsId")
-                        .HasColumnType("uniqueidentifier")
-                        .HasColumnName("Ms Id");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)")
                         .HasColumnName("Name");
 
-                    b.Property<int?>("Tenant")
+                    b.Property<int?>("TenantNavigationId")
                         .HasColumnType("int");
+
+                    b.Property<Guid>("WorkspacePbId")
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("Ms Id");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Tenant");
+                    b.HasIndex("TenantNavigationId");
 
                     b.ToTable("Workspace", (string)null);
                 });
 
-            modelBuilder.Entity("at.PowerBIUnitTest.Portal.Data.Models.TabularModel", b =>
-                {
-                    b.HasOne("at.PowerBIUnitTest.Portal.Data.Models.Workspace", "WorkspaceNavigation")
-                        .WithMany("TabularModels")
-                        .HasForeignKey("Workspace")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("WorkspaceNavigation");
-                });
-
-            modelBuilder.Entity("at.PowerBIUnitTest.Portal.Data.Models.TestRun", b =>
+            modelBuilder.Entity("at.PowerBIUnitTest.Portal.Data.Models.History", b =>
                 {
                     b.HasOne("at.PowerBIUnitTest.Portal.Data.Models.User", "CreatedByNavigation")
                         .WithMany("TestRunCreatedByNavigations")
                         .HasForeignKey("CreatedBy")
+                        .IsRequired()
                         .HasConstraintName("FK_TestRun_Created_By");
 
                     b.HasOne("at.PowerBIUnitTest.Portal.Data.Models.User", "ModifiedByNavigation")
                         .WithMany("TestRunModifiedByNavigations")
                         .HasForeignKey("ModifiedBy")
+                        .IsRequired()
                         .HasConstraintName("FK_TestRun_Modified_By");
 
-                    b.HasOne("at.PowerBIUnitTest.Portal.Data.Models.TestRunCollection", "TestRunCollectionNavigation")
-                        .WithMany("TestRuns")
-                        .HasForeignKey("TestRunCollection");
+                    b.HasOne("at.PowerBIUnitTest.Portal.Data.Models.TestRuns", "TestRunCollectionNavigation")
+                        .WithMany("TestRunsDummy")
+                        .HasForeignKey("TestRun");
 
                     b.HasOne("at.PowerBIUnitTest.Portal.Data.Models.UnitTest", "UnitTestNavigation")
                         .WithMany("TestRuns")
@@ -438,16 +431,29 @@ namespace at.PowerBIUnitTest.Portal.Data.Migrations
                     b.Navigation("UnitTestNavigation");
                 });
 
-            modelBuilder.Entity("at.PowerBIUnitTest.Portal.Data.Models.TestRunCollection", b =>
+            modelBuilder.Entity("at.PowerBIUnitTest.Portal.Data.Models.TabularModel", b =>
+                {
+                    b.HasOne("at.PowerBIUnitTest.Portal.Data.Models.Workspace", "WorkspaceNavigation")
+                        .WithMany("TabularModels")
+                        .HasForeignKey("Workspace")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("WorkspaceNavigation");
+                });
+
+            modelBuilder.Entity("at.PowerBIUnitTest.Portal.Data.Models.TestRuns", b =>
                 {
                     b.HasOne("at.PowerBIUnitTest.Portal.Data.Models.User", "CreatedByNavigation")
                         .WithMany("TestRunCollectionCreatedByNavigations")
                         .HasForeignKey("CreatedBy")
+                        .IsRequired()
                         .HasConstraintName("FK_TestRunCollection_Created_By");
 
                     b.HasOne("at.PowerBIUnitTest.Portal.Data.Models.User", "ModifiedByNavigation")
                         .WithMany("TestRunCollectionModifiedByNavigations")
                         .HasForeignKey("ModifiedBy")
+                        .IsRequired()
                         .HasConstraintName("FK_TestRunCollection_Modified_By");
 
                     b.Navigation("CreatedByNavigation");
@@ -460,16 +466,19 @@ namespace at.PowerBIUnitTest.Portal.Data.Migrations
                     b.HasOne("at.PowerBIUnitTest.Portal.Data.Models.User", "CreatedByNavigation")
                         .WithMany("UnitTestCreatedByNavigations")
                         .HasForeignKey("CreatedBy")
+                        .IsRequired()
                         .HasConstraintName("FK_UnitTest_Created_By");
 
                     b.HasOne("at.PowerBIUnitTest.Portal.Data.Models.User", "ModifiedByNavigation")
                         .WithMany("UnitTestModifiedByNavigations")
                         .HasForeignKey("ModifiedBy")
+                        .IsRequired()
                         .HasConstraintName("FK_UnitTest_Modified_By");
 
                     b.HasOne("at.PowerBIUnitTest.Portal.Data.Models.ResultType", "ResultTypeNavigation")
                         .WithMany("UnitTests")
-                        .HasForeignKey("ResultType");
+                        .HasForeignKey("ResultType")
+                        .IsRequired();
 
                     b.HasOne("at.PowerBIUnitTest.Portal.Data.Models.UserStory", "UserStoryNavigation")
                         .WithMany("UnitTests")
@@ -501,11 +510,13 @@ namespace at.PowerBIUnitTest.Portal.Data.Migrations
                     b.HasOne("at.PowerBIUnitTest.Portal.Data.Models.User", "CreatedByNavigation")
                         .WithMany("UserStoryCreatedByNavigations")
                         .HasForeignKey("CreatedBy")
+                        .IsRequired()
                         .HasConstraintName("FK_UserStory_Created_By");
 
                     b.HasOne("at.PowerBIUnitTest.Portal.Data.Models.User", "ModifiedByNavigation")
                         .WithMany("UserStoryModifiedByNavigations")
                         .HasForeignKey("ModifiedBy")
+                        .IsRequired()
                         .HasConstraintName("FK_UserStory_Modified_By");
 
                     b.HasOne("at.PowerBIUnitTest.Portal.Data.Models.TabularModel", "TabularModelNavigation")
@@ -525,8 +536,7 @@ namespace at.PowerBIUnitTest.Portal.Data.Migrations
                 {
                     b.HasOne("at.PowerBIUnitTest.Portal.Data.Models.Tenant", "TenantNavigation")
                         .WithMany("Workspaces")
-                        .HasForeignKey("Tenant")
-                        .HasConstraintName("FK_Workspace_Tenant");
+                        .HasForeignKey("TenantNavigationId");
 
                     b.Navigation("TenantNavigation");
                 });
@@ -548,9 +558,9 @@ namespace at.PowerBIUnitTest.Portal.Data.Migrations
                     b.Navigation("Workspaces");
                 });
 
-            modelBuilder.Entity("at.PowerBIUnitTest.Portal.Data.Models.TestRunCollection", b =>
+            modelBuilder.Entity("at.PowerBIUnitTest.Portal.Data.Models.TestRuns", b =>
                 {
-                    b.Navigation("TestRuns");
+                    b.Navigation("TestRunsDummy");
                 });
 
             modelBuilder.Entity("at.PowerBIUnitTest.Portal.Data.Models.UnitTest", b =>

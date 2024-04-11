@@ -22,14 +22,16 @@ namespace at.PowerBIUnitTest.Portal.Data.Models
         {
         }
 
-        public virtual DbSet<Tenant> Tenants { get; set; }
-        public virtual DbSet<User> Users { get; set; }
-        public virtual DbSet<Workspace> Workspaces { get; set; }
+        public virtual DbSet<ResultType> ResultTypes {get; set;}
         public virtual DbSet<TabularModel> TabularModels {get; set;}
-        public virtual DbSet<UserStory> UserStories {get; set;}
+        public virtual DbSet<Tenant> Tenants { get; set; }
+        public virtual DbSet<TestRun> TestRuns {get; set;}
+        public virtual DbSet<TestRunCollection> TestRunCollections {get; set;}
         public virtual DbSet<UnitTest> UnitTests {get; set;}
-        public virtual DbSet<History> Histories {get; set;}
-        public virtual DbSet<TestRuns> TestRuns {get; set;}
+        public virtual DbSet<User> Users { get; set; }
+        public virtual DbSet<UserStory> UserStories {get; set;}
+        public virtual DbSet<Workspace> Workspaces { get; set; }
+        
         public Guid MsIdCurrentUser { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -41,182 +43,19 @@ namespace at.PowerBIUnitTest.Portal.Data.Models
         {
             modelBuilder.HasAnnotation("Relational:Collation", "SQL_Latin1_General_CP1_CI_AS");
 
-            modelBuilder.Entity<Tenant>(entity =>
-            {
-                entity.ToTable("Tenant");
-
-                entity.Property(e => e.MsId)
-                    .IsRequired()
-                    .HasMaxLength(36)
-                    .IsUnicode(false)
-                    .HasColumnName("MS Id");
-
-                entity.Property(e => e.Name)
-                    .IsRequired()
-                    .HasMaxLength(100)
-                    .IsUnicode(false);
-            });
-
-            modelBuilder.Entity<User>(entity =>
-            {
-                entity.ToTable("User");
-
-                entity.Property(e => e.Email)
-                    .IsRequired()
-                    .HasMaxLength(255)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.Firstname)
-                    .IsRequired()
-                    .HasMaxLength(255)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.Lastname)
-                    .HasMaxLength(100)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.MsId)
-                    .IsRequired()
-                    .HasMaxLength(36)
-                    .IsUnicode(false)
-                    .HasColumnName("MS Id");
-
-                entity.HasOne(d => d.TenantNavigation)
-                    .WithMany(p => p.Users)
-                    .HasForeignKey(d => d.Tenant)
-                    .OnDelete(DeleteBehavior.ClientSetNull);
-            });
-
-            modelBuilder.Entity<Workspace>(entity =>
-            {
-                entity.ToTable("Workspace");
-
-                entity.Property(e => e.Id)
-                   .IsRequired()
-                   .HasMaxLength(255)
-                   .IsUnicode(false)
-                   .HasColumnName("Id");
-
-                   entity.Property(e => e.Name)
-                   .IsRequired()
-                   .HasMaxLength(255)
-                   .IsUnicode(false)
-                   .HasColumnName("Name");
-
-                    entity.Property(e => e.WorkspacePbId)
-                   .IsRequired()
-                   .HasMaxLength(255)
-                   .IsUnicode(false)
-                   .HasColumnName("WorkspacePbId");
-            });
-
-            modelBuilder.Entity<UserStory>(entity =>
-            {
-                entity.ToTable("UserStory");
-
-                entity.Property(e => e.Id)
-                   .IsRequired()
-                   .HasMaxLength(255)
-                   .IsUnicode(false)
-                   .HasColumnName("Id");
-
-                  entity.Property(e => e.Beschreibung)
-                   .IsRequired()
-                   .HasMaxLength(255)
-                   .IsUnicode(false)
-                   .HasColumnName("Beschreibung"); 
-
-                   entity.HasOne(d => d.TabularModelNavigation)
-                    .WithMany(p => p.UserStories)
-                    .HasForeignKey(d => d.TabularModel)
-                    .OnDelete(DeleteBehavior.Cascade);
-            });
-
-            modelBuilder.Entity<UnitTest>(entity =>
-            {
-                entity.ToTable("UnitTest");
-                
-                
-                entity.Property(e => e.Id)
-                   .IsRequired()
-                   .HasMaxLength(255)
-                   .IsUnicode(false)
-                   .HasColumnName("Id");
-
-                  entity.Property(e => e.Name)
-                   .IsRequired()
-                   .HasMaxLength(255)
-                   .IsUnicode(false)
-                   .HasColumnName("Name"); 
-
-                   entity.Property(e => e.ExpectedResult)
-                   .IsRequired()
-                   .HasMaxLength(255)
-                   .IsUnicode(false)
-                   .HasColumnName("ExpectedResult");
-
-                   entity.Property(e => e.LastResult)
-                   .HasMaxLength(255)
-                   .IsUnicode(false)
-                   .HasColumnName("LastResult");
-
-                   entity.Property(e => e.Timestamp)
-                   .HasDefaultValue("Error")
-                   .HasMaxLength(255)
-                   .IsUnicode(false)
-                   .HasColumnName("LastRun");
-
-                   entity.Property(e => e.DateTimeFormat)
-                   .HasMaxLength(255)
-                   .IsUnicode(false)
-                   .HasColumnName("DateTimeFormat");
-
-                   entity.Property(e => e.DecimalPlaces)
-                   .HasMaxLength(255)
-                   .IsUnicode(false)
-                   .HasColumnName("DecimalPlaces");
-
-                   entity.Property(e => e.FloatSeparators)
-                   .HasMaxLength(255)
-                   .IsUnicode(false)
-                   .HasColumnName("FloatSeparators");
-
-                   entity.Property(e => e.DAX)
-                   .IsRequired()
-                   .HasMaxLength(3000)
-                   .IsUnicode(false)
-                   .HasColumnName("DAX")
-                    .UseCollation("LATIN1_GENERAL_100_CI_AS_SC_UTF8")
-                    .IsUnicode();
-
-                   entity.HasOne(d => d.UserStoryNavigation)
-                    .WithMany(p => p.UnitTests)
-                    .HasForeignKey(d => d.UserStory)
-                    .OnDelete(DeleteBehavior.Cascade);
-
-                    entity.HasOne(d => d.ResultTypeNavigation)
-                    .WithMany(p => p.UnitTests)
-                    .HasForeignKey(d => d.ResultType)
-                    .OnDelete(DeleteBehavior.ClientSetNull);
-
-                    entity.HasIndex(p => new {p.Name , p.UserStory}).IsUnique();
-                
-            });
-
             modelBuilder.Entity<ResultType>(entity =>
             {
                 entity.ToTable("ResultType");
 
                 entity.Property(e => e.Name)
-                .IsRequired()
-                .HasMaxLength(255)
-                .IsUnicode(false)
-                .HasColumnName("Name");
+                 .IsRequired()
+                 .HasMaxLength(255)
+                 .HasColumnName("Name");
 
-                entity.HasData(new ResultType{Name = "Date"});
-                entity.HasData(new ResultType{Name = "Float"});
-                entity.HasData(new ResultType{Name = "Percentage"});
-                entity.HasData(new ResultType{Name = "String"});
+                entity.HasData(new ResultType{Id =  1, Name = "Date"});
+                entity.HasData(new ResultType{Id =  2, Name = "Float"});
+                entity.HasData(new ResultType{Id =  3, Name = "Percentage"});
+                entity.HasData(new ResultType{Id =  4, Name = "String"});
             });
 
             modelBuilder.Entity<TabularModel>(entity =>
@@ -229,15 +68,12 @@ namespace at.PowerBIUnitTest.Portal.Data.Models
                    .IsUnicode(false)
                    .HasColumnName("Id");
 
-                  entity.Property(e => e.DatasetPbId)
+                  entity.Property(e => e.MsId)
                    .IsRequired()
-                   .HasMaxLength(255)
-                   .IsUnicode(false)
-                   .HasColumnName("DatasetPbId"); 
+                   .HasColumnName("Ms Id"); 
 
                    entity.Property(e => e.Name)
                    .HasMaxLength(255)
-                   .IsUnicode(false)
                    .HasColumnName("Name");
 
                    entity.HasOne(d => d.WorkspaceNavigation)
@@ -246,106 +82,230 @@ namespace at.PowerBIUnitTest.Portal.Data.Models
                     .OnDelete(DeleteBehavior.Cascade);
             });
 
-
-             modelBuilder.Entity<History>(entity =>
+            modelBuilder.Entity<Tenant>(entity =>
             {
-                entity.ToTable("History");
+                entity.ToTable("Tenant");
 
-                entity.Property(e => e.Id)
+                entity.Property(e => e.MsId)
+                    .IsRequired()
+                    .HasColumnName("MS Id");
+
+                entity.Property(e => e.Name)
+                    .IsRequired()
+                    .HasMaxLength(100);
+            });
+
+            modelBuilder.Entity<TestRun>(entity =>
+            {
+                entity.ToTable("TestRun");
+
+                entity.Property(e => e.WasPassed)
+                 .IsRequired()
+                 .HasColumnName("WasPassed");
+
+                entity.Property(e => e.TimeStamp)
+                 .IsRequired()
+                 .HasColumnName("TimeStamp");
+
+                entity.Property(e => e.Result)
+                 .IsRequired()
+                 .HasMaxLength(255)
+                 .HasColumnName("Result");
+
+                entity.Property(e => e.ExpectedResult)
+                 .IsRequired()
+                 .HasMaxLength(255)
+                 .HasColumnName("Expected Result");
+
+                entity.HasOne(d => d.UnitTestNavigation)
+                 .WithMany(p => p.TestRuns)
+                 .HasForeignKey(d => d.UnitTest)
+                 .OnDelete(DeleteBehavior.Cascade);
+                
+                entity.HasOne(d => d.TestRunCollectionNavigation)
+                 .WithMany(p => p.TestRuns)
+                 .HasForeignKey(d => d.TestRunCollection)
+                 .OnDelete(DeleteBehavior.ClientSetNull)
+                 .IsRequired(false);             
+
+                entity.HasOne(d => d.CreatedByNavigation)
+                 .WithMany(p => p.TestRunCreatedByNavigations)
+                 .HasForeignKey(d => d.CreatedBy)
+                 .OnDelete(DeleteBehavior.ClientSetNull)
+                 .HasConstraintName("FK_TestRun_Created_By");
+
+                entity.HasOne(d => d.ModifiedByNavigation)
+                 .WithMany(p => p.TestRunModifiedByNavigations)
+                 .HasForeignKey(d => d.ModifiedBy)
+                 .OnDelete(DeleteBehavior.ClientSetNull)
+                 .HasConstraintName("FK_TestRun_Modified_By");
+                    
+            });
+
+            modelBuilder.Entity<TestRunCollection>(entity =>
+            {
+                entity.ToTable("TestRunCollection");
+
+                entity.Property(e => e.WasPassed)
+                 .IsRequired()
+                 .HasMaxLength(255)
+                 .IsUnicode(false)
+                 .HasColumnName("Result");
+
+                entity.Property(e => e.TimeStamp)
+                 .IsRequired()
+                 .HasColumnName("TimeStamp");
+
+                entity.HasOne(d => d.CreatedByNavigation)
+                 .WithMany(p => p.TestRunCollectionCreatedByNavigations)
+                 .HasForeignKey(d => d.CreatedBy)
+                 .OnDelete(DeleteBehavior.ClientSetNull)
+                 .HasConstraintName("FK_TestRunCollection_Created_By");
+
+                entity.HasOne(d => d.ModifiedByNavigation)
+                 .WithMany(p => p.TestRunCollectionModifiedByNavigations)
+                 .HasForeignKey(d => d.ModifiedBy)
+                 .OnDelete(DeleteBehavior.ClientSetNull)
+                 .HasConstraintName("FK_TestRunCollection_Modified_By");
+            });
+          
+            modelBuilder.Entity<UnitTest>(entity =>
+            {
+                entity.ToTable("UnitTest");      
+                
+                entity.HasIndex(p => new {p.Name , p.UserStory})
+                 .IsUnique();
+                
+                entity.Property(e => e.Name)
+                 .IsRequired()
+                 .HasMaxLength(255)
+                 .HasColumnName("Name"); 
+
+                entity.Property(e => e.ExpectedResult)
+                 .IsRequired()
+                 .HasMaxLength(255)
+                 .HasColumnName("Expected Result");
+
+                entity.Property(e => e.DateTimeFormat)
+                 .HasMaxLength(255)
+                 .HasColumnName("DateTimeFormat");
+
+                entity.Property(e => e.DecimalPlaces)
+                 .HasMaxLength(255)
+                 .HasColumnName("DecimalPlaces");
+
+                entity.Property(e => e.FloatSeparators)
+                 .HasMaxLength(255)
+                 .HasColumnName("FloatSeparators");
+
+                entity.Property(e => e.DAX)
+                 .IsRequired()
+                 .HasMaxLength(3000)
+                 .HasColumnName("DAX")
+                 .UseCollation("LATIN1_GENERAL_100_CI_AS_SC_UTF8")
+                 .IsUnicode();
+
+                entity.HasOne(d => d.UserStoryNavigation)
+                 .WithMany(p => p.UnitTests)
+                 .HasForeignKey(d => d.UserStory)
+                 .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne(d => d.ResultTypeNavigation)
+                 .WithMany(p => p.UnitTests)
+                 .HasForeignKey(d => d.ResultType)
+                 .OnDelete(DeleteBehavior.ClientSetNull)
+                 .IsRequired(false);
+
+                entity.HasOne(d => d.CreatedByNavigation)
+                 .WithMany(p => p.UnitTestCreatedByNavigations)
+                 .HasForeignKey(d => d.CreatedBy)
+                 .OnDelete(DeleteBehavior.ClientSetNull)
+                 .HasConstraintName("FK_UnitTest_Created_By")
+                 .IsRequired(false);
+
+                entity.HasOne(d => d.ModifiedByNavigation)
+                 .WithMany(p => p.UnitTestModifiedByNavigations)
+                 .HasForeignKey(d => d.ModifiedBy)
+                 .OnDelete(DeleteBehavior.ClientSetNull)
+                 .HasConstraintName("FK_UnitTest_Modified_By")
+                 .IsRequired(false);
+            });
+
+            modelBuilder.Entity<User>(entity =>
+            {
+                entity.ToTable("User");
+
+                entity.Property(e => e.Email)
+                    .IsRequired()
+                    .HasMaxLength(255);
+
+                entity.Property(e => e.Firstname)
+                    .IsRequired()
+                    .HasMaxLength(255);
+
+                entity.Property(e => e.Lastname)
+                    .HasMaxLength(255);
+
+                entity.Property(e => e.MsId)
+                    .IsRequired()
+                    .HasColumnName("MS Id");
+
+                entity.HasOne(d => d.TenantNavigation)
+                    .WithMany(p => p.Users)
+                    .HasForeignKey(d => d.Tenant)
+                    .OnDelete(DeleteBehavior.ClientSetNull);
+            });
+
+            modelBuilder.Entity<UserStory>(entity =>
+            {
+                entity.ToTable("UserStory");
+
+                  entity.Property(e => e.Description)
                    .IsRequired()
                    .HasMaxLength(255)
-                   .IsUnicode(false)
-                   .HasColumnName("Id");
+                   .HasColumnName("Description"); 
 
-                  entity.Property(e => e.Result)
-                   .IsRequired()
-                   .HasMaxLength(255)
-                   .IsUnicode(false)
-                   .HasColumnName("Result");
-
-                   entity.Property(e => e.TimeStamp)
-                   .IsRequired()
-                   .IsUnicode(false)
-                   . HasColumnName("TimeStamp");
-
-                   entity.Property(e => e.LastRun)
-                   .IsRequired()
-                   .HasMaxLength(255)
-                   .IsUnicode(false)
-                   .HasColumnName("LastRun");
-
-                   entity.Property(e => e.ExpectedRun)
-                   .IsRequired()
-                   .HasMaxLength(255)
-                   .IsUnicode(false)
-                   .HasColumnName("ExpectedRun");
-
-                   entity.HasOne(d => d.UnitTestNavigation)
-                    .WithMany(p => p.Histories)
-                    .HasForeignKey(d => d.UnitTest)
+                   entity.HasOne(d => d.TabularModelNavigation)
+                    .WithMany(p => p.UserStories)
+                    .HasForeignKey(d => d.TabularModel)
                     .OnDelete(DeleteBehavior.Cascade);
 
-                    
-                   entity.HasOne(d => d.TestRunNavigation)
-                    .WithMany(p => p.HistoriesRun)
-                    .HasForeignKey(d => d.TestRun)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .IsRequired(false);
-                    
+                    entity.HasOne(d => d.CreatedByNavigation)
+                     .WithMany(p => p.UserStoryCreatedByNavigations)
+                     .HasForeignKey(d => d.CreatedBy)
+                     .OnDelete(DeleteBehavior.ClientSetNull)
+                     .HasConstraintName("FK_UserStory_Created_By")
+                     .IsRequired(false);
 
-                    
+                    entity.HasOne(d => d.ModifiedByNavigation)
+                     .WithMany(p => p.UserStoryModifiedByNavigations)
+                     .HasForeignKey(d => d.ModifiedBy)
+                     .OnDelete(DeleteBehavior.ClientSetNull)
+                     .HasConstraintName("FK_UserStory_Modified_By")
+                     .IsRequired(false);
             });
 
-             modelBuilder.Entity<TestRuns>(entity =>
+            modelBuilder.Entity<Workspace>(entity =>
             {
-                entity.ToTable("TestRuns");
+                entity.ToTable("Workspace");
 
-                entity.Property(e => e.Id)
-                   .IsRequired()
-                   .HasMaxLength(255)
-                   .IsUnicode(false)
-                   .HasColumnName("Id");
+                entity.Property(e => e.Name)
+                .IsRequired()
+                .HasMaxLength(255)
+                .HasColumnName("Name");
 
-                  entity.Property(e => e.Result)
-                   .IsRequired()
-                   .HasMaxLength(255)
-                   .IsUnicode(false)
-                   .HasColumnName("Result");
+                entity.Property(e => e.MsId)
+                .IsRequired()
+                .HasColumnName("Ms Id");
 
-                   entity.Property(e => e.TimeStamp)
-                   .IsRequired()
-                   .IsUnicode(false)
-                   . HasColumnName("TimeStamp");
-
-                   entity.Property(e => e.Workspace)
-                   .HasMaxLength(255)
-                   .IsUnicode(false)
-                   .HasColumnName("Workspace");
-
-                   entity.Property(e => e.Count)
-                   .HasMaxLength(255)
-                   .IsUnicode(false)
-                   .HasColumnName("Count");
-
-                     entity.Property(e => e.TabularModel)
-                   .HasMaxLength(255)
-                   .IsUnicode(false)
-                   .HasColumnName("TabularModel");
-
-                    entity.Property(e => e.UserStory)
-                   .HasMaxLength(255)
-                   .IsUnicode(false)
-                   .HasColumnName("UserStory");
-
-                    entity.Property(e => e.Type)
-                   .HasMaxLength(255)
-                   .IsUnicode(false)
-                   .HasColumnName("Type");
-
-            });
-            
-            
-
+                entity.HasOne(d => d.TenantNavigation)
+                 .WithMany(p => p.Workspaces)
+                 .HasForeignKey(d => d.Tenant)
+                 .OnDelete(DeleteBehavior.ClientSetNull)
+                 .HasConstraintName("FK_Workspace_Tenant")
+                 .IsRequired(false);
+            }); 
+              
             OnModelCreatingPartial(modelBuilder);
         }
 

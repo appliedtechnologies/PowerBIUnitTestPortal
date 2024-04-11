@@ -41,8 +41,8 @@ namespace at.PowerBIUnitTest.Portal
             builder.EntitySet<UserStory>("UserStories");
             builder.EntitySet<Workspace>("Workspaces");
             builder.EntitySet<TabularModel>("TabularModels");
-            builder.EntitySet<History>("Histories");
-            builder.EntitySet<TestRuns>("TestRuns");
+            builder.EntitySet<TestRun>("Histories");
+            builder.EntitySet<TestRunCollection>("TestRuns");
             builder.EntityType<User>().Collection.Action("Login");
             builder.EntityType<UnitTest>().Collection.Action("Execute");
             builder.EntityType<UnitTest>().Collection.Action("LoadWorkspace");

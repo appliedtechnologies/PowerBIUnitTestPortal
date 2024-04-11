@@ -8,19 +8,14 @@ namespace at.PowerBIUnitTest.Portal.Data.Models
 {
     public partial class Workspace
     {
-        public Workspace()
-        {
-            TabularModels = new HashSet<TabularModel>();
-        }
-
-        [Key]
         public int Id { get; set; }
 
         public string Name { get; set; }
 
-        public string WorkspacePbId {get; set;}
+        public Guid MsId {get; set;}
+        public int? Tenant { get; set; }
 
-        public virtual ICollection<TabularModel> TabularModels { get; set; }
-        
+        public virtual Tenant TenantNavigation { get; set; }
+        public virtual ICollection<TabularModel> TabularModels { get; set; }  
     }
 }

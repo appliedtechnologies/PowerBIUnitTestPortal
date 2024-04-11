@@ -18,9 +18,7 @@ using Newtonsoft.Json;
 
 namespace at.PowerBIUnitTest.Portal.Controllers
 {
-
     public class HistoriesController : BaseController
-
     {
          private readonly IConfiguration configuration;
          private readonly ILogger<HistoriesController> logger;
@@ -31,11 +29,10 @@ namespace at.PowerBIUnitTest.Portal.Controllers
             this.logger = logger;
         }
         [EnableQuery]
-        public IQueryable<History> Get()
+        public IQueryable<TestRun> Get()
         {
             logger.LogDebug($"Begin & End: HistoriesController Get()");
-            return base.dbContext.Histories;
+            return base.dbContext.TestRuns;
         }
     }
-
 }

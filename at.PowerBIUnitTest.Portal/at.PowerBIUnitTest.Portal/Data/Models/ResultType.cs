@@ -9,15 +9,11 @@ namespace at.PowerBIUnitTest.Portal.Data.Models
 {
     public partial class ResultType
     {   
-        public ResultType()
-        {
-           UnitTests = new HashSet<UnitTest>();
-        }
-        [Key]
+        public int Id {get; set;}
+        
         public string Name {get; set;}
 
         public virtual ICollection<UnitTest> UnitTests { get; set; }
     }
-
     
 }

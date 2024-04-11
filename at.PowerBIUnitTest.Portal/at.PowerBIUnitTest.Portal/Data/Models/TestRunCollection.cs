@@ -1,16 +1,17 @@
+using Microsoft.AspNetCore.OData.Routing.Attributes;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.SqlServer;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-#nullable disable
-
 namespace at.PowerBIUnitTest.Portal.Data.Models
 {
-    public partial class UserStory : ITrackModified
+    public partial class TestRunCollection : ITrackModified
     {
-        public int Id { get; set; }
-        public string Description { get; set; }
-        public int TabularModel { get; set; }
+        public int Id {get; set;}
+        public DateTime TimeStamp {get; set;}
+        public string WasPassed {get; set;}
 
         public int? CreatedBy { get; set; }
         public DateTime? CreatedOn { get; set; }
@@ -19,8 +20,7 @@ namespace at.PowerBIUnitTest.Portal.Data.Models
 
         public virtual User CreatedByNavigation { get; set; }
         public virtual User ModifiedByNavigation { get; set; }
-
-        public virtual ICollection<UnitTest> UnitTests { get; set; }
-        public virtual TabularModel TabularModelNavigation { get; set; }
+        
+        public virtual ICollection<TestRun> TestRuns { get; set; }
     }
 }

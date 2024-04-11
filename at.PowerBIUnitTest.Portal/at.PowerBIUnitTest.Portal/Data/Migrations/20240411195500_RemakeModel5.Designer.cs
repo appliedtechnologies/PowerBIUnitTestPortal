@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using at.PowerBIUnitTest.Portal.Data.Models;
 
@@ -11,9 +12,10 @@ using at.PowerBIUnitTest.Portal.Data.Models;
 namespace at.PowerBIUnitTest.Portal.Data.Migrations
 {
     [DbContext(typeof(PortalDbContext))]
-    partial class PortalDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240411195500_RemakeModel5")]
+    partial class RemakeModel5
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -386,12 +388,12 @@ namespace at.PowerBIUnitTest.Portal.Data.Migrations
                         .HasColumnType("nvarchar(255)")
                         .HasColumnName("Name");
 
-                    b.Property<int?>("Tenant")
+                    b.Property<int?>("TenantNavigationId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Tenant");
+                    b.HasIndex("TenantNavigationId");
 
                     b.ToTable("Workspace", (string)null);
                 });
@@ -525,8 +527,7 @@ namespace at.PowerBIUnitTest.Portal.Data.Migrations
                 {
                     b.HasOne("at.PowerBIUnitTest.Portal.Data.Models.Tenant", "TenantNavigation")
                         .WithMany("Workspaces")
-                        .HasForeignKey("Tenant")
-                        .HasConstraintName("FK_Workspace_Tenant");
+                        .HasForeignKey("TenantNavigationId");
 
                     b.Navigation("TenantNavigation");
                 });
