@@ -21,11 +21,12 @@ namespace at.PowerBIUnitTest.Portal.Controllers
         protected IHttpContextAccessor HttpContextAccessor;
 
 
-        public BaseController(PortalDbContext portalDbContext, IDownstreamWebApi downstreamWebApi, IHttpContextAccessor httpContextAccessor)
+        public BaseController(PortalDbContext portalDbContext, IDownstreamWebApi downstreamWebApi, IHttpContextAccessor httpContextAccessor, ILogger logger)
         {
             dbContext = portalDbContext;
             this.downstreamWebApi = downstreamWebApi;
             this.HttpContextAccessor = httpContextAccessor;
+            this.logger = logger;
             this.msIdTenantCurrentUser = Guid.Parse(httpContextAccessor.HttpContext.User.FindFirst(ClaimConstants.TenantId).Value);
             this.msIdCurrentUser = Guid.Parse(httpContextAccessor.HttpContext.User.FindFirst(ClaimConstants.ObjectId).Value);
             this.dbContext.MsIdCurrentUser = this.msIdCurrentUser;

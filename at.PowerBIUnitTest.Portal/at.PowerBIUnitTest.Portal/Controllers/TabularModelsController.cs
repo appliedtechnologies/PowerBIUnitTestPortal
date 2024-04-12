@@ -22,32 +22,22 @@ namespace at.PowerBIUnitTest.Portal.Controllers
 
     public class TabularModelsController : BaseController
     {
-        private readonly IConfiguration configuration;
-        private readonly ILogger<TabularModelsController> logger;
-        public TabularModelsController(Data.Models.PortalDbContext portalDbContext, IDownstreamWebApi downstreamWebApi, IHttpContextAccessor httpContextAccessor, IConfiguration configuration, ILogger<TabularModelsController> logger) : base(portalDbContext, downstreamWebApi, httpContextAccessor)
+        public TabularModelsController(Data.Models.PortalDbContext portalDbContext, IDownstreamWebApi downstreamWebApi, IHttpContextAccessor httpContextAccessor, IConfiguration configuration, ILogger<TabularModelsController> logger) : base(portalDbContext, downstreamWebApi, httpContextAccessor, logger)
         {
-            this.configuration = configuration;
-            this.logger = logger;
         }
 
-       
-        [EnableQuery(MaxExpansionDepth = 4)]
-        [AllowAnonymous]
+        [EnableQuery]
+        public IQueryable<TabularModel> Get([FromODataUri] int key)
+        {
+            logger.LogDebug($"Begin & End: TabularModelsController Get(key: {key})");
+            return base.dbContext.TabularModels.Where(e => e.WorkspaceNavigation.TenantNavigation.MsId == this.msIdTenantCurrentUser && e.Id == key);
+        }
+
+        [EnableQuery]
         public IQueryable<TabularModel> Get()
         {
-            try
-            {
-                logger.LogDebug($"Begin & End: TabularModelsController Get()");
-            return base.dbContext.TabularModels;
-            }
-            catch(Exception ex)
-            {
-                logger.LogError(ex, "An error occured while performig GET(TabModel)");
-                throw;
-            }
-        }   
-
+            logger.LogDebug($"Begin & End: TabularModelsController Get()");
+            return base.dbContext.TabularModels.Where(e => e.WorkspaceNavigation.TenantNavigation.MsId == this.msIdTenantCurrentUser);
+        }  
     }
-
-
 }
