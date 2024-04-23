@@ -25,64 +25,88 @@ namespace at.PowerBIUnitTest.Portal.Controllers
     [Authorize]
     public class UserStoriesController : BaseController
     {
-        private readonly IConfiguration configuration;
-        private readonly ILogger<UsersController> logger;
-        public UserStoriesController(Data.Models.PortalDbContext portalDbContext, IDownstreamWebApi downstreamWebApi, IHttpContextAccessor httpContextAccessor, IConfiguration configuration, ILogger<UsersController> logger) : base(portalDbContext, downstreamWebApi, httpContextAccessor)
+        public UserStoriesController(Data.Models.PortalDbContext portalDbContext, IDownstreamWebApi downstreamWebApi, IHttpContextAccessor httpContextAccessor, IConfiguration configuration, ILogger<UsersController> logger) : base(portalDbContext, downstreamWebApi, httpContextAccessor, logger)
         {
-            this.configuration = configuration;
-            this.logger = logger;
         }
 
+        [EnableQuery]
+        public IQueryable<UserStory> Get([FromODataUri] int key)
+        {
+            logger.LogDebug($"Begin & End: UserStoriesController Get(key: {key})");
+            return base.dbContext.UserStories.Where(e => e.TabularModelNavigation.WorkspaceNavigation.TenantNavigation.MsId == this.msIdTenantCurrentUser && e.Id == key);
+        }
 
         [EnableQuery]
         public IQueryable<UserStory> Get()
         {
             logger.LogDebug($"Begin & End: UserStoriesController Get()");
-            return base.dbContext.UserStories;
+            return base.dbContext.UserStories.Where(e => e.TabularModelNavigation.WorkspaceNavigation.TenantNavigation.MsId == this.msIdTenantCurrentUser);
         }
 
-        // Add odata/UserStory
         [HttpPost]
-        public UserStory Post([FromBody] UserStory userStory)
+        public async Task<IActionResult> Post([FromBody] UserStory userStory)
         {
-            try
+            logger.LogDebug($"Begin: UserStoriesController Post(unitTest Description: {userStory.Description})");
+
+            if (!ModelState.IsValid)
             {
-                logger.LogDebug($"Begin: UserStoriesController Post()");
-                var newUserStory = base.dbContext.Add(userStory);
-                base.dbContext.SaveChanges();
-                logger.LogDebug($"End: UserStoriesController Post()");
-                return newUserStory.Entity;
+                return BadRequest(ModelState);
             }
-            catch (Exception ex)
-            {
-                logger.LogError(ex, "An error occured while adding a User Story");
-                throw;
-            }
+
+            if ((await this.dbContext.TabularModels.FirstOrDefaultAsync(e => e.Id == userStory.TabularModel && e.WorkspaceNavigation.TenantNavigation.MsId == this.msIdTenantCurrentUser)) == null)
+                return Forbid();
+
+            this.dbContext.UserStories.Add(userStory);
+            await this.dbContext.SaveChangesAsync();
+
+            logger.LogDebug($"End: UserStoriesController Post(unitTest Description: {userStory.Description})");
+
+            return Created(userStory);
         }
 
+        [HttpDelete]
+        public async Task<IActionResult> Delete([FromODataUri] int key)
+        {
+            logger.LogDebug($"Begin: UserStoriesController Delete(key: {key}");
+
+            var userStory = await this.dbContext.UserStories.FindAsync(key);
+
+            if (userStory == null)
+                return NotFound();
+
+            if (userStory.TabularModelNavigation.WorkspaceNavigation.TenantNavigation.MsId != this.msIdTenantCurrentUser)
+                return Forbid();
+
+            this.dbContext.UserStories.Remove(userStory);
+
+            logger.LogDebug($"End: UserStoriesController Delete(key: {key}");
+            return Ok();
+        }
+
+        [HttpPatch]
         public async Task<IActionResult> Patch([FromODataUri] int key, Delta<UserStory> userStory)
         {
-            try
+            logger.LogDebug($"Begin: UserStoriesController Patch(key: {key}, userStory: {userStory.GetChangedPropertyNames()}");
+
+            if ((await this.dbContext.UserStories.FirstOrDefaultAsync(e => e.Id == key && e.TabularModelNavigation.WorkspaceNavigation.TenantNavigation.MsId == this.msIdTenantCurrentUser)) == null)
+                return Forbid();
+
+            if (!ModelState.IsValid)
             {
-                logger.LogDebug($"Begin: UnitTestsController Patch()");
-                var userStoryToChange = await base.dbContext.UserStories.FindAsync(key);
-
-                if (userStoryToChange == null)
-                {
-                    return NotFound();
-                }
-
-                userStory.Patch(userStoryToChange);
-                base.dbContext.SaveChanges();
-
-                logger.LogDebug($"End: UnitTestsController Patch()");
-                return Updated(userStoryToChange);
+                return BadRequest(ModelState);
             }
-            catch (Exception ex)
+            var entity = await base.dbContext.UserStories.FindAsync(key);
+            if (entity == null)
             {
-                logger.LogError(ex, "An error occured while performing PATCH");
-                throw;
+                return NotFound();
             }
+
+            userStory.Patch(entity);
+            await base.dbContext.SaveChangesAsync();
+
+            logger.LogDebug($"End: UserStoriesController Patch(key: {key}, userStory: {userStory.GetChangedPropertyNames()}");
+
+            return Updated(entity);
         }
 
         [HttpPost]

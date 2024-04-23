@@ -19,7 +19,6 @@ using at.PowerBIUnitTest.Portal.Services;
 
 namespace at.PowerBIUnitTest.Portal.Controllers
 {
-
     public class TabularModelsController : BaseController
     {
         public TabularModelsController(Data.Models.PortalDbContext portalDbContext, IDownstreamWebApi downstreamWebApi, IHttpContextAccessor httpContextAccessor, IConfiguration configuration, ILogger<TabularModelsController> logger) : base(portalDbContext, downstreamWebApi, httpContextAccessor, logger)

@@ -41,18 +41,11 @@ namespace at.PowerBIUnitTest.Portal
             builder.EntitySet<UserStory>("UserStories");
             builder.EntitySet<Workspace>("Workspaces");
             builder.EntitySet<TabularModel>("TabularModels");
-            builder.EntitySet<TestRun>("Histories");
-            builder.EntitySet<TestRunCollection>("TestRuns");
+            builder.EntitySet<TestRun>("TestRuns");
+            builder.EntitySet<TestRunCollection>("TestRunCollections");
             builder.EntityType<User>().Collection.Action("Login");
             builder.EntityType<UnitTest>().Collection.Action("Execute");
             builder.EntityType<UnitTest>().Collection.Action("LoadWorkspace");
-            builder.EntityType<UnitTest>().Collection.Action("LoadDataset");
-            var SaveTestRun = builder.EntityType<UnitTest>().Collection.Action("SaveTestRun");
-            SaveTestRun.Parameter<string>("Result");
-            SaveTestRun.Parameter<string>("Type");
-            SaveTestRun.Parameter<int>("Count");
-            SaveTestRun.Parameter<string>("Name");
-            builder.EntityType<Workspace>().Collection.Action("FilterWorkspace");
 
             var copyUserStory = builder.EntityType<UserStory>().Action("Copy");
             copyUserStory.Parameter<int>("targetTabularModelId");
@@ -61,19 +54,6 @@ namespace at.PowerBIUnitTest.Portal
             copy.Parameter<int>("targetTabularModelId1");
             copy.Parameter<int>("targetWorkspaceId1");
             copy.Parameter<int>("userStoryId1");
-
-            // var executeAction = builder.Function("Execute");
-            //executeAction.Parameter<UnitTest>("unitTestToExecute");
-            //executeAction.ReturnsFromEntitySet<UnitTest>("UnitTests");
-
-            //var execute =
-            //builder.EntityType<UnitTest>()
-            // .Collection
-            //.Action("Execute");
-
-
-            //execute.Parameter<int>("id").Required();
-            //execute.Returns<int>();
 
             return builder.GetEdmModel();
         }

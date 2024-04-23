@@ -9,7 +9,6 @@ using Microsoft.AspNet.OData;
 
 namespace at.PowerBIUnitTest.Portal.Controllers
 {
-    [Authorize]
     public class TenantsController : BaseController
     {
         public TenantsController(Data.Models.PortalDbContext portalDbContext, IDownstreamWebApi downstreamWebApi, IHttpContextAccessor httpContextAccessor, ILogger<TenantsController> logger) : base(portalDbContext, downstreamWebApi, httpContextAccessor, logger)
