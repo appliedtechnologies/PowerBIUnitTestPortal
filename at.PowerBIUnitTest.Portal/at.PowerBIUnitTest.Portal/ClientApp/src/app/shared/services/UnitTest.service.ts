@@ -28,6 +28,7 @@ export class UnitTestService {
   getStore(): ODataStore {
     return this.odataService.context["UnitTests"];
   }
+  
   //executeUnitTest(unitTestToExecute: UnitTest) {
 
     //var urlToCall = AppConfig.settings.api.url + "/UnitTests/Execute";

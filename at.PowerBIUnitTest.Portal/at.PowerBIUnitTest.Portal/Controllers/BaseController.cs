@@ -18,14 +18,14 @@ namespace at.PowerBIUnitTest.Portal.Controllers
 
         protected Guid msIdTenantCurrentUser;
         protected Guid msIdCurrentUser;
-        protected IHttpContextAccessor HttpContextAccessor;
+        protected IHttpContextAccessor httpContextAccessor;
 
 
         public BaseController(PortalDbContext portalDbContext, IDownstreamWebApi downstreamWebApi, IHttpContextAccessor httpContextAccessor, ILogger logger)
         {
             dbContext = portalDbContext;
             this.downstreamWebApi = downstreamWebApi;
-            this.HttpContextAccessor = httpContextAccessor;
+            this.httpContextAccessor = httpContextAccessor;
             this.logger = logger;
             this.msIdTenantCurrentUser = Guid.Parse(httpContextAccessor.HttpContext.User.FindFirst(ClaimConstants.TenantId).Value);
             this.msIdCurrentUser = Guid.Parse(httpContextAccessor.HttpContext.User.FindFirst(ClaimConstants.ObjectId).Value);

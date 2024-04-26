@@ -45,7 +45,7 @@ namespace at.PowerBIUnitTest.Portal
             builder.EntitySet<TestRunCollection>("TestRunCollections");
             builder.EntityType<User>().Collection.Action("Login");
             builder.EntityType<UnitTest>().Collection.Action("Execute");
-            builder.EntityType<UnitTest>().Collection.Action("LoadWorkspace");
+            builder.EntityType<Workspace>().Collection.Action("Pull");
 
             var copyUserStory = builder.EntityType<UserStory>().Action("Copy");
             copyUserStory.Parameter<int>("targetTabularModelId");
@@ -82,7 +82,8 @@ namespace at.PowerBIUnitTest.Portal
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
             services.AddScoped<PowerBiService>();
-
+            services.AddScoped<WorkspaceService>();
+            services.AddScoped<TabularModelService>();
         }
 
 

@@ -27,18 +27,31 @@ namespace at.PowerBIUnitTest.Portal.Controllers
         {
         }
 
-        [EnableQuery]
+        [EnableQuery(MaxExpansionDepth = 4)]
         public IQueryable<Workspace> Get([FromODataUri] int key)
         {
             logger.LogDebug($"Begin & End: WorkspacesController Get(key: {key})");
             return base.dbContext.Workspaces.Where(e => e.TenantNavigation.MsId == this.msIdTenantCurrentUser && e.Id == key);
         }
 
-        [EnableQuery]
+        [EnableQuery(MaxExpansionDepth = 4)]
         public IQueryable<Workspace> Get()
         {
             logger.LogDebug($"Begin & End: WorkspacesController Get()");
             return base.dbContext.Workspaces.Where(e => e.TenantNavigation.MsId == this.msIdTenantCurrentUser);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Pull([FromServices] WorkspaceService workspaceService, [FromServices] TabularModelService tabularModelService)
+        { 
+            logger.LogDebug($"Begin: WorkspacesController Pull()");
+
+            var accessToken = httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+            await workspaceService.PullWorkspacesFromPowerBi(msIdTenantCurrentUser, accessToken);
+            await tabularModelService.PullDatasetsFromPowerBi(msIdTenantCurrentUser, accessToken);
+
+            logger.LogDebug($"End: WorkspacesController Pull()");
+            return Ok();
         }
     }
 }

@@ -1,0 +1,23 @@
+<h1>Unit Tests</h1>
+
+<dx-data-grid [dataSource]="dataSourceUnitTests">
+  <dxo-toolbar>
+    <dxi-item location="before">
+      <div *dxTemplate class="informer">
+        <dx-button
+          stylingMode="contained"
+          icon="download"
+          text="Pull Workspaces"
+          type="normal"
+          [width]="200"
+          (onClick)="onClickPullWorkspaces($event)"
+        >
+        </dx-button>
+      </div>
+    </dxi-item>
+  </dxo-toolbar>
+
+  <dxi-column dataField="Name"></dxi-column>
+  <dxi-column dataField="ExpectedResult"></dxi-column>
+  <dxi-column dataField="DAX"></dxi-column>
+</dx-data-grid>

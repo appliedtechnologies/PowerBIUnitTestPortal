@@ -68,11 +68,11 @@ import { UnitTestService } from "./shared/services/UnitTest.service";
 import { UserStoryService } from "./shared/services/UserStory.service";
 import { WorkspaceService } from "./shared/services/workspace.service";
 import { TabularModelService } from "./shared/services/TabularModel.service";
-import { StructurService } from "./shared/services/structur.service";
 import { DxoHideEventModule } from "devextreme-angular/ui/nested";
 import { HistoryService } from "./shared/services/history.service";
 import { SideNavigationMenuComponent } from "./components/side-navigation-menu/side-navigation-menu.component";
 import { UnitTestsComponent } from "./components/unit-tests/unit-tests.component";
+import { UnitTestsNewComponent } from "./components/unit-tests-new/unit-tests-new.component";
 
 
 
@@ -87,6 +87,7 @@ export function initializeAppConfig(appConfig: AppConfig, router: Router) {
     ProfileComponent,
     UserComponent,
     UnitTestsComponent,
+    UnitTestsNewComponent,
     SideNavigationMenuComponent
   ],
   imports: [
@@ -158,7 +159,6 @@ export function initializeAppConfig(appConfig: AppConfig, router: Router) {
     UserStoryService,
     WorkspaceService,
     TabularModelService,
-    StructurService,
     HistoryService,
   ],
   bootstrap: [AppComponent, MsalRedirectComponent],
