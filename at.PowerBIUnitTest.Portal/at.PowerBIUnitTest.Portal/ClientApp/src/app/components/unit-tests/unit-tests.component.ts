@@ -17,11 +17,11 @@ import { TabularModelStructure } from "src/app/shared/models/TabularModelStructu
 
 
 @Component({
-    selector: "app-TreeViewTest",
-    templateUrl: "./utTreeViewTest.component.html",
-    styleUrls: ["./utTreeViewTest.component.css"],
+    selector: "app-unit-tests",
+    templateUrl: "./unit-tests.component.html",
+    styleUrls: ["./unit-tests.component.css"],
   })
-  export class utTreeViewTestComponent{
+  export class UnitTestsComponent{
     public structures: Structur[];
     public TestRunsStructures: TestRunStructur[];
     public TabularModelStructures: TabularModelStructure[];
