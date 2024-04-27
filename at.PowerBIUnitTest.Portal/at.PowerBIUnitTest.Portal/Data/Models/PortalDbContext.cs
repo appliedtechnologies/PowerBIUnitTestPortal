@@ -260,10 +260,10 @@ namespace at.PowerBIUnitTest.Portal.Data.Models
             {
                 entity.ToTable("UserStory");
 
-                  entity.Property(e => e.Description)
+                  entity.Property(e => e.Name)
                    .IsRequired()
                    .HasMaxLength(255)
-                   .HasColumnName("Description"); 
+                   .HasColumnName("Name"); 
 
                    entity.HasOne(d => d.TabularModelNavigation)
                     .WithMany(p => p.UserStories)

@@ -12,10 +12,10 @@ namespace at.PowerBIUnitTest.Portal.Data.Models
 
         public string Name { get; set; }
 
-        public Guid MsId {get; set;}
+        public Guid MsId { get; set; }
         public int? Tenant { get; set; }
 
         public virtual Tenant TenantNavigation { get; set; }
-        public virtual ICollection<TabularModel> TabularModels { get; set; }  
+        public virtual ICollection<TabularModel> TabularModels { get; set; }
     }
 }

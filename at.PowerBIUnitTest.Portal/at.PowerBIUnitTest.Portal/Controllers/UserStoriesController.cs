@@ -46,7 +46,7 @@ namespace at.PowerBIUnitTest.Portal.Controllers
         [HttpPost]
         public async Task<IActionResult> Post([FromBody] UserStory userStory)
         {
-            logger.LogDebug($"Begin: UserStoriesController Post(unitTest Description: {userStory.Description})");
+            logger.LogDebug($"Begin: UserStoriesController Post(unitTest Description: {userStory.Name})");
 
             if (!ModelState.IsValid)
             {
@@ -59,7 +59,7 @@ namespace at.PowerBIUnitTest.Portal.Controllers
             this.dbContext.UserStories.Add(userStory);
             await this.dbContext.SaveChangesAsync();
 
-            logger.LogDebug($"End: UserStoriesController Post(unitTest Description: {userStory.Description})");
+            logger.LogDebug($"End: UserStoriesController Post(unitTest Description: {userStory.Name})");
 
             return Created(userStory);
         }
