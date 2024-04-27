@@ -17,6 +17,11 @@
     </dxi-item>
   </dxo-toolbar>
 
+  <dxo-grouping [autoExpandAll]="false"> </dxo-grouping>
+
+  <dxi-column dataField="UserStoryNavigation.Description" caption="User Story" groupIndex="3"></dxi-column>
+  <dxi-column dataField="UserStoryNavigation.TabularModelNavigation.Name" caption="Tabular Model" groupIndex="2"></dxi-column>
+  <dxi-column dataField="UserStoryNavigation.TabularModelNavigation.WorkspaceNavigation.Name" caption="Workspace" groupIndex="1"></dxi-column>
   <dxi-column dataField="Name"></dxi-column>
   <dxi-column dataField="ExpectedResult"></dxi-column>
   <dxi-column dataField="DAX"></dxi-column>

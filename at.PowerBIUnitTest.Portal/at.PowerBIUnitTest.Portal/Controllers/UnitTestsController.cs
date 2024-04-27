@@ -33,14 +33,14 @@ namespace at.PowerBIUnitTest.Portal.Controllers
 
         }
 
-        [EnableQuery]
+        [EnableQuery(MaxExpansionDepth = 4)]
         public IQueryable<UnitTest> Get([FromODataUri] int key)
         {
             logger.LogDebug($"Begin & End: UnitTestsController Get(key: {key})");
             return base.dbContext.UnitTests.Where(e => e.UserStoryNavigation.TabularModelNavigation.WorkspaceNavigation.TenantNavigation.MsId == this.msIdTenantCurrentUser && e.Id == key);
         }
 
-        [EnableQuery]
+        [EnableQuery(MaxExpansionDepth = 4)]
         public IQueryable<UnitTest> Get()
         {
             logger.LogDebug($"Begin & End: UnitTestsController Get()");
