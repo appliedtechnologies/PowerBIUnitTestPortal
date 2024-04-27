@@ -8,7 +8,7 @@ import { LayoutService } from "./layout.service";
 import ODataContext from "devextreme/data/odata/context";
 import { map } from "rxjs/operators";
 import { Workspace } from "../models/workspace.model";
-import { UserStoryService } from "./UserStory.service";
+import { UserStoryService } from "./user-story.service";
 @Injectable()
 export class WorkspaceService {
   constructor(

@@ -22,16 +22,16 @@ namespace at.PowerBIUnitTest.Portal.Data.Models
         {
         }
 
-        public virtual DbSet<ResultType> ResultTypes {get; set;}
-        public virtual DbSet<TabularModel> TabularModels {get; set;}
+        public virtual DbSet<ResultType> ResultTypes { get; set; }
+        public virtual DbSet<TabularModel> TabularModels { get; set; }
         public virtual DbSet<Tenant> Tenants { get; set; }
-        public virtual DbSet<TestRun> TestRuns {get; set;}
-        public virtual DbSet<TestRunCollection> TestRunCollections {get; set;}
-        public virtual DbSet<UnitTest> UnitTests {get; set;}
+        public virtual DbSet<TestRun> TestRuns { get; set; }
+        public virtual DbSet<TestRunCollection> TestRunCollections { get; set; }
+        public virtual DbSet<UnitTest> UnitTests { get; set; }
         public virtual DbSet<User> Users { get; set; }
-        public virtual DbSet<UserStory> UserStories {get; set;}
+        public virtual DbSet<UserStory> UserStories { get; set; }
         public virtual DbSet<Workspace> Workspaces { get; set; }
-        
+
         public Guid MsIdCurrentUser { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -52,10 +52,10 @@ namespace at.PowerBIUnitTest.Portal.Data.Models
                  .HasMaxLength(255)
                  .HasColumnName("Name");
 
-                entity.HasData(new ResultType{Id =  1, Name = "Date"});
-                entity.HasData(new ResultType{Id =  2, Name = "Float"});
-                entity.HasData(new ResultType{Id =  3, Name = "Percentage"});
-                entity.HasData(new ResultType{Id =  4, Name = "String"});
+                entity.HasData(new ResultType { Id = 1, Name = "Date" });
+                entity.HasData(new ResultType { Id = 2, Name = "Float" });
+                entity.HasData(new ResultType { Id = 3, Name = "Percentage" });
+                entity.HasData(new ResultType { Id = 4, Name = "String" });
             });
 
             modelBuilder.Entity<TabularModel>(entity =>
@@ -68,18 +68,23 @@ namespace at.PowerBIUnitTest.Portal.Data.Models
                    .IsUnicode(false)
                    .HasColumnName("Id");
 
-                  entity.Property(e => e.MsId)
-                   .IsRequired()
-                   .HasColumnName("Ms Id"); 
+                entity.Property(e => e.UniqueIdentifier)
+                 .HasDefaultValueSql("NEWID()")
+                 .IsRequired()
+                 .HasColumnName("Unique Identifier");
 
-                   entity.Property(e => e.Name)
-                   .HasMaxLength(255)
-                   .HasColumnName("Name");
+                entity.Property(e => e.MsId)
+                 .IsRequired()
+                 .HasColumnName("Ms Id");
 
-                   entity.HasOne(d => d.WorkspaceNavigation)
-                    .WithMany(p => p.TabularModels)
-                    .HasForeignKey(d => d.Workspace)
-                    .OnDelete(DeleteBehavior.Cascade);
+                entity.Property(e => e.Name)
+                .HasMaxLength(255)
+                .HasColumnName("Name");
+
+                entity.HasOne(d => d.WorkspaceNavigation)
+                 .WithMany(p => p.TabularModels)
+                 .HasForeignKey(d => d.Workspace)
+                 .OnDelete(DeleteBehavior.Cascade);
             });
 
             modelBuilder.Entity<Tenant>(entity =>
@@ -121,12 +126,12 @@ namespace at.PowerBIUnitTest.Portal.Data.Models
                  .WithMany(p => p.TestRuns)
                  .HasForeignKey(d => d.UnitTest)
                  .OnDelete(DeleteBehavior.Cascade);
-                
+
                 entity.HasOne(d => d.TestRunCollectionNavigation)
                  .WithMany(p => p.TestRuns)
                  .HasForeignKey(d => d.TestRunCollection)
                  .OnDelete(DeleteBehavior.ClientSetNull)
-                 .IsRequired(false);             
+                 .IsRequired(false);
 
                 entity.HasOne(d => d.CreatedByNavigation)
                  .WithMany(p => p.TestRunCreatedByNavigations)
@@ -139,7 +144,7 @@ namespace at.PowerBIUnitTest.Portal.Data.Models
                  .HasForeignKey(d => d.ModifiedBy)
                  .OnDelete(DeleteBehavior.ClientSetNull)
                  .HasConstraintName("FK_TestRun_Modified_By");
-                    
+
             });
 
             modelBuilder.Entity<TestRunCollection>(entity =>
@@ -168,18 +173,23 @@ namespace at.PowerBIUnitTest.Portal.Data.Models
                  .OnDelete(DeleteBehavior.ClientSetNull)
                  .HasConstraintName("FK_TestRunCollection_Modified_By");
             });
-          
+
             modelBuilder.Entity<UnitTest>(entity =>
             {
-                entity.ToTable("UnitTest");      
-                
-                entity.HasIndex(p => new {p.Name , p.UserStory})
+                entity.ToTable("UnitTest");
+
+                entity.HasIndex(p => new { p.Name, p.UserStory })
                  .IsUnique();
-                
+
                 entity.Property(e => e.Name)
                  .IsRequired()
                  .HasMaxLength(255)
-                 .HasColumnName("Name"); 
+                 .HasColumnName("Name");
+
+                entity.Property(e => e.UniqueIdentifier)
+                 .HasDefaultValueSql("NEWID()")
+                 .IsRequired()
+                 .HasColumnName("Unique Identifier");
 
                 entity.Property(e => e.ExpectedResult)
                  .IsRequired()
@@ -260,29 +270,34 @@ namespace at.PowerBIUnitTest.Portal.Data.Models
             {
                 entity.ToTable("UserStory");
 
-                  entity.Property(e => e.Name)
-                   .IsRequired()
-                   .HasMaxLength(255)
-                   .HasColumnName("Name"); 
+                entity.Property(e => e.UniqueIdentifier)
+                 .HasDefaultValueSql("NEWID()")
+                .IsRequired()
+                .HasColumnName("Unique Identifier");
 
-                   entity.HasOne(d => d.TabularModelNavigation)
-                    .WithMany(p => p.UserStories)
-                    .HasForeignKey(d => d.TabularModel)
-                    .OnDelete(DeleteBehavior.Cascade);
+                entity.Property(e => e.Name)
+                 .IsRequired()
+                 .HasMaxLength(255)
+                 .HasColumnName("Name");
 
-                    entity.HasOne(d => d.CreatedByNavigation)
-                     .WithMany(p => p.UserStoryCreatedByNavigations)
-                     .HasForeignKey(d => d.CreatedBy)
-                     .OnDelete(DeleteBehavior.ClientSetNull)
-                     .HasConstraintName("FK_UserStory_Created_By")
-                     .IsRequired(false);
+                entity.HasOne(d => d.TabularModelNavigation)
+                 .WithMany(p => p.UserStories)
+                 .HasForeignKey(d => d.TabularModel)
+                 .OnDelete(DeleteBehavior.Cascade);
 
-                    entity.HasOne(d => d.ModifiedByNavigation)
-                     .WithMany(p => p.UserStoryModifiedByNavigations)
-                     .HasForeignKey(d => d.ModifiedBy)
-                     .OnDelete(DeleteBehavior.ClientSetNull)
-                     .HasConstraintName("FK_UserStory_Modified_By")
-                     .IsRequired(false);
+                entity.HasOne(d => d.CreatedByNavigation)
+                 .WithMany(p => p.UserStoryCreatedByNavigations)
+                 .HasForeignKey(d => d.CreatedBy)
+                 .OnDelete(DeleteBehavior.ClientSetNull)
+                 .HasConstraintName("FK_UserStory_Created_By")
+                 .IsRequired(false);
+
+                entity.HasOne(d => d.ModifiedByNavigation)
+                 .WithMany(p => p.UserStoryModifiedByNavigations)
+                 .HasForeignKey(d => d.ModifiedBy)
+                 .OnDelete(DeleteBehavior.ClientSetNull)
+                 .HasConstraintName("FK_UserStory_Modified_By")
+                 .IsRequired(false);
             });
 
             modelBuilder.Entity<Workspace>(entity =>
@@ -294,6 +309,11 @@ namespace at.PowerBIUnitTest.Portal.Data.Models
                 .HasMaxLength(255)
                 .HasColumnName("Name");
 
+                entity.Property(e => e.UniqueIdentifier)
+                 .HasDefaultValueSql("NEWID()")
+                 .IsRequired()
+                 .HasColumnName("Unique Identifier");
+
                 entity.Property(e => e.MsId)
                 .IsRequired()
                 .HasColumnName("Ms Id");
@@ -304,8 +324,8 @@ namespace at.PowerBIUnitTest.Portal.Data.Models
                  .OnDelete(DeleteBehavior.ClientSetNull)
                  .HasConstraintName("FK_Workspace_Tenant")
                  .IsRequired(false);
-            }); 
-              
+            });
+
             OnModelCreatingPartial(modelBuilder);
         }
 

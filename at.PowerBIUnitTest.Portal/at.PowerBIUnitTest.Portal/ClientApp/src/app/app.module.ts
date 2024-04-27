@@ -64,15 +64,13 @@ import { LayoutService } from "./shared/services/layout.service";
 import { DxTreeListModule } from "devextreme-angular";
 import { RoleGuard } from "./shared/guards/role.guard";
 import { Router } from "@angular/router";
-import { UnitTestService } from "./shared/services/UnitTest.service";
-import { UserStoryService } from "./shared/services/UserStory.service";
+import { UnitTestService } from "./shared/services/unit-test.service";
+import { UserStoryService } from "./shared/services/user-story.service";
 import { WorkspaceService } from "./shared/services/workspace.service";
-import { TabularModelService } from "./shared/services/TabularModel.service";
+import { TabularModelService } from "./shared/services/tabular-model.service";
 import { DxoHideEventModule } from "devextreme-angular/ui/nested";
-import { HistoryService } from "./shared/services/history.service";
 import { SideNavigationMenuComponent } from "./components/side-navigation-menu/side-navigation-menu.component";
 import { UnitTestsComponent } from "./components/unit-tests/unit-tests.component";
-import { UnitTestsNewComponent } from "./components/unit-tests-new/unit-tests-new.component";
 
 
 
@@ -87,7 +85,6 @@ export function initializeAppConfig(appConfig: AppConfig, router: Router) {
     ProfileComponent,
     UserComponent,
     UnitTestsComponent,
-    UnitTestsNewComponent,
     SideNavigationMenuComponent
   ],
   imports: [
@@ -159,7 +156,6 @@ export function initializeAppConfig(appConfig: AppConfig, router: Router) {
     UserStoryService,
     WorkspaceService,
     TabularModelService,
-    HistoryService,
   ],
   bootstrap: [AppComponent, MsalRedirectComponent],
 })

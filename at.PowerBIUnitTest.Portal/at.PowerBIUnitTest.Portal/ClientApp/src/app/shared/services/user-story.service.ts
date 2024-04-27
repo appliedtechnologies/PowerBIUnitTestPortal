@@ -5,22 +5,28 @@ import { AppConfig } from "../config/app.config";
 import { ODataService } from "./odata.service";
 import { UserService } from "./user.service";
 import { LayoutService } from "./layout.service";
-import { UnitTest } from "src/app/shared/models/UnitTest.model";
+import { UnitTest } from "src/app/shared/models/unit-test.model";
 import ODataContext from "devextreme/data/odata/context";
 import { map } from "rxjs/operators";
-import { UserStory } from "../models/UserStory.model";
+import { UserStory } from "../models/user-story.model";
 @Injectable()
 export class UserStoryService {
 
   constructor(
     private odataService: ODataService,
-    //private UserStoryService: UserStoryService,
     private http: HttpClient,
-
   ) { }
 
-  getStore(): ODataStore {
+  public getStore(): ODataStore {
     return this.odataService.context["UserStories"];
+  }
+
+  public add (userStory: UserStory): Promise<void> {
+    return this.getStore().insert(userStory);
+  }
+
+  public remove (id: number): Promise<void> {
+    return this.getStore().remove(id);
   }
 
   public copyToOtherTabularModel(userStoryId: number, targetTabularModelId: number, targetWorkspaceId: number): Promise<void> {

@@ -1,12 +1,12 @@
-import { UserStory } from "./UserStory.model";
+import { UserStory } from "./user-story.model";
 import { Workspace } from "./workspace.model";
 
 export interface TabularModel {
     Id?: number;
-    DatasetPbId?: string;
+    UniqueIdentifier?: string;
+    MsId?: string;
     Workspace?: number;
     Name?: string;
-
-    WorkspaceNavigation?: Workspace;
     UserStories?: UserStory[];
+    WorkspaceNavigation?: Workspace;
 }

@@ -9,6 +9,8 @@ namespace at.PowerBIUnitTest.Portal.Data.Models
     public partial class UserStory : ITrackModified
     {
         public int Id { get; set; }
+        public Guid UniqueIdentifier { get; set; }
+
         public string Name { get; set; }
         public int TabularModel { get; set; }
 

@@ -78,6 +78,7 @@ namespace at.PowerBIUnitTest.Portal.Controllers
                 return Forbid();
 
             this.dbContext.UserStories.Remove(userStory);
+            await base.dbContext.SaveChangesAsync();
 
             logger.LogDebug($"End: UserStoriesController Delete(key: {key}");
             return Ok();

@@ -82,6 +82,7 @@ namespace at.PowerBIUnitTest.Portal.Controllers
                 return Forbid();
 
             this.dbContext.UnitTests.Remove(unitTest);
+            await base.dbContext.SaveChangesAsync();
 
             logger.LogDebug($"End: UnitTestsController Delete(key: {key}");
             return Ok();

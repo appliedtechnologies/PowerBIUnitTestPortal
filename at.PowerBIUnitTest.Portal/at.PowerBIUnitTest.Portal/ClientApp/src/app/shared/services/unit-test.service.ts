@@ -5,22 +5,23 @@ import { AppConfig } from "../config/app.config";
 import { ODataService } from "./odata.service";
 import { UserService } from "./user.service";
 import { LayoutService } from "./layout.service";
-import { UnitTest } from "src/app/shared/models/UnitTest.model";
+import { UnitTest } from "src/app/shared/models/unit-test.model";
 import ODataContext from "devextreme/data/odata/context";
 import { map } from "rxjs/operators";
-import { History } from "../models/History.model";
-@Injectable()
-export class HistoryService {
+import notify from "devextreme/ui/notify";
 
+@Injectable()
+export class UnitTestService {
   constructor(
     private odataService: ODataService,
-    //private UserStoryService: UserStoryService,
-    private http: HttpClient,
-
-  ) { }
+    private http: HttpClient
+  ) {}
 
   getStore(): ODataStore {
-    return this.odataService.context["History"];
+    return this.odataService.context["UnitTests"];
   }
 
+  public remove (id: number): Promise<void> {
+    return this.getStore().remove(id);
+  }
 }
