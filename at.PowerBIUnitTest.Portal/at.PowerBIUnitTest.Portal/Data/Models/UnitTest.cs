@@ -19,7 +19,7 @@ namespace at.PowerBIUnitTest.Portal.Data.Models
         public string ExpectedResult { get; set; }
         public int UserStory { get; set; }
         public string DAX { get; set; }
-        public int? ResultType { get; set; }
+        public string ResultType { get; set; }
         public string DateTimeFormat { get; set; }
         public string DecimalPlaces { get; set; }
         public string FloatSeparators { get; set; }
@@ -34,6 +34,5 @@ namespace at.PowerBIUnitTest.Portal.Data.Models
 
         public virtual ICollection<TestRun> TestRuns { get; set; }
         public virtual UserStory UserStoryNavigation { get; set; }
-        public virtual ResultType ResultTypeNavigation { get; set; }
     }
 }

@@ -21,6 +21,7 @@ using Microsoft.AspNetCore.Routing;
 using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OData;
 
 namespace at.PowerBIUnitTest.Portal.Controllers
 {
@@ -59,6 +60,9 @@ namespace at.PowerBIUnitTest.Portal.Controllers
 
             if ((await this.dbContext.UserStories.FirstOrDefaultAsync(e => e.Id == unitTest.UserStory && e.TabularModelNavigation.WorkspaceNavigation.TenantNavigation.MsId == this.msIdTenantCurrentUser)) == null)
                 return Forbid();
+
+            if (base.dbContext.UnitTests.Any(e => e.Name == unitTest.Name && e.UserStory == unitTest.UserStory))
+                return BadRequest(new ODataError { ErrorCode =  "400", Message = "Unit test with the same name already exists in the user story."});
 
             this.dbContext.UnitTests.Add(unitTest);
             await this.dbContext.SaveChangesAsync();
@@ -107,6 +111,10 @@ namespace at.PowerBIUnitTest.Portal.Controllers
             }
 
             unitTest.Patch(entity);
+
+            if (base.dbContext.UnitTests.Any(e => e.Name == entity.Name && e.UserStory == entity.UserStory && e.Id != entity.Id))
+                return BadRequest(new ODataError { ErrorCode =  "400", Message = "Unit test with the same name already exists in the user story."});
+
             await base.dbContext.SaveChangesAsync();
 
             logger.LogDebug($"End: UnitTestsController Patch(key: {key}, unitTest: {unitTest.GetChangedPropertyNames()}");

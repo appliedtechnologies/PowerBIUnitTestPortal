@@ -1,7 +1,6 @@
 import { User } from "oidc-client";
 import { TestRun } from "./test-run.model";
 import { UserStory } from "./user-story.model";
-import { ResultType } from "./result-type.model";
 
 export interface UnitTest {
   Id?: number;
@@ -10,7 +9,7 @@ export interface UnitTest {
   ExpectedResult?: string;
   UserStory?: number;
   DAX?: string;
-  ResultType?: number | null;
+  ResultType?: string;
   DateTimeFormat?: string;
   DecimalPlaces?: string;
   FloatSeparators?: string;
@@ -22,5 +21,4 @@ export interface UnitTest {
   ModifiedByNavigation?: User;
   TestRuns?: TestRun[];
   UserStoryNavigation?: UserStory;
-  ResultTypeNavigation?: ResultType;
 }

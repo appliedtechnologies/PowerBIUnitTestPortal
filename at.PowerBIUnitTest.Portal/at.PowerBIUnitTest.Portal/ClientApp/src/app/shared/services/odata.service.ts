@@ -10,13 +10,6 @@ export class ODataService {
   context: ODataContext;
   constructor(private router: Router, private logService: LogService) {
     this.context = new ODataContext({
-      beforeSend: (e) => {
-        /*if(e.url == "/odata/Workspaces")
-          e.params.$filter = e.params.$filter.replace("ParentId eq 0", "");
-
-        if(e.params.$filter == "")
-          delete e.params.$filter;*/
-      },
       url: AppConfig.settings.api.url,
       version: 4,
       errorHandler: (error) => {
@@ -50,7 +43,10 @@ export class ODataService {
           key: "Id",
           keyType: "Int32",
         },
-        
+        ResultTypes: {
+          key: "Id",
+          keyType: "Int32",
+        }
       },
     });
   }

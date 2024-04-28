@@ -14,6 +14,8 @@ import {
 } from "src/app/shared/services/layout.service";
 import { UserStoryService } from "src/app/shared/services/user-story.service";
 import { WorkspaceService } from "src/app/shared/services/workspace.service";
+import { UnitTest } from "src/app/shared/models/unit-test.model";
+import ODataContext from "devextreme/data/odata/context";
 
 @Component({
     selector: "app-unit-tests",
@@ -30,6 +32,12 @@ export class UnitTestsComponent implements OnInit {
     public popupTitle: string = "";
 
     public userStoryToEdit: UserStory = {};
+    public unitTestToEdit: UnitTest = {};
+
+    public resultTypeItems: string[] = ["String", "Float", "Date", "Percentage"];
+    public dateTimeFormatItems: string[] = ["UTC", "CET"];
+    public floatSeparatorItems: string[] = ["Use Seperators", "Dont use Sperators"];
+    public decimalPlacesItems: string[] = ["1", "2", "3", "4", "5"];
 
     constructor(
         private unitTestService: UnitTestService,
@@ -39,8 +47,10 @@ export class UnitTestsComponent implements OnInit {
     ) {
         this.onClickAddUserStory = this.onClickAddUserStory.bind(this);
         this.onClickEditUserStory = this.onClickEditUserStory.bind(this);
-        this.onClickDeleteUnitTest = this.onClickDeleteUnitTest.bind(this);
         this.onClickDeleteUserStory = this.onClickDeleteUserStory.bind(this);
+        this.onClickAddUnitTest = this.onClickAddUnitTest.bind(this);
+        this.onClickEditUnitTest = this.onClickEditUnitTest.bind(this);
+        this.onClickDeleteUnitTest = this.onClickDeleteUnitTest.bind(this);
 
         this.dataSourceWorkspaces = new DataSource({
             store: new CustomStore({
@@ -131,8 +141,16 @@ export class UnitTestsComponent implements OnInit {
         this.treeList.instance.refresh();
     }
 
-    public onClickAddUnitTest(e: ClickEvent): void {
+    public onClickAddUnitTest(e: any): void {
         this.popupTitle = "Add Unit Test";
+        this.unitTestToEdit = {};
+        this.unitTestToEdit.UserStory = e.row.data.Id;
+        this.isVisibleEditUnitTest = true;
+    }
+
+    public onClickEditUnitTest(e: any): void {
+        this.popupTitle = "Edit Unit Test";
+        this.unitTestToEdit = structuredClone(e.row.data);
         this.isVisibleEditUnitTest = true;
     }
 
@@ -193,38 +211,93 @@ export class UnitTestsComponent implements OnInit {
         });
     }
 
-    public onClickSaveUserStory(e: ClickEvent): void {
-        this.layoutService.change(LayoutParameter.ShowLoading, true);
-        let editPromise;
-        if (this.userStoryToEdit.Id != null) {
-            editPromise = this.userStoryService.update(this.userStoryToEdit.Id, { Name: this.userStoryToEdit.Name })
-                .then(() => this.layoutService.notify({
-                    type: NotificationType.Success,
-                    message: "The user story has been edited successfully."
-                }))
-                .catch((error: Error) => this.layoutService.notify({
-                    type: NotificationType.Error,
-                    message: error.message ? `The user story could not be edited: ${error.message}` : "The user story could not be edited."
-                }))
-        }
-        else {
-            editPromise = this.userStoryService.add(this.userStoryToEdit)
-                .then(() => this.layoutService.notify({
-                    type: NotificationType.Success,
-                    message: "The new user story has been created successfully."
-                }))
-                .catch((error: Error) => this.layoutService.notify({
-                    type: NotificationType.Error,
-                    message: error.message ? `The new user story could not be created: ${error.message}` : "The new user story could not be created."
-                }))
-        }
+    public onClickSaveUnitTest(e: ClickEvent): void {
+        let validation = e.validationGroup.validate();
+        if (validation.isValid == true) {
+            this.layoutService.change(LayoutParameter.ShowLoading, true);
+            let editPromise;
+            if (this.unitTestToEdit.Id != null) {
+                editPromise = this.unitTestService.update(this.unitTestToEdit.Id, { Name: this.unitTestToEdit.Name, DAX: this.unitTestToEdit.DAX, ExpectedResult: this.unitTestToEdit.ExpectedResult, ResultType: this.unitTestToEdit.ResultType, DateTimeFormat: this.unitTestToEdit.DateTimeFormat, FloatSeparators: this.unitTestToEdit.FloatSeparators, DecimalPlaces: this.unitTestToEdit.DecimalPlaces})
+                    .then(() => {
+                        this.layoutService.notify({
+                            type: NotificationType.Success,
+                            message: "The unit test has been edited successfully."
+                        });
+                        this.isVisibleEditUnitTest = false;
+                        this.unitTestToEdit = {};
+                        this.treeList.instance.refresh();
+                    })
+                    .catch((error: Error) => this.layoutService.notify({
+                        type: NotificationType.Error,
+                        message: error.message ? `The unit test could not be edited: ${error.message}` : "The unit test could not be edited."
+                    }))
 
-        editPromise.then(() => {
-            this.isVisibleEditUserStory = false;
-            this.userStoryToEdit = {};
-            this.treeList.instance.refresh();
-            this.layoutService.change(LayoutParameter.ShowLoading, false);
-        });
+            }
+            else {
+                editPromise = this.unitTestService.add(this.unitTestToEdit)
+                    .then(() => {
+                        this.layoutService.notify({
+                            type: NotificationType.Success,
+                            message: "The new uni test has been created successfully."
+                        });
+                        this.isVisibleEditUnitTest = false;
+                        this.unitTestToEdit = {};
+                        this.treeList.instance.refresh();
+                    })
+                    .catch((error: Error) => this.layoutService.notify({
+                        type: NotificationType.Error,
+                        message: error.message ? `The new unit test could not be created: ${error.message}` : "The new unit test could not be created."
+                    }))
+            }
+
+            editPromise.then(() => {
+                this.layoutService.change(LayoutParameter.ShowLoading, false);
+            });
+        }
+    }
+
+    public onClickSaveUserStory(e: ClickEvent): void {
+        let validation = e.validationGroup.validate();
+        if (validation.isValid == true) {
+            this.layoutService.change(LayoutParameter.ShowLoading, true);
+            let editPromise;
+            if (this.userStoryToEdit.Id != null) {
+                editPromise = this.userStoryService.update(this.userStoryToEdit.Id, { Name: this.userStoryToEdit.Name })
+                    .then(() => {
+                        this.layoutService.notify({
+                            type: NotificationType.Success,
+                            message: "The user story has been edited successfully."
+                        });
+                        this.isVisibleEditUserStory = false;
+                        this.userStoryToEdit = {};
+                        this.treeList.instance.refresh();
+                    })
+                    .catch((error: Error) => this.layoutService.notify({
+                        type: NotificationType.Error,
+                        message: error.message ? `The user story could not be edited: ${error.message}` : "The user story could not be edited."
+                    }))
+            }
+            else {
+                editPromise = this.userStoryService.add(this.userStoryToEdit)
+                    .then(() => {
+                        this.layoutService.notify({
+                            type: NotificationType.Success,
+                            message: "The new user story has been created successfully."
+                        });
+                        this.isVisibleEditUserStory = false;
+                        this.userStoryToEdit = {};
+                        this.treeList.instance.refresh();
+                    })
+                    .catch((error: Error) => this.layoutService.notify({
+                        type: NotificationType.Error,
+                        message: error.message ? `The new user story could not be created: ${error.message}` : "The new user story could not be created."
+                    }))
+            }
+
+            editPromise.then(() => {
+                this.layoutService.change(LayoutParameter.ShowLoading, false);
+            });
+        }
     }
 
     public isWorkspaceRow(e: any): boolean {

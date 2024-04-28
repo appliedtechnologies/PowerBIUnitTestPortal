@@ -72,8 +72,6 @@ import { DxoHideEventModule } from "devextreme-angular/ui/nested";
 import { SideNavigationMenuComponent } from "./components/side-navigation-menu/side-navigation-menu.component";
 import { UnitTestsComponent } from "./components/unit-tests/unit-tests.component";
 
-
-
 export function initializeAppConfig(appConfig: AppConfig, router: Router) {
   return () => appConfig.load();
 }

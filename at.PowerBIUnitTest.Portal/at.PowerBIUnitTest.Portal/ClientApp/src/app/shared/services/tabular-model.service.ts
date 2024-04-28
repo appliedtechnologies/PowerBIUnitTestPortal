@@ -15,5 +15,4 @@ export class TabularModelService {
   getStore(): ODataStore {
     return this.odataService.context["TabularModels"];
   }
-
 }

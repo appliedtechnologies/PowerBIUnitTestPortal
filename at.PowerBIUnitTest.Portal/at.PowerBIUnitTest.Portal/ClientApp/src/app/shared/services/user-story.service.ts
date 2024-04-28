@@ -9,28 +9,19 @@ import { UnitTest } from "src/app/shared/models/unit-test.model";
 import ODataContext from "devextreme/data/odata/context";
 import { map } from "rxjs/operators";
 import { UserStory } from "../models/user-story.model";
+import { CrudBaseService } from "./crud-base.service";
 @Injectable()
-export class UserStoryService {
+export class UserStoryService extends CrudBaseService<UserStory>{
 
   constructor(
     private odataService: ODataService,
     private http: HttpClient,
-  ) { }
+  ) {
+    super();
+  }
 
   public getStore(): ODataStore {
     return this.odataService.context["UserStories"];
-  }
-
-  public add (userStory: UserStory): Promise<void> {
-    return this.getStore().insert(userStory);
-  }
-
-  public remove (id: number): Promise<void> {
-    return this.getStore().remove(id);
-  }
-
-  public update (id: number, userStory: UserStory): Promise<void> {
-    return this.getStore().update(id, userStory);
   }
 
   public copyToOtherTabularModel(userStoryId: number, targetTabularModelId: number, targetWorkspaceId: number): Promise<void> {

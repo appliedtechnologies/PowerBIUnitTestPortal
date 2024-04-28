@@ -3,6 +3,7 @@
 <dx-tree-list #treeList [dataSource]="dataSourceWorkspaces" dataStructure="tree" [showRowLines]="true" [hoverStateEnabled]="true"
   [showBorders]="true" height="100%" (onToolbarPreparing)="onToolbarPreparingTreeList($event)">
   <dxo-search-panel [visible]="true" [width]="250"></dxo-search-panel>
+  <dxo-state-storing [enabled]="true" storageKey="atPowerBiUnitTestPortal_UnitTests_TreeListState"></dxo-state-storing>
 
   <dxi-column dataField="type"></dxi-column>
   <dxi-column dataField="Name"></dxi-column>
@@ -22,8 +23,11 @@
     <dxi-button [visible]="isUnitTestRow" icon="trash" text="Delete Unit Test" type="default"
       [onClick]="onClickDeleteUnitTest">
     </dxi-button>
-    <dxi-button [visible]="isUserStoryRow" icon="edit" text="Edit Unit Test" type="default"
+    <dxi-button [visible]="isUserStoryRow" icon="edit" text="Edit User Story" type="default"
       [onClick]="onClickEditUserStory">
+    </dxi-button>
+    <dxi-button [visible]="isUnitTestRow" icon="edit" text="Edit Unit Test" type="default"
+      [onClick]="onClickEditUnitTest">
     </dxi-button>
   </dxi-column>
 </dx-tree-list>
@@ -31,13 +35,35 @@
 <dx-popup *ngIf="isVisibleEditUserStory" [title]="popupTitle" [showTitle]="true" [width]="500" height="auto"
   [(visible)]="isVisibleEditUserStory">
   <dx-form [(formData)]="userStoryToEdit">
-    <dxi-item dataField="Name" [label]="{ text: 'Name' }"></dxi-item>
+    <dxi-item dataField="Name" [label]="{ text: 'Name' }" isRequired="true"></dxi-item>
 
     <dxi-item itemType="button" horizontalAlignment="left" [buttonOptions]="{
         icon: 'save',
         text: 'Save',
         type: 'success',
         onClick: this.onClickSaveUserStory.bind(this),
+
+        width: '100%'
+      }"></dxi-item>
+  </dx-form>
+</dx-popup>
+
+<dx-popup *ngIf="isVisibleEditUnitTest" [title]="popupTitle" [showTitle]="true" [width]="750" height="auto"
+  [(visible)]="isVisibleEditUnitTest">
+  <dx-form [(formData)]="unitTestToEdit">
+    <dxi-item dataField="Name" [label]="{ text: 'Name' }" isRequired="true"></dxi-item>
+    <dxi-item dataField="ResultType" [label]="{ text: 'Result Type' }" editorType="dxSelectBox" [editorOptions]="{ items: resultTypeItems }" isRequired="true"></dxi-item>
+    <dxi-item *ngIf="unitTestToEdit.ResultType == 'Float'" dataField="DecimalPlaces" [label]="{ text: 'Decimal Places' }" editorType="dxSelectBox" [editorOptions]="{  items: decimalPlacesItems }"></dxi-item>
+    <dxi-item *ngIf="unitTestToEdit.ResultType == 'Float'" dataField="FloatSeparators" [label]="{ text: 'Float Separators' }" editorType="dxSelectBox" [editorOptions]="{  items: floatSeparatorItems }"></dxi-item>
+    <dxi-item *ngIf="unitTestToEdit.ResultType == 'Date'" dataField="DateTimeFormat" [label]="{ text: 'DateTime Format' }" editorType="dxSelectBox" [editorOptions]="{  items: dateTimeFormatItems }"></dxi-item>
+    <dxi-item dataField="ExpectedResult" [label]="{ text: 'Expected Result' }" isRequired="true"></dxi-item>
+    <dxi-item dataField="DAX" [label]="{ text: 'DAX' }" editorType="dxTextArea" [editorOptions]="{ height: 250 }" isRequired="true"></dxi-item>
+
+    <dxi-item itemType="button" horizontalAlignment="left" [buttonOptions]="{
+        icon: 'save',
+        text: 'Save',
+        type: 'success',
+        onClick: this.onClickSaveUnitTest.bind(this),
 
         width: '100%'
       }"></dxi-item>

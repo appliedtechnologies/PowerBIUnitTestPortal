@@ -42,6 +42,7 @@ namespace at.PowerBIUnitTest.Portal
             builder.EntitySet<Workspace>("Workspaces");
             builder.EntitySet<TabularModel>("TabularModels");
             builder.EntitySet<TestRun>("TestRuns");
+            builder.EntitySet<TestRun>("ResultTypes");
             builder.EntitySet<TestRunCollection>("TestRunCollections");
             builder.EntityType<User>().Collection.Action("Login");
             builder.EntityType<UnitTest>().Collection.Action("Execute");
@@ -75,7 +76,7 @@ namespace at.PowerBIUnitTest.Portal
             services.AddDbContext<PortalDbContext>(options =>
                 options.UseLazyLoadingProxies().UseSqlServer(Configuration.GetConnectionString("AzureDbConnection")));
 
-            services.AddControllers().AddOData(options => options.AddRouteComponents("odata", GetEdmModel()).Select().Count().Filter().OrderBy().Expand().SetMaxTop(100));
+            services.AddControllers(options => { options.Filters.Add<UnhandledExceptionFilterAttribute>(); }).AddOData(options => options.AddRouteComponents("odata", GetEdmModel()).Select().Count().Filter().OrderBy().Expand().SetMaxTop(100));
 
             services.AddSwaggerGen();
 
@@ -109,7 +110,7 @@ namespace at.PowerBIUnitTest.Portal
                 app.UseDeveloperExceptionPage();
             }
             else
-            {   
+            {
                 dbContext.Database.MigrateAsync();
                 app.UseExceptionHandler("/Error");
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.

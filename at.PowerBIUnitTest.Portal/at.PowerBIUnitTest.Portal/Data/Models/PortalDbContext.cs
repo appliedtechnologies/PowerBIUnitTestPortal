@@ -22,7 +22,6 @@ namespace at.PowerBIUnitTest.Portal.Data.Models
         {
         }
 
-        public virtual DbSet<ResultType> ResultTypes { get; set; }
         public virtual DbSet<TabularModel> TabularModels { get; set; }
         public virtual DbSet<Tenant> Tenants { get; set; }
         public virtual DbSet<TestRun> TestRuns { get; set; }
@@ -42,21 +41,6 @@ namespace at.PowerBIUnitTest.Portal.Data.Models
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.HasAnnotation("Relational:Collation", "SQL_Latin1_General_CP1_CI_AS");
-
-            modelBuilder.Entity<ResultType>(entity =>
-            {
-                entity.ToTable("ResultType");
-
-                entity.Property(e => e.Name)
-                 .IsRequired()
-                 .HasMaxLength(255)
-                 .HasColumnName("Name");
-
-                entity.HasData(new ResultType { Id = 1, Name = "Date" });
-                entity.HasData(new ResultType { Id = 2, Name = "Float" });
-                entity.HasData(new ResultType { Id = 3, Name = "Percentage" });
-                entity.HasData(new ResultType { Id = 4, Name = "String" });
-            });
 
             modelBuilder.Entity<TabularModel>(entity =>
             {
@@ -219,12 +203,6 @@ namespace at.PowerBIUnitTest.Portal.Data.Models
                  .WithMany(p => p.UnitTests)
                  .HasForeignKey(d => d.UserStory)
                  .OnDelete(DeleteBehavior.Cascade);
-
-                entity.HasOne(d => d.ResultTypeNavigation)
-                 .WithMany(p => p.UnitTests)
-                 .HasForeignKey(d => d.ResultType)
-                 .OnDelete(DeleteBehavior.ClientSetNull)
-                 .IsRequired(false);
 
                 entity.HasOne(d => d.CreatedByNavigation)
                  .WithMany(p => p.UnitTestCreatedByNavigations)
