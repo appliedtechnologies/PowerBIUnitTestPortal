@@ -97,7 +97,6 @@ namespace at.PowerBIUnitTest.Portal.Data.Models
                  .HasColumnName("TimeStamp");
 
                 entity.Property(e => e.Result)
-                 .IsRequired()
                  .HasMaxLength(255)
                  .HasColumnName("Result");
 
@@ -105,6 +104,12 @@ namespace at.PowerBIUnitTest.Portal.Data.Models
                  .IsRequired()
                  .HasMaxLength(255)
                  .HasColumnName("Expected Result");
+
+                entity.Property(e => e.JsonResponse)
+                 .HasColumnName("Json Repsonse");
+
+                entity.Property(e => e.ExecutedSuccessfully)
+                 .HasColumnName("Executed Successfully");
 
                 entity.HasOne(d => d.UnitTestNavigation)
                  .WithMany(p => p.TestRuns)

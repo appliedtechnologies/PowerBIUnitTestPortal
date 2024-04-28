@@ -5,6 +5,8 @@ import { TestRunCollection } from "./test-run-collection.model";
 export interface TestRun {
     Id?: number;
     TimeStamp?: string;
+    ExecutedSuccessfully?: boolean;
+    JsonResponse?: string;
     WasPassed?: boolean;
     Result?: string;
     ExpectedResult?: string;

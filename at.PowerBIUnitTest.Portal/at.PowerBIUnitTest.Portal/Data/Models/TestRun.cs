@@ -14,6 +14,8 @@ namespace at.PowerBIUnitTest.Portal.Data.Models
         public bool WasPassed {get; set;}
         public string Result {get; set;}
         public string ExpectedResult{get; set;}
+        public string JsonResponse {get; set;}
+        public bool ExecutedSuccessfully {get; set;}
         public int UnitTest {get; set;}
         public int TestRunCollection {get; set;}
 

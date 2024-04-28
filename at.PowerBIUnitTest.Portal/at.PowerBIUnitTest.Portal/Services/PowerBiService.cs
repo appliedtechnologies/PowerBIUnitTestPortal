@@ -97,7 +97,7 @@ namespace at.PowerBIUnitTest.Portal.Services
             }
         }
 
-        public async Task<string> QueryDataset(string authToken, Guid datasetId, string daxQuery)
+        public async Task<(string jsonResponse, JObject jObject)> QueryDataset(string authToken, Guid datasetId, string daxQuery)
         {
             logger.LogDebug($"Begin: PowerBIService QueryDataset(datasetId: {datasetId}, daxQuery: {daxQuery})");
             try
@@ -114,17 +114,17 @@ namespace at.PowerBIUnitTest.Portal.Services
 
 
                 var response = await client.PostAsync(url, new StringContent(requestBody, UnicodeEncoding.UTF8, "application/json"));
-                var jsonResponse = await response.Content.ReadAsAsync<JObject>();
-                var testReuslt = ((jsonResponse["results"][0]["tables"][0]["rows"][0] as JObject).First as JProperty).Value.ToString();
+                var jObject = await response.Content.ReadAsAsync<JObject>();
+                var jsonResponse = await response.Content.ReadAsStringAsync();
 
-                logger.LogDebug($"End: PowerBIService QueryDataset(return: {jsonResponse})");
-                return testReuslt;
+                logger.LogDebug($"End: PowerBIService QueryDataset(jsonResponse: {jsonResponse})");
 
+                return (jsonResponse, jObject);
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "An error occurred while querying the dataset.");
-                return "!! Error during execution !!";
+                logger.LogError(ex, "An error occurred while querying the dataset."); 
+                throw;
             }
         }
     }

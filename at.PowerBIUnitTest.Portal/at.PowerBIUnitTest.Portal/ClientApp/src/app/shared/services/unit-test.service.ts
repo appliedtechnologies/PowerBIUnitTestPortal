@@ -30,7 +30,7 @@ export class UnitTestService extends CrudBaseService<UnitTest> {
         .post(`${AppConfig.settings.api.url}/UnitTests/Execute`, { unitTestIds: ids })
         .subscribe({
           next: () => resolve(),
-          error: (error: Error) => reject(error["error"]["error"])
+          error: (error: any) => reject(error?.error?.error)
         });
     });
   }

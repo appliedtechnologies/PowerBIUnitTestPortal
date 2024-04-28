@@ -267,7 +267,7 @@ export class UnitTestsComponent implements OnInit {
                     }))
                     .catch((error: Error) => this.layoutService.notify({
                         type: NotificationType.Error,
-                        message: error.message ? `The user story could not be deleted: ${error.message}` : "The user story could not be deleted."
+                        message: error?.message ? `The user story could not be deleted: ${error.message}` : "The user story could not be deleted."
                     }))
                     .then(() => {
                         this.treeList.instance.refresh();
@@ -303,7 +303,7 @@ export class UnitTestsComponent implements OnInit {
                     }))
                     .catch((error: Error) => this.layoutService.notify({
                         type: NotificationType.Error,
-                        message: error.message ? `One or more unit tests could not be deleted: ${error.message}` : "One or more unit tests could not be deleted"
+                        message: error?.message ? `One or more unit tests could not be deleted: ${error.message}` : "One or more unit tests could not be deleted"
                     }))
                     .then(() => {
                         this.treeList.instance.refresh();
@@ -325,7 +325,7 @@ export class UnitTestsComponent implements OnInit {
                     }))
                     .catch((error: Error) => this.layoutService.notify({
                         type: NotificationType.Error,
-                        message: error.message ? `The unit test could not be deleted: ${error.message}` : "The unit test could not be deleted."
+                        message: error?.message ? `The unit test could not be deleted: ${error.message}` : "The unit test could not be deleted."
                     }))
                     .then(() => {
                         this.treeList.instance.refresh();
@@ -353,7 +353,7 @@ export class UnitTestsComponent implements OnInit {
                     })
                     .catch((error: Error) => this.layoutService.notify({
                         type: NotificationType.Error,
-                        message: error.message ? `The unit test could not be edited: ${error.message}` : "The unit test could not be edited."
+                        message: error?.message ? `The unit test could not be edited: ${error.message}` : "The unit test could not be edited."
                     }))
 
             }
@@ -370,7 +370,7 @@ export class UnitTestsComponent implements OnInit {
                     })
                     .catch((error: Error) => this.layoutService.notify({
                         type: NotificationType.Error,
-                        message: error.message ? `The new unit test could not be created: ${error.message}` : "The new unit test could not be created."
+                        message: error?.message ? `The new unit test could not be created: ${error.message}` : "The new unit test could not be created."
                     }))
             }
 
@@ -398,7 +398,7 @@ export class UnitTestsComponent implements OnInit {
                     })
                     .catch((error: Error) => this.layoutService.notify({
                         type: NotificationType.Error,
-                        message: error.message ? `The user story could not be edited: ${error.message}` : "The user story could not be edited."
+                        message: error?.message ? `The user story could not be edited: ${error.message}` : "The user story could not be edited."
                     }))
             }
             else {
@@ -414,7 +414,7 @@ export class UnitTestsComponent implements OnInit {
                     })
                     .catch((error: Error) => this.layoutService.notify({
                         type: NotificationType.Error,
-                        message: error.message ? `The new user story could not be created: ${error.message}` : "The new user story could not be created."
+                        message: error?.message ? `The new user story could not be created: ${error.message}` : "The new user story could not be created."
                     }))
             }
 
@@ -472,7 +472,7 @@ export class UnitTestsComponent implements OnInit {
             })
             .catch((error: Error) => this.layoutService.notify({
                 type: NotificationType.Error,
-                message: error.message ? `Unit tests could not be executed: ${error.message}` : "Unit tests could not be executed."
+                message: error?.message ? `Unit tests could not be executed: ${error.message}` : "Unit tests could not be executed."
             }))
             .then(() => { this.layoutService.change(LayoutParameter.ShowLoading, false); });
     }

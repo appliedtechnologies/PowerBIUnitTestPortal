@@ -71,6 +71,7 @@ import { TabularModelService } from "./shared/services/tabular-model.service";
 import { DxoHideEventModule } from "devextreme-angular/ui/nested";
 import { SideNavigationMenuComponent } from "./components/side-navigation-menu/side-navigation-menu.component";
 import { UnitTestsComponent } from "./components/unit-tests/unit-tests.component";
+import { GetFirstElementPipe } from "./shared/pipes/get-first-element.pipe";
 
 export function initializeAppConfig(appConfig: AppConfig, router: Router) {
   return () => appConfig.load();
@@ -83,7 +84,8 @@ export function initializeAppConfig(appConfig: AppConfig, router: Router) {
     ProfileComponent,
     UserComponent,
     UnitTestsComponent,
-    SideNavigationMenuComponent
+    SideNavigationMenuComponent,
+    GetFirstElementPipe
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: "ng-cli-universal" }),
