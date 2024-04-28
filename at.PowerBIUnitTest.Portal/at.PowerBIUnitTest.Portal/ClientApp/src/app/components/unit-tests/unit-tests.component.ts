@@ -45,7 +45,7 @@ export class UnitTestsComponent implements OnInit {
         private workspaceService: WorkspaceService,
         private layoutService: LayoutService
     ) {
-        this.onClickExecuteUnitTest = this.onClickExecuteUnitTest.bind(this);
+        this.onClickExecuteUnitTests = this.onClickExecuteUnitTests.bind(this);
         this.onClickAddUserStory = this.onClickAddUserStory.bind(this);
         this.onClickEditUserStory = this.onClickEditUserStory.bind(this);
         this.onClickDeleteUserStory = this.onClickDeleteUserStory.bind(this);
@@ -179,7 +179,7 @@ export class UnitTestsComponent implements OnInit {
 
     public onCellPreparedTreeList(e: any): void {
         if (e.rowType === "data" && e.row.data.type == "Unit Test" && e.column.dataField === "TestRuns[0].Result") {
-            e.cellElement.style.color = e.row.data.TestRuns[0].WasPassed ? "green" : "red";
+            e.cellElement.style.color = e.row.data?.TestRuns[0]?.WasPassed ? "green" : "red";
         }
     }
 
@@ -215,8 +215,18 @@ export class UnitTestsComponent implements OnInit {
         this.executeUnitTest(unitTestIds);
     }
 
-    public onClickExecuteUnitTest(e: any): void {
-        this.executeUnitTest([e.row.data.Id]);
+    public onClickExecuteUnitTests(e: any): void {
+        let unitTestIdsToExecute = [];
+        if(e.row.data.type == "Unit Test")
+            unitTestIdsToExecute = [e.row.data.Id];
+        else if(e.row.data.type == "User Story")
+            unitTestIdsToExecute = e.row.node.children.map((e: any) => e.data.Id);
+        else if(e.row.data.type == "Tabular Model")
+            unitTestIdsToExecute = e.row.node.children.flatMap((e: any) => e.children.map((ee: any) => ee.data.Id));
+        else if(e.row.data.type == "Workspace")
+            unitTestIdsToExecute = e.row.node.children.flatMap((e: any) => e.children.flatMap((ee: any) => ee.children.map((eee: any) => eee.data.Id)));
+
+        this.executeUnitTest(unitTestIdsToExecute);
     }
 
     public onClickRefresh(e: ClickEvent): void {
