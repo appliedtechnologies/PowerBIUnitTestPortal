@@ -39,7 +39,7 @@ jobs:
     - name: Update package.json
       uses: jossef/action-set-json-field@v2.1
       with:
-        file: at.D365.PowerCID.Portal/ClientApp/package.json
+        file: at.PowerBIUnitTest.Portal/at.PowerBIUnitTest.Portal/ClientApp/package.json
         field: version
         value: "${{ github.event.inputs.versionName }}"
         
