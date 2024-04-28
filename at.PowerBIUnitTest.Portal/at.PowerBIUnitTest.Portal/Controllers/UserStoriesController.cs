@@ -18,6 +18,7 @@ using Newtonsoft.Json;
 using Microsoft.AspNetCore.OData.Deltas;
 using Microsoft.EntityFrameworkCore;
 using at.PowerBIUnitTest.Portal.Services;
+using System.Collections.Generic;
 
 namespace at.PowerBIUnitTest.Portal.Controllers
 {
@@ -114,99 +115,47 @@ namespace at.PowerBIUnitTest.Portal.Controllers
         public async Task<IActionResult> Copy([FromODataUri] int key, ODataActionParameters parameters)
         {
             logger.LogDebug($"Begin: UserStoriesController Copy(key: {key})");
-            /*
-            var solution = await this.dbContext.UserStories.FirstOrDefaultAsync(e => e.Id == key && e.TabularModelNavigation.WorkspaceNavigation..DevelopmentEnvironmentNavigation.TenantNavigation.MsId == this.msIdTenantCurrentUser);
-            if (solution == null)
-                return Forbid();
 
-            if (solution.IsPatch())
-                return BadRequest("Can't apply upgrade for patch solution");
+            int targetTabularModelId = (int)parameters["targetTabularModelId"];
 
-            int targetEnvironmentId = (int)parameters["targetEnvironmentId"];
-            if (ImportExistsOnEnvironment(key, targetEnvironmentId) == false)
-                return BadRequest("Can't skip import before applying an upgrade");
+            var originalUserStory = await base.dbContext.UserStories.FirstOrDefaultAsync(e => e.Id == key && e.TabularModelNavigation.WorkspaceNavigation.TenantNavigation.MsId == this.msIdTenantCurrentUser);
+            var tabularModel = await base.dbContext.TabularModels.FirstOrDefaultAsync(e => e.Id == targetTabularModelId && e.WorkspaceNavigation.TenantNavigation.MsId == this.msIdTenantCurrentUser);
 
-            Data.Models.Action createdAction;
-
-            try
+            if (originalUserStory == null || tabularModel == null)
             {
-                createdAction = await solutionService.AddApplyUpgradeAction(key, targetEnvironmentId, this.msIdCurrentUser);
+                return NotFound();
             }
-            catch (Exception e)
+
+            var copiedUserStory = new UserStory
             {
-                return BadRequest(e.Message);
+                Name = originalUserStory.Name,
+                TabularModel = targetTabularModelId,
+            };
+
+            var copiedUnitTests = new List<UnitTest>();
+
+            foreach (var originalUnitTest in originalUserStory.UnitTests)
+            {
+                var copiedUnitTest = new UnitTest
+                {
+                    Name = originalUnitTest.Name,
+                    DAX = originalUnitTest.DAX,
+                    ExpectedResult = originalUnitTest.ExpectedResult,
+                    ResultType = originalUnitTest.ResultType,
+                    DateTimeFormat = originalUnitTest.DateTimeFormat,
+                    DecimalPlaces = originalUnitTest.DecimalPlaces,
+                    FloatSeparators = originalUnitTest.FloatSeparators,                    
+                };
+
+                copiedUnitTests.Add(copiedUnitTest);
             }
-            logger.LogDebug($"End: SolutionsController ApplyUpgrade()");
-            */
 
+            copiedUserStory.UnitTests = copiedUnitTests;
+            base.dbContext.UserStories.Add(copiedUserStory);
+            await dbContext.SaveChangesAsync();
 
+            logger.LogDebug($"End: UserStoriesController Copy()");
             return Ok();
         }
-
-    //     [HttpPost]
-    //     public async Task<IActionResult> Copy2([FromODataUri] int key, ODataActionParameters parameters)
-    //     {
-    //         try
-    //         {
-    //             int targetTabularModelId = (int)parameters["targetTabularModelId1"];
-    //             int targetWorkspaceId = (int)parameters["targetWorkspaceId1"];
-    //             int originalUserStoryId = (int)parameters["userStoryId1"];
-
-    //             // 1. UserStory kopieren
-    //             var originalUserStory = await base.dbContext.UserStories
-    //                 .Include(us => us.UnitTests)  // Include, um die verknüpften UnitTests abzurufen
-    //                 .FirstOrDefaultAsync(us => us.Id == originalUserStoryId);
-
-    //             if (originalUserStory == null)
-    //             {
-    //                 return NotFound();
-    //             }
-
-    //             var copiedUserStory = new UserStory
-    //             {
-    //                 Beschreibung = originalUserStory.Beschreibung,
-    //                 TabularModel = targetTabularModelId,
-    //             };
-
-    //             base.dbContext.UserStories.Add(copiedUserStory);
-    //             base.dbContext.SaveChanges();
-
-    //             // 2. UnitTests kopieren
-    //             foreach (var originalUnitTest in originalUserStory.UnitTests)
-    //             {
-    //                 var copiedUnitTest = new UnitTest
-    //                 {
-    //                     // Kopieren Sie alle erforderlichen Eigenschaften des UnitTests
-    //                     // ... 
-
-    //                     // Aktualisieren Sie die Beziehung zur kopierten UserStory
-    //                     Name = originalUnitTest.Name,
-    //                     DAX = originalUnitTest.DAX,
-    //                     ExpectedResult = originalUnitTest.ExpectedResult,
-    //                     ResultType = originalUnitTest.ResultType,
-    //                     DateTimeFormat = originalUnitTest.DateTimeFormat,
-    //                     DecimalPlaces = originalUnitTest.DecimalPlaces,
-    //                     FloatSeparators = originalUnitTest.FloatSeparators,
-    //                     Timestamp = originalUnitTest.Timestamp,
-    //                     UserStory = copiedUserStory.Id,
-    //                 };
-
-    //                 dbContext.UnitTests.Add(copiedUnitTest);
-    //             }
-
-    //             dbContext.SaveChanges();
-
-    //             logger.LogDebug($"End: UserStoriesController Copy()");
-    //             return Ok();
-    //         }
-    //         catch (Exception ex)
-    //         {
-    //             logger.LogError(ex, "An error occurred while copying UserStory");
-    //             throw;
-    //         }
-    //     }
-
     }
-
-
 }

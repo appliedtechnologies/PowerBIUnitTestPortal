@@ -9,6 +9,7 @@ import {
 import { Subject } from "rxjs";
 import { filter, takeUntil } from "rxjs/operators";
 import { User } from "src/app/shared/models/user.model";
+import { LayoutService, NotificationType } from "src/app/shared/services/layout.service";
 import { ODataService } from "src/app/shared/services/odata.service";
 import { UserService } from "src/app/shared/services/user.service";
 
@@ -23,8 +24,9 @@ export class ProfileComponent implements OnInit {
   roles: string;
 
   constructor(
-    private userService: UserService
-  ) {}
+    private userService: UserService,
+    private layoutService: LayoutService
+  ) { }
 
   ngOnInit(): void {
     this.getUserInformation();
@@ -33,9 +35,9 @@ export class ProfileComponent implements OnInit {
     });
   }
 
-  private getUserInformation(){
+  private getUserInformation() {
     this.isLoggedIn = this.userService.isLogggedIn;
-    if(this.isLoggedIn){
+    if (this.isLoggedIn) {
       this.user = this.userService.currentDbUserWithTenant;
       this.roles = this.userService.currentUserRoles?.join(", ");
     }
@@ -47,5 +49,10 @@ export class ProfileComponent implements OnInit {
 
   async logout() {
     await this.userService.logout();
+  }
+
+  public onClickResetGridSettings(e): void {
+    localStorage.removeItem("atPowerBiUnitTestPortal_UnitTests_TreeListState");
+    this.layoutService.notify({ message: "The grid settings have been successfully reset.", type: NotificationType.Success });
   }
 }

@@ -6,10 +6,11 @@
   (onRowDblClick)="onRowDbClickTreeList($event)" (onRowPrepared)="onRowPreparedTreeList($event)">
   <dxo-search-panel [visible]="true" [width]="250"></dxo-search-panel>
   <dxo-selection mode="multiple"></dxo-selection>
+  <dxo-sorting mode="single"></dxo-sorting>
   <dxo-state-storing [enabled]="true" storageKey="atPowerBiUnitTestPortal_UnitTests_TreeListState"></dxo-state-storing>
 
   <dxi-column dataField="type"></dxi-column>
-  <dxi-column dataField="Name"></dxi-column>
+  <dxi-column dataField="Name" sortOrder="asc" [sortIndex]="0"></dxi-column>
   <dxi-column dataField="TestRuns[0].TimeStamp" caption="Last Execution" format="dd.MM.yyyy HH:mm:ss"></dxi-column>
   <dxi-column dataField="TestRuns[0].Result" caption="Last Result" cellTemplate="cellTemplateLastResult"></dxi-column>
   <dxi-column dataField="ExpectedResult"></dxi-column>
@@ -36,12 +37,16 @@
     <dxi-button [visible]="isUnitTestRow" icon="trash" text="Delete Unit Test" type="default"
       [onClick]="onClickDeleteUnitTest">
     </dxi-button>
+    <dxi-button [visible]="isUserStoryRow" icon="copy" text="Copy User Story" type="default"
+      [onClick]="onClickCopyUserStory">
+    </dxi-button>
   </dxi-column>
 
   <div *dxTemplate="let data of 'cellTemplateLastResult'">
     <div *ngIf="data.data?.TestRuns | getFirstElement as testRun">
       <span *ngIf="testRun.ExecutedSuccessfully" [title]="testRun.JsonResponse ?? ''">{{ data.value }}</span>
-      <span *ngIf="!testRun.ExecutedSuccessfully" [title]="testRun.JsonResponse ?? ''"><i>error durring execution</i></span>
+      <span *ngIf="!testRun.ExecutedSuccessfully" [title]="testRun.JsonResponse ?? ''"><i>error durring
+          execution</i></span>
     </div>
   </div>
 </dx-tree-list>
@@ -90,4 +95,25 @@
         width: '100%'
       }"></dxi-item>
   </dx-form>
+</dx-popup>
+
+<dx-popup *ngIf="isVisibleCopyUserStory" [width]="700" height="auto" [showTitle]="true" title="Copy User Story"
+  [hideOnOutsideClick]="true" [(visible)]="isVisibleCopyUserStory">
+
+  <span>Workspace:</span>
+  <dx-select-box [dataSource]="dataSourceWorkspacesOdata" displayExpr="Name" (onValueChanged)="onValueChangeCopyUserStoryWorkspace($event)"
+    ></dx-select-box>
+
+  <span>Tabular Model:</span>
+  <dx-select-box [disabled]="copyUserStoryConfig.workspaceId == null" [dataSource]="dataSourceTabularModels" displayExpr="Name" (onValueChanged)="onValueChangeCopyUserStoryTabularModel($event)"
+    ></dx-select-box>
+
+  <dx-form>
+    <dxi-item itemType="button" horizontalAlignment="left" [buttonOptions]="{
+      icon: 'copy',
+      text: 'Copy',
+      type: 'success',
+      onClick: this.onClickSaveCopyUserStory.bind(this),
+      width: '100%'
+    }"></dxi-item></dx-form>
 </dx-popup>

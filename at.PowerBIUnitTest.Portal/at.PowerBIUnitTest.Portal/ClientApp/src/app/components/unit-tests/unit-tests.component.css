@@ -9,3 +9,7 @@
 ::ng-deep .hide-checkbox .dx-treelist-icon-container{
   padding-right: 0px;
 }
+
+::ng-deep dx-select-box {
+  margin-bottom: 15px;
+}

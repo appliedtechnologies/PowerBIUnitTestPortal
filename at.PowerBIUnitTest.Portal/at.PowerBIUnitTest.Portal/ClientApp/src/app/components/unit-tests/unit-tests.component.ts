@@ -16,6 +16,7 @@ import { UserStoryService } from "src/app/shared/services/user-story.service";
 import { WorkspaceService } from "src/app/shared/services/workspace.service";
 import { UnitTest } from "src/app/shared/models/unit-test.model";
 import ODataContext from "devextreme/data/odata/context";
+import { TabularModelService } from "src/app/shared/services/tabular-model.service";
 
 @Component({
     selector: "app-unit-tests",
@@ -24,15 +25,19 @@ import ODataContext from "devextreme/data/odata/context";
 })
 export class UnitTestsComponent implements OnInit {
     public dataSourceWorkspaces: DataSource;
+    public dataSourceWorkspacesOdata: DataSource;
+    public dataSourceTabularModels: DataSource;
     @ViewChild(DxTreeListComponent, { static: false })
     treeList: DxDataGridComponent;
 
     public isVisibleEditUnitTest: boolean = false;
     public isVisibleEditUserStory: boolean = false;
+    public isVisibleCopyUserStory: boolean = false;
     public popupTitle: string = "";
 
     public userStoryToEdit: UserStory = {};
     public unitTestToEdit: UnitTest = {};
+    public copyUserStoryConfig: { workspaceId?: number, tabularModelId?: number, userStoryId?: number, tabularModelToExclude?: number } = {};
 
     public resultTypeItems: string[] = ["String", "Float", "Date", "Percentage"];
     public dateTimeFormatItems: string[] = ["UTC", "CET"];
@@ -43,6 +48,7 @@ export class UnitTestsComponent implements OnInit {
         private unitTestService: UnitTestService,
         private userStoryService: UserStoryService,
         private workspaceService: WorkspaceService,
+        private tabularModelService: TabularModelService,
         private layoutService: LayoutService
     ) {
         this.onClickExecuteUnitTests = this.onClickExecuteUnitTests.bind(this);
@@ -52,6 +58,7 @@ export class UnitTestsComponent implements OnInit {
         this.onClickAddUnitTest = this.onClickAddUnitTest.bind(this);
         this.onClickEditUnitTest = this.onClickEditUnitTest.bind(this);
         this.onClickDeleteUnitTest = this.onClickDeleteUnitTest.bind(this);
+        this.onClickCopyUserStory = this.onClickCopyUserStory.bind(this);
 
         this.dataSourceWorkspaces = new DataSource({
             store: new CustomStore({
@@ -86,6 +93,11 @@ export class UnitTestsComponent implements OnInit {
                     });
                 }
             })
+        });
+
+        this.dataSourceWorkspacesOdata = new DataSource({
+            store: this.workspaceService.getStore(),
+            sort: [{ selector: "Name", desc: false }]
         });
     }
 
@@ -198,6 +210,45 @@ export class UnitTestsComponent implements OnInit {
         }
     }
 
+    public onClickCopyUserStory(e: any): void {
+        this.copyUserStoryConfig = {};
+        this.copyUserStoryConfig.tabularModelToExclude = e.row.data.TabularModel;
+        this.copyUserStoryConfig.userStoryId = e.row.data.Id;
+        this.isVisibleCopyUserStory = true;
+    }
+
+    public onClickSaveCopyUserStory(e: any): void {
+        this.layoutService.change(LayoutParameter.ShowLoading, true);
+        this.userStoryService.copyToOtherTabularModel(this.copyUserStoryConfig.userStoryId, this.copyUserStoryConfig.tabularModelId)
+            .then(() => {
+                this.layoutService.notify({
+                    type: NotificationType.Success,
+                    message: "The user story was copied successfully."
+                });
+                this.isVisibleCopyUserStory = false;
+                this.copyUserStoryConfig = {};
+                this.treeList.instance.refresh();
+            })
+            .catch((error: Error) => this.layoutService.notify({
+                type: NotificationType.Error,
+                message: error?.message ? `The user story could not be copied.: ${error.message}` : "The user story could not be copied."
+            }))
+            .then(() => { this.layoutService.change(LayoutParameter.ShowLoading, false); });
+    }
+
+    public onValueChangeCopyUserStoryWorkspace(e: any): void {
+        this.copyUserStoryConfig.workspaceId = e.value.Id;
+        this.dataSourceTabularModels = new DataSource({
+            store: this.tabularModelService.getStore(),
+            filter: [["Workspace", "=", e.value.Id], "and", ["Id", "<>", this.copyUserStoryConfig.tabularModelToExclude]],
+            sort: [{ selector: "Name", desc: false }],
+        });
+    }
+
+    public onValueChangeCopyUserStoryTabularModel(e: any): void {
+        this.copyUserStoryConfig.tabularModelId = e.value.Id;
+    }
+
     public onClickClearSelection(e: any): void {
         this.treeList.instance.clearSelection();
     }
@@ -217,13 +268,13 @@ export class UnitTestsComponent implements OnInit {
 
     public onClickExecuteUnitTests(e: any): void {
         let unitTestIdsToExecute = [];
-        if(e.row.data.type == "Unit Test")
+        if (e.row.data.type == "Unit Test")
             unitTestIdsToExecute = [e.row.data.Id];
-        else if(e.row.data.type == "User Story")
+        else if (e.row.data.type == "User Story")
             unitTestIdsToExecute = e.row.node.children.map((e: any) => e.data.Id);
-        else if(e.row.data.type == "Tabular Model")
+        else if (e.row.data.type == "Tabular Model")
             unitTestIdsToExecute = e.row.node.children.flatMap((e: any) => e.children.map((ee: any) => ee.data.Id));
-        else if(e.row.data.type == "Workspace")
+        else if (e.row.data.type == "Workspace")
             unitTestIdsToExecute = e.row.node.children.flatMap((e: any) => e.children.flatMap((ee: any) => ee.children.map((eee: any) => eee.data.Id)));
 
         this.executeUnitTest(unitTestIdsToExecute);
@@ -256,7 +307,7 @@ export class UnitTestsComponent implements OnInit {
     }
 
     public onClickDeleteUserStory(e: any): void {
-        let result = confirm("Are you sure you want to delete this user story?", "Delete User Story");
+        let result = confirm("Are you sure you want to delete this user story (including all unit tests)?", "Delete User Story");
         result.then((dialogResult) => {
             if (dialogResult) {
                 this.layoutService.change(LayoutParameter.ShowLoading, true);
