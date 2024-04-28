@@ -29,6 +29,10 @@ export class UserStoryService {
     return this.getStore().remove(id);
   }
 
+  public update (id: number, userStory: UserStory): Promise<void> {
+    return this.getStore().update(id, userStory);
+  }
+
   public copyToOtherTabularModel(userStoryId: number, targetTabularModelId: number, targetWorkspaceId: number): Promise<void> {
     return new Promise<void>((resolve, reject) => {
       let request = this.http

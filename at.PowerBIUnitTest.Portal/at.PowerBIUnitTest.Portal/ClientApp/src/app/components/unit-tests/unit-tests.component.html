@@ -22,19 +22,22 @@
     <dxi-button [visible]="isUnitTestRow" icon="trash" text="Delete Unit Test" type="default"
       [onClick]="onClickDeleteUnitTest">
     </dxi-button>
+    <dxi-button [visible]="isUserStoryRow" icon="edit" text="Edit Unit Test" type="default"
+      [onClick]="onClickEditUserStory">
+    </dxi-button>
   </dxi-column>
 </dx-tree-list>
 
-<dx-popup *ngIf="isVisibleAddUserStory" title="Add User Story" [showTitle]="true" [width]="500" height="auto"
-  [(visible)]="isVisibleAddUserStory">
-  <dx-form [(formData)]="newUserStory">
+<dx-popup *ngIf="isVisibleEditUserStory" [title]="popupTitle" [showTitle]="true" [width]="500" height="auto"
+  [(visible)]="isVisibleEditUserStory">
+  <dx-form [(formData)]="userStoryToEdit">
     <dxi-item dataField="Name" [label]="{ text: 'Name' }"></dxi-item>
 
     <dxi-item itemType="button" horizontalAlignment="left" [buttonOptions]="{
         icon: 'save',
         text: 'Save',
         type: 'success',
-        onClick: this.onClickSaveNewUserStory.bind(this),
+        onClick: this.onClickSaveUserStory.bind(this),
 
         width: '100%'
       }"></dxi-item>

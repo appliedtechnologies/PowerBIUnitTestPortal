@@ -4,9 +4,9 @@ import CustomStore from "devextreme/data/custom_store";
 import DataSource from "devextreme/data/data_source";
 import { ClickEvent } from "devextreme/ui/button";
 import { ToolbarPreparingEvent } from "devextreme/ui/tree_list";
-import { resolve } from "dns";
 import { UserStory } from "src/app/shared/models/user-story.model";
 import { UnitTestService } from "src/app/shared/services/unit-test.service";
+import { confirm } from 'devextreme/ui/dialog';
 import {
     LayoutParameter,
     LayoutService,
@@ -25,10 +25,11 @@ export class UnitTestsComponent implements OnInit {
     @ViewChild(DxTreeListComponent, { static: false })
     treeList: DxDataGridComponent;
 
-    public isVisibleAddUnitTest: boolean = false;
-    public isVisibleAddUserStory: boolean = false;
+    public isVisibleEditUnitTest: boolean = false;
+    public isVisibleEditUserStory: boolean = false;
+    public popupTitle: string = "";
 
-    public newUserStory: UserStory = {};
+    public userStoryToEdit: UserStory = {};
 
     constructor(
         private unitTestService: UnitTestService,
@@ -37,6 +38,7 @@ export class UnitTestsComponent implements OnInit {
         private layoutService: LayoutService
     ) {
         this.onClickAddUserStory = this.onClickAddUserStory.bind(this);
+        this.onClickEditUserStory = this.onClickEditUserStory.bind(this);
         this.onClickDeleteUnitTest = this.onClickDeleteUnitTest.bind(this);
         this.onClickDeleteUserStory = this.onClickDeleteUserStory.bind(this);
 
@@ -129,66 +131,100 @@ export class UnitTestsComponent implements OnInit {
         this.treeList.instance.refresh();
     }
 
-    public onClickAddUnitTest(e: ClickEvent): void { 
-        this.isVisibleAddUnitTest = true;
+    public onClickAddUnitTest(e: ClickEvent): void {
+        this.popupTitle = "Add Unit Test";
+        this.isVisibleEditUnitTest = true;
     }
 
-    public onClickAddUserStory(e: any): void { 
-        this.newUserStory.TabularModel = e.row.data.Id;
-        this.isVisibleAddUserStory = true;
+    public onClickAddUserStory(e: any): void {
+        this.popupTitle = "Add User Story";
+        this.userStoryToEdit = {};
+        this.userStoryToEdit.TabularModel = e.row.data.Id;
+        this.isVisibleEditUserStory = true;
     }
 
-    public onClickDeleteUserStory(e: any): void{
+    public onClickEditUserStory(e: any): void {
+        this.popupTitle = "Edit User Story";
+        this.userStoryToEdit = structuredClone(e.row.data);
+        this.isVisibleEditUserStory = true;
+    }
+
+    public onClickDeleteUserStory(e: any): void {
+        let result = confirm("Are you sure you want to delete this user story?", "Delete User Story");
+        result.then((dialogResult) => {
+            if (dialogResult) {
+                this.layoutService.change(LayoutParameter.ShowLoading, true);
+                this.userStoryService.remove(e.row.data.Id)
+                    .then(() => this.layoutService.notify({
+                        type: NotificationType.Success,
+                        message: "The user story was deleted successfully."
+                    }))
+                    .catch((error: Error) => this.layoutService.notify({
+                        type: NotificationType.Error,
+                        message: error.message ? `The user story could not be deleted: ${error.message}` : "The user story could not be deleted."
+                    }))
+                    .then(() => {
+                        this.treeList.instance.refresh();
+                        this.layoutService.change(LayoutParameter.ShowLoading, false);
+                    });
+            }
+        });
+    }
+
+    public onClickDeleteUnitTest(e: any): void {
+        let result = confirm("Are you sure you want to delete this unit test?", "Delete Unit Test");
+        result.then((dialogResult) => {
+            if (dialogResult) {
+                this.layoutService.change(LayoutParameter.ShowLoading, true);
+                this.unitTestService.remove(e.row.data.Id)
+                    .then(() => this.layoutService.notify({
+                        type: NotificationType.Success,
+                        message: "The unit test was deleted successfully."
+                    }))
+                    .catch((error: Error) => this.layoutService.notify({
+                        type: NotificationType.Error,
+                        message: error.message ? `The unit test could not be deleted: ${error.message}` : "The unit test could not be deleted."
+                    }))
+                    .then(() => {
+                        this.treeList.instance.refresh();
+                        this.layoutService.change(LayoutParameter.ShowLoading, false);
+                    });
+            }
+        });
+    }
+
+    public onClickSaveUserStory(e: ClickEvent): void {
         this.layoutService.change(LayoutParameter.ShowLoading, true);
-        this.userStoryService.remove(e.row.data.Id)
-          .then(() => this.layoutService.notify({
-            type: NotificationType.Success,
-            message: "The user story was deleted successfully."
-          }))
-          .catch((error: Error) => this.layoutService.notify({
-            type: NotificationType.Error,
-            message: error.message ? `The user story could not be deleted: ${error.message}` : "The user story could not be deleted."
-          }))
-          .then(() => {
+        let editPromise;
+        if (this.userStoryToEdit.Id != null) {
+            editPromise = this.userStoryService.update(this.userStoryToEdit.Id, { Name: this.userStoryToEdit.Name })
+                .then(() => this.layoutService.notify({
+                    type: NotificationType.Success,
+                    message: "The user story has been edited successfully."
+                }))
+                .catch((error: Error) => this.layoutService.notify({
+                    type: NotificationType.Error,
+                    message: error.message ? `The user story could not be edited: ${error.message}` : "The user story could not be edited."
+                }))
+        }
+        else {
+            editPromise = this.userStoryService.add(this.userStoryToEdit)
+                .then(() => this.layoutService.notify({
+                    type: NotificationType.Success,
+                    message: "The new user story has been created successfully."
+                }))
+                .catch((error: Error) => this.layoutService.notify({
+                    type: NotificationType.Error,
+                    message: error.message ? `The new user story could not be created: ${error.message}` : "The new user story could not be created."
+                }))
+        }
+
+        editPromise.then(() => {
+            this.isVisibleEditUserStory = false;
+            this.userStoryToEdit = {};
             this.treeList.instance.refresh();
             this.layoutService.change(LayoutParameter.ShowLoading, false);
-          });
-    }
-
-    public onClickDeleteUnitTest(e: any): void{
-        this.layoutService.change(LayoutParameter.ShowLoading, true);
-        this.unitTestService.remove(e.row.data.Id)
-          .then(() => this.layoutService.notify({
-            type: NotificationType.Success,
-            message: "The unit test was deleted successfully."
-          }))
-          .catch((error: Error) => this.layoutService.notify({
-            type: NotificationType.Error,
-            message: error.message ? `The unit test could not be deleted: ${error.message}` : "The unit test could not be deleted."
-          }))
-          .then(() => {
-            this.treeList.instance.refresh();
-            this.layoutService.change(LayoutParameter.ShowLoading, false);
-          });
-    }
-
-    public onClickSaveNewUserStory(e: ClickEvent): void {
-        this.layoutService.change(LayoutParameter.ShowLoading, true);
-        this.userStoryService.add(this.newUserStory)
-          .then(() => this.layoutService.notify({
-            type: NotificationType.Success,
-            message: "The new user story has been created successfully."
-          }))
-          .catch((error: Error) => this.layoutService.notify({
-            type: NotificationType.Error,
-            message: error.message ? `The new user story could not be created: ${error.message}` : "The new user story could not be created."
-          }))
-          .then(() => {
-            this.isVisibleAddUserStory = false;
-            this.newUserStory = {};
-            this.treeList.instance.refresh();
-            this.layoutService.change(LayoutParameter.ShowLoading, false);
-          });
+        });
     }
 
     public isWorkspaceRow(e: any): boolean {
