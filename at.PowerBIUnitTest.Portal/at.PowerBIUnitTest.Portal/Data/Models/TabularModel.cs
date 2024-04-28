@@ -8,23 +8,17 @@ namespace at.PowerBIUnitTest.Portal.Data.Models
 {
     public partial class TabularModel
     {
-        public TabularModel()
-        {
-            UserStories = new HashSet<UserStory>();
-        }
-
-        [Key]
         public int Id { get; set; }
+        public Guid UniqueIdentifier { get; set; }
 
-        public string DatasetPbId { get; set; }
+        public Guid MsId { get; set; }
 
-        public int Workspace {get; set;}
+        public int Workspace { get; set; }
 
-        public string Name {get; set;}
+        public string Name { get; set; }
 
         public virtual ICollection<UserStory> UserStories { get; set; }
 
         public virtual Workspace WorkspaceNavigation { get; set; }
-        
     }
 }

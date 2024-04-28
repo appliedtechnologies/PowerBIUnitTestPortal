@@ -1,0 +1,119 @@
+<h1>Unit Tests</h1>
+
+<dx-tree-list #treeList [dataSource]="dataSourceWorkspaces" dataStructure="tree" [showRowLines]="true"
+  [hoverStateEnabled]="true" [showBorders]="true" height="100%"
+  (onToolbarPreparing)="onToolbarPreparingTreeList($event)" (onCellPrepared)="onCellPreparedTreeList($event)"
+  (onRowDblClick)="onRowDbClickTreeList($event)" (onRowPrepared)="onRowPreparedTreeList($event)">
+  <dxo-search-panel [visible]="true" [width]="250"></dxo-search-panel>
+  <dxo-selection mode="multiple"></dxo-selection>
+  <dxo-sorting mode="single"></dxo-sorting>
+  <dxo-state-storing [enabled]="true" storageKey="atPowerBiUnitTestPortal_UnitTests_TreeListState"></dxo-state-storing>
+
+  <dxi-column dataField="type"></dxi-column>
+  <dxi-column dataField="Name" sortOrder="asc" [sortIndex]="0"></dxi-column>
+  <dxi-column dataField="TestRuns[0].TimeStamp" caption="Last Execution" format="dd.MM.yyyy HH:mm:ss"></dxi-column>
+  <dxi-column dataField="TestRuns[0].Result" caption="Last Result" cellTemplate="cellTemplateLastResult"></dxi-column>
+  <dxi-column dataField="ExpectedResult"></dxi-column>
+  <dxi-column dataField="DAX"></dxi-column>
+
+  <dxi-column type="buttons" caption="Actions" alignment="left" width="200">
+    <dxi-button icon="runner" text="Execute Unit Test(s)" type="default" [onClick]="onClickExecuteUnitTests">
+    </dxi-button>
+    <dxi-button [visible]="isTabularModelRow" icon="add" text="Add User Story" type="default"
+      [onClick]="onClickAddUserStory">
+    </dxi-button>
+    <dxi-button [visible]="isUserStoryRow" icon="add" text="Add Unit Test" type="default"
+      [onClick]="onClickAddUnitTest">
+    </dxi-button>
+    <dxi-button [visible]="isUserStoryRow" icon="edit" text="Edit User Story" type="default"
+      [onClick]="onClickEditUserStory">
+    </dxi-button>
+    <dxi-button [visible]="isUnitTestRow" icon="edit" text="Edit Unit Test" type="default"
+      [onClick]="onClickEditUnitTest">
+    </dxi-button>
+    <dxi-button [visible]="isUserStoryRow" icon="trash" text="Delete User Story" type="default"
+      [onClick]="onClickDeleteUserStory">
+    </dxi-button>
+    <dxi-button [visible]="isUnitTestRow" icon="trash" text="Delete Unit Test" type="default"
+      [onClick]="onClickDeleteUnitTest">
+    </dxi-button>
+    <dxi-button [visible]="isUserStoryRow" icon="copy" text="Copy User Story" type="default"
+      [onClick]="onClickCopyUserStory">
+    </dxi-button>
+  </dxi-column>
+
+  <div *dxTemplate="let data of 'cellTemplateLastResult'">
+    <div *ngIf="data.data?.TestRuns | getFirstElement as testRun">
+      <span *ngIf="testRun.ExecutedSuccessfully" [title]="testRun.JsonResponse ?? ''">{{ data.value }}</span>
+      <span *ngIf="!testRun.ExecutedSuccessfully" [title]="testRun.JsonResponse ?? ''"><i>error durring
+          execution</i></span>
+    </div>
+  </div>
+</dx-tree-list>
+
+<dx-popup *ngIf="isVisibleEditUserStory" [title]="popupTitle" [showTitle]="true" [width]="500" height="auto"
+  [(visible)]="isVisibleEditUserStory">
+  <dx-form [(formData)]="userStoryToEdit">
+    <dxi-item dataField="Name" [label]="{ text: 'Name' }" isRequired="true"></dxi-item>
+
+    <dxi-item itemType="button" horizontalAlignment="left" [buttonOptions]="{
+        icon: 'save',
+        text: 'Save',
+        type: 'success',
+        onClick: this.onClickSaveUserStory.bind(this),
+
+        width: '100%'
+      }"></dxi-item>
+  </dx-form>
+</dx-popup>
+
+<dx-popup *ngIf="isVisibleEditUnitTest" [title]="popupTitle" [showTitle]="true" [width]="750" height="auto"
+  [(visible)]="isVisibleEditUnitTest">
+  <dx-form [(formData)]="unitTestToEdit">
+    <dxi-item dataField="Name" [label]="{ text: 'Name' }" isRequired="true"></dxi-item>
+    <dxi-item dataField="ResultType" [label]="{ text: 'Result Type' }" editorType="dxSelectBox"
+      [editorOptions]="{ items: resultTypeItems }" isRequired="true"></dxi-item>
+    <dxi-item *ngIf="unitTestToEdit.ResultType == 'Float'" dataField="DecimalPlaces"
+      [label]="{ text: 'Decimal Places' }" editorType="dxSelectBox"
+      [editorOptions]="{  items: decimalPlacesItems }"></dxi-item>
+    <dxi-item *ngIf="unitTestToEdit.ResultType == 'Float'" dataField="FloatSeparators"
+      [label]="{ text: 'Float Separators' }" editorType="dxSelectBox"
+      [editorOptions]="{  items: floatSeparatorItems }"></dxi-item>
+    <dxi-item *ngIf="unitTestToEdit.ResultType == 'Date'" dataField="DateTimeFormat"
+      [label]="{ text: 'DateTime Format' }" editorType="dxSelectBox"
+      [editorOptions]="{  items: dateTimeFormatItems }"></dxi-item>
+    <dxi-item dataField="ExpectedResult" [label]="{ text: 'Expected Result' }" isRequired="true"></dxi-item>
+    <dxi-item dataField="DAX" [label]="{ text: 'DAX' }" editorType="dxTextArea" [editorOptions]="{ height: 250 }"
+      isRequired="true"></dxi-item>
+
+    <dxi-item itemType="button" horizontalAlignment="left" [buttonOptions]="{
+        icon: 'save',
+        text: 'Save',
+        type: 'success',
+        onClick: this.onClickSaveUnitTest.bind(this),
+
+        width: '100%'
+      }"></dxi-item>
+  </dx-form>
+</dx-popup>
+
+<dx-popup *ngIf="isVisibleCopyUserStory" [width]="700" height="auto" [showTitle]="true" title="Copy User Story"
+  [hideOnOutsideClick]="true" [(visible)]="isVisibleCopyUserStory">
+
+  <span>Workspace:</span>
+  <dx-select-box [dataSource]="dataSourceWorkspacesOdata" displayExpr="Name" (onValueChanged)="onValueChangeCopyUserStoryWorkspace($event)"
+    ></dx-select-box>
+
+  <span>Tabular Model:</span>
+  <dx-select-box [disabled]="copyUserStoryConfig.workspaceId == null" [dataSource]="dataSourceTabularModels" displayExpr="Name" (onValueChanged)="onValueChangeCopyUserStoryTabularModel($event)"
+    ></dx-select-box>
+
+  <dx-form>
+    <dxi-item itemType="button" horizontalAlignment="left" [buttonOptions]="{
+      icon: 'copy',
+      text: 'Copy',
+      type: 'success',
+      onClick: this.onClickSaveCopyUserStory.bind(this),
+      width: '100%'
+    }"></dxi-item></dx-form>
+</dx-popup>
