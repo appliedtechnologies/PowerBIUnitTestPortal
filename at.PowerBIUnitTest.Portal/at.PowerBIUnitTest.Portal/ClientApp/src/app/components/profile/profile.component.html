@@ -20,10 +20,18 @@
 
 <div *ngIf="isLoggedIn">
   <div *ngIf="user">
-    <p><strong>First Name: </strong> {{user?.Firstname}}</p>
-    <p><strong>Last Name: </strong> {{user?.Lastname}}</p>
-    <p><strong>Email: </strong> {{user?.Email}}</p>
-    <p><strong>Azure AD Id: </strong> {{user?.MsId}}</p>
-    <p><strong>Roles: </strong> {{roles}}</p>
+    <p><strong>First Name: </strong> {{ user?.Firstname }}</p>
+    <p><strong>Last Name: </strong> {{ user?.Lastname }}</p>
+    <p><strong>Email: </strong> {{ user?.Email }}</p>
+    <p><strong>Azure AD Id: </strong> {{ user?.MsId }}</p>
+    <p><strong>Roles: </strong> {{ roles }}</p>
+    <dx-button
+      width="100%"  
+      text="Reset the settings of the grids"
+      type="success"
+      stylingMode="contained"
+      icon="clear"
+      (onClick)="onClickResetGridSettings($event)"
+    ></dx-button>
   </div>
 </div>

@@ -18,6 +18,7 @@ using Newtonsoft.Json;
 using Microsoft.AspNetCore.OData.Deltas;
 using Microsoft.EntityFrameworkCore;
 using at.PowerBIUnitTest.Portal.Services;
+using System.Collections.Generic;
 
 namespace at.PowerBIUnitTest.Portal.Controllers
 {
@@ -25,163 +26,136 @@ namespace at.PowerBIUnitTest.Portal.Controllers
     [Authorize]
     public class UserStoriesController : BaseController
     {
-        private readonly IConfiguration configuration;
-        private readonly ILogger<UsersController> logger;
-        public UserStoriesController(Data.Models.PortalDbContext portalDbContext, IDownstreamWebApi downstreamWebApi, IHttpContextAccessor httpContextAccessor, IConfiguration configuration, ILogger<UsersController> logger) : base(portalDbContext, downstreamWebApi, httpContextAccessor)
+        public UserStoriesController(Data.Models.PortalDbContext portalDbContext, IDownstreamWebApi downstreamWebApi, IHttpContextAccessor httpContextAccessor, IConfiguration configuration, ILogger<UsersController> logger) : base(portalDbContext, downstreamWebApi, httpContextAccessor, logger)
         {
-            this.configuration = configuration;
-            this.logger = logger;
         }
 
-       
+        [EnableQuery]
+        public IQueryable<UserStory> Get([FromODataUri] int key)
+        {
+            logger.LogDebug($"Begin & End: UserStoriesController Get(key: {key})");
+            return base.dbContext.UserStories.Where(e => e.TabularModelNavigation.WorkspaceNavigation.TenantNavigation.MsId == this.msIdTenantCurrentUser && e.Id == key);
+        }
+
         [EnableQuery]
         public IQueryable<UserStory> Get()
         {
             logger.LogDebug($"Begin & End: UserStoriesController Get()");
-            return base.dbContext.UserStories;
-        }
-
-        // Add odata/UserStory
-        [HttpPost]
-        public UserStory Post([FromBody] UserStory userStory)
-        {
-            try
-            {
-            logger.LogDebug($"Begin: UserStoriesController Post()");
-            var newUserStory = base.dbContext.Add(userStory);
-            base.dbContext.SaveChanges();
-            logger.LogDebug($"End: UserStoriesController Post()");
-            return newUserStory.Entity;
-            }
-            catch(Exception ex)
-            {
-                logger.LogError(ex, "An error occured while adding a User Story");
-                throw;
-            }
-        }
-
-        public async Task<IActionResult> Patch([FromODataUri] int key, Delta<UserStory> userStory)
-        {
-            try
-            {
-                logger.LogDebug($"Begin: UnitTestsController Patch()");
-                var userStoryToChange = await base.dbContext.UserStories.FindAsync(key);
-
-                if (userStoryToChange == null)
-                {
-                    return NotFound();
-                }
-
-                userStory.Patch(userStoryToChange);
-                base.dbContext.SaveChanges();
-
-                logger.LogDebug($"End: UnitTestsController Patch()");
-                return Updated(userStoryToChange);
-            }
-            catch (Exception ex)
-            {
-                logger.LogError(ex, "An error occured while performing PATCH");
-                throw;
-            }
+            return base.dbContext.UserStories.Where(e => e.TabularModelNavigation.WorkspaceNavigation.TenantNavigation.MsId == this.msIdTenantCurrentUser);
         }
 
         [HttpPost]
-        public async Task<IActionResult> Copy ([FromODataUri] int key, ODataActionParameters parameters)
+        public async Task<IActionResult> Post([FromBody] UserStory userStory)
         {
-            logger.LogDebug($"Begin: UserStoriesController Copy(key: {key})");
-            /*
-            var solution = await this.dbContext.UserStories.FirstOrDefaultAsync(e => e.Id == key && e.TabularModelNavigation.WorkspaceNavigation..DevelopmentEnvironmentNavigation.TenantNavigation.MsId == this.msIdTenantCurrentUser);
-            if (solution == null)
+            logger.LogDebug($"Begin: UserStoriesController Post(unitTest Description: {userStory.Name})");
+
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            if ((await this.dbContext.TabularModels.FirstOrDefaultAsync(e => e.Id == userStory.TabularModel && e.WorkspaceNavigation.TenantNavigation.MsId == this.msIdTenantCurrentUser)) == null)
                 return Forbid();
 
-            if (solution.IsPatch())
-                return BadRequest("Can't apply upgrade for patch solution");
+            this.dbContext.UserStories.Add(userStory);
+            await this.dbContext.SaveChangesAsync();
 
-            int targetEnvironmentId = (int)parameters["targetEnvironmentId"];
-            if (ImportExistsOnEnvironment(key, targetEnvironmentId) == false)
-                return BadRequest("Can't skip import before applying an upgrade");
+            logger.LogDebug($"End: UserStoriesController Post(unitTest Description: {userStory.Name})");
 
-            Data.Models.Action createdAction;
+            return Created(userStory);
+        }
 
-            try
-            {
-                createdAction = await solutionService.AddApplyUpgradeAction(key, targetEnvironmentId, this.msIdCurrentUser);
-            }
-            catch (Exception e)
-            {
-                return BadRequest(e.Message);
-            }
-            logger.LogDebug($"End: SolutionsController ApplyUpgrade()");
-            */
-            
-            
+        [HttpDelete]
+        public async Task<IActionResult> Delete([FromODataUri] int key)
+        {
+            logger.LogDebug($"Begin: UserStoriesController Delete(key: {key}");
+
+            var userStory = await this.dbContext.UserStories.FindAsync(key);
+
+            if (userStory == null)
+                return NotFound();
+
+            if (userStory.TabularModelNavigation.WorkspaceNavigation.TenantNavigation.MsId != this.msIdTenantCurrentUser)
+                return Forbid();
+
+            this.dbContext.UserStories.Remove(userStory);
+            await base.dbContext.SaveChangesAsync();
+
+            logger.LogDebug($"End: UserStoriesController Delete(key: {key}");
             return Ok();
         }
 
-[HttpPost]
-public async Task<IActionResult> Copy2 ([FromODataUri] int key, ODataActionParameters parameters)
-{
-    try
-    {
-        int targetTabularModelId = (int)parameters["targetTabularModelId1"];
-        int targetWorkspaceId = (int)parameters["targetWorkspaceId1"];
-        int originalUserStoryId = (int)parameters["userStoryId1"];
-
-        // 1. UserStory kopieren
-        var originalUserStory = await base.dbContext.UserStories
-            .Include(us => us.UnitTests)  // Include, um die verknüpften UnitTests abzurufen
-            .FirstOrDefaultAsync(us => us.Id == originalUserStoryId);
-
-        if (originalUserStory == null)
+        [HttpPatch]
+        public async Task<IActionResult> Patch([FromODataUri] int key, Delta<UserStory> userStory)
         {
-            return NotFound();
+            logger.LogDebug($"Begin: UserStoriesController Patch(key: {key}, userStory: {userStory.GetChangedPropertyNames()}");
+
+            if ((await this.dbContext.UserStories.FirstOrDefaultAsync(e => e.Id == key && e.TabularModelNavigation.WorkspaceNavigation.TenantNavigation.MsId == this.msIdTenantCurrentUser)) == null)
+                return Forbid();
+
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            var entity = await base.dbContext.UserStories.FindAsync(key);
+            if (entity == null)
+            {
+                return NotFound();
+            }
+
+            userStory.Patch(entity);
+            await base.dbContext.SaveChangesAsync();
+
+            logger.LogDebug($"End: UserStoriesController Patch(key: {key}, userStory: {userStory.GetChangedPropertyNames()}");
+
+            return Updated(entity);
         }
 
-        var copiedUserStory = new UserStory
+        [HttpPost]
+        public async Task<IActionResult> Copy([FromODataUri] int key, ODataActionParameters parameters)
         {
-            Beschreibung = originalUserStory.Beschreibung,
-            TabularModel = targetTabularModelId,
-        };
+            logger.LogDebug($"Begin: UserStoriesController Copy(key: {key})");
 
-        base.dbContext.UserStories.Add(copiedUserStory);
-        base.dbContext.SaveChanges();
+            int targetTabularModelId = (int)parameters["targetTabularModelId"];
 
-        // 2. UnitTests kopieren
-        foreach (var originalUnitTest in originalUserStory.UnitTests)
-        {
-            var copiedUnitTest = new UnitTest
+            var originalUserStory = await base.dbContext.UserStories.FirstOrDefaultAsync(e => e.Id == key && e.TabularModelNavigation.WorkspaceNavigation.TenantNavigation.MsId == this.msIdTenantCurrentUser);
+            var tabularModel = await base.dbContext.TabularModels.FirstOrDefaultAsync(e => e.Id == targetTabularModelId && e.WorkspaceNavigation.TenantNavigation.MsId == this.msIdTenantCurrentUser);
+
+            if (originalUserStory == null || tabularModel == null)
             {
-                // Kopieren Sie alle erforderlichen Eigenschaften des UnitTests
-                // ... 
+                return NotFound();
+            }
 
-                // Aktualisieren Sie die Beziehung zur kopierten UserStory
-                Name = originalUnitTest.Name,
-                DAX = originalUnitTest.DAX,
-                ExpectedResult = originalUnitTest.ExpectedResult,
-                ResultType = originalUnitTest.ResultType,
-                DateTimeFormat = originalUnitTest.DateTimeFormat,
-                DecimalPlaces = originalUnitTest.DecimalPlaces,
-                FloatSeparators = originalUnitTest.FloatSeparators,
-                Timestamp = originalUnitTest.Timestamp,
-                UserStory = copiedUserStory.Id,
+            var copiedUserStory = new UserStory
+            {
+                Name = originalUserStory.Name,
+                TabularModel = targetTabularModelId,
             };
 
-            dbContext.UnitTests.Add(copiedUnitTest);
+            var copiedUnitTests = new List<UnitTest>();
+
+            foreach (var originalUnitTest in originalUserStory.UnitTests)
+            {
+                var copiedUnitTest = new UnitTest
+                {
+                    Name = originalUnitTest.Name,
+                    DAX = originalUnitTest.DAX,
+                    ExpectedResult = originalUnitTest.ExpectedResult,
+                    ResultType = originalUnitTest.ResultType,
+                    DateTimeFormat = originalUnitTest.DateTimeFormat,
+                    DecimalPlaces = originalUnitTest.DecimalPlaces,
+                    FloatSeparators = originalUnitTest.FloatSeparators,                    
+                };
+
+                copiedUnitTests.Add(copiedUnitTest);
+            }
+
+            copiedUserStory.UnitTests = copiedUnitTests;
+            base.dbContext.UserStories.Add(copiedUserStory);
+            await dbContext.SaveChangesAsync();
+
+            logger.LogDebug($"End: UserStoriesController Copy()");
+            return Ok();
         }
-
-        dbContext.SaveChanges();
-
-        logger.LogDebug($"End: UserStoriesController Copy()");
-        return Ok();
     }
-    catch (Exception ex)
-    {
-        logger.LogError(ex, "An error occurred while copying UserStory");
-        throw;
-    }
-}
-
-    }
-
-
 }

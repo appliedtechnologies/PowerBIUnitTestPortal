@@ -26,13 +26,15 @@ namespace at.PowerBIUnitTest.Portal.Controllers
 {
     public class UsersController : BaseController
     {
-
-        private readonly IConfiguration configuration;
-         private readonly ILogger<UsersController> logger;
-        public UsersController(Data.Models.PortalDbContext portalDbContext, IDownstreamWebApi downstreamWebApi, IHttpContextAccessor httpContextAccessor, IConfiguration configuration, ILogger<UsersController> logger) : base(portalDbContext, downstreamWebApi, httpContextAccessor)
+        public UsersController(Data.Models.PortalDbContext portalDbContext, IDownstreamWebApi downstreamWebApi, IHttpContextAccessor httpContextAccessor, IConfiguration configuration, ILogger<UsersController> logger) : base(portalDbContext, downstreamWebApi, httpContextAccessor, logger)
         {
-            this.configuration = configuration;
-            this.logger = logger;
+        }
+
+        [EnableQuery]
+        public IQueryable<User> Get([FromODataUri] int key)
+        {
+            logger.LogDebug($"Begin & End: UsersController Get(key: {key})");
+            return base.dbContext.Users.Where(e => e.TenantNavigation.MsId == this.msIdTenantCurrentUser && e.Id == key);
         }
 
         // GET: odata/Users
@@ -63,6 +65,9 @@ namespace at.PowerBIUnitTest.Portal.Controllers
 
             if (string.IsNullOrEmpty(currentUser.Firstname))
                 currentUser.Firstname = currentUser.Email;
+
+            if (string.IsNullOrEmpty(currentUser.Lastname))
+                currentUser.Lastname = string.Empty;
 
             Guid msIdTenantCurrentUser = Guid.Parse(this.HttpContext.User.FindFirst(ClaimConstants.TenantId).Value);
 

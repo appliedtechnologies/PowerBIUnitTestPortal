@@ -16,10 +16,10 @@ using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
 using Microsoft.Net.Http.Headers;
 using Microsoft.AspNetCore.Http;
-using at.PowerBIUnitTest.Portal.Services;
 using System.Globalization;
 using Microsoft.AspNetCore.Localization;
 using System.Collections.Generic;
+using at.PowerBIUnitTest.Portal.Services;
 
 namespace at.PowerBIUnitTest.Portal
 {
@@ -41,39 +41,16 @@ namespace at.PowerBIUnitTest.Portal
             builder.EntitySet<UserStory>("UserStories");
             builder.EntitySet<Workspace>("Workspaces");
             builder.EntitySet<TabularModel>("TabularModels");
-            builder.EntitySet<History>("Histories");
-            builder.EntitySet<TestRuns>("TestRuns");
+            builder.EntitySet<TestRun>("TestRuns");
+            builder.EntitySet<TestRun>("ResultTypes");
+            builder.EntitySet<TestRunCollection>("TestRunCollections");
             builder.EntityType<User>().Collection.Action("Login");
-            builder.EntityType<UnitTest>().Collection.Action("Execute");
-            builder.EntityType<UnitTest>().Collection.Action("LoadWorkspace");
-            builder.EntityType<UnitTest>().Collection.Action("LoadDataset");
-            var SaveTestRun = builder.EntityType<UnitTest>().Collection.Action("SaveTestRun");
-            SaveTestRun.Parameter<string>("Result");
-            SaveTestRun.Parameter<string>("Type");
-            SaveTestRun.Parameter<int>("Count");
-            SaveTestRun.Parameter<string>("Name");
-            builder.EntityType<Workspace>().Collection.Action("FilterWorkspace");
+            builder.EntityType<Workspace>().Collection.Action("Pull");
+
+            builder.EntityType<UnitTest>().Collection.Action("Execute").CollectionParameter<int>("unitTestIds");
 
             var copyUserStory = builder.EntityType<UserStory>().Action("Copy");
             copyUserStory.Parameter<int>("targetTabularModelId");
-
-            var copy = builder.EntityType<UserStory>().Action("Copy2");
-            copy.Parameter<int>("targetTabularModelId1");
-            copy.Parameter<int>("targetWorkspaceId1");
-            copy.Parameter<int>("userStoryId1");
-
-            // var executeAction = builder.Function("Execute");
-            //executeAction.Parameter<UnitTest>("unitTestToExecute");
-            //executeAction.ReturnsFromEntitySet<UnitTest>("UnitTests");
-
-            //var execute =
-            //builder.EntityType<UnitTest>()
-            // .Collection
-            //.Action("Execute");
-
-
-            //execute.Parameter<int>("id").Required();
-            //execute.Returns<int>();
 
             return builder.GetEdmModel();
         }
@@ -95,14 +72,16 @@ namespace at.PowerBIUnitTest.Portal
             services.AddDbContext<PortalDbContext>(options =>
                 options.UseLazyLoadingProxies().UseSqlServer(Configuration.GetConnectionString("AzureDbConnection")));
 
-            services.AddControllers().AddOData(options => options.AddRouteComponents("odata", GetEdmModel()).Select().Count().Filter().OrderBy().Expand().SetMaxTop(100));
+            services.AddControllers(options => { options.Filters.Add<UnhandledExceptionFilterAttribute>(); }).AddOData(options => options.AddRouteComponents("odata", GetEdmModel()).Select().Count().Filter().OrderBy().Expand().SetMaxTop(100));
 
             services.AddSwaggerGen();
 
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
             services.AddScoped<PowerBiService>();
-
+            services.AddScoped<WorkspaceService>();
+            services.AddScoped<TabularModelService>();
+            services.AddScoped<UnitTestService>();
         }
 
 
@@ -128,7 +107,7 @@ namespace at.PowerBIUnitTest.Portal
                 app.UseDeveloperExceptionPage();
             }
             else
-            {   
+            {
                 dbContext.Database.MigrateAsync();
                 app.UseExceptionHandler("/Error");
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.

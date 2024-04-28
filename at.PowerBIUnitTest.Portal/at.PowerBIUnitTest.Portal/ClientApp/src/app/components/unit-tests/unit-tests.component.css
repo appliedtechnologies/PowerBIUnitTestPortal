@@ -1,0 +1,15 @@
+::ng-deep .dx-treelist-search-panel {
+  margin: 0 !important;
+}
+
+::ng-deep .hide-checkbox .dx-select-checkbox{
+  display: none;
+}
+
+::ng-deep .hide-checkbox .dx-treelist-icon-container{
+  padding-right: 0px;
+}
+
+::ng-deep dx-select-box {
+  margin-bottom: 15px;
+}
