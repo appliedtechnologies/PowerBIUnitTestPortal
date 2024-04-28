@@ -7,60 +7,63 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
 
-public class TabularModelService
+namespace at.PowerBIUnitTest.Portal.Services
 {
-    private readonly ILogger logger;
-    private readonly PortalDbContext dbContext;
-    private readonly PowerBiService powerBiService;
-
-    public TabularModelService(ILogger<TabularModelService> logger, PortalDbContext dbContext, PowerBiService powerBiService)
+    public class TabularModelService
     {
-        this.logger = logger;
-        this.dbContext = dbContext;
-        this.powerBiService = powerBiService;
-    }
+        private readonly ILogger logger;
+        private readonly PortalDbContext dbContext;
+        private readonly PowerBiService powerBiService;
 
-    public async Task PullDatasetsFromPowerBi(Guid msIdTenantCurrentUser, string accessToken)
-    {
-        logger.LogDebug($"Begin: TabularModelService PullDatasetsFromPowerBi(msIdTenantCurrentUser: {msIdTenantCurrentUser})");
-
-        var powerBiToken = await powerBiService.GetTokenOnBehalfOf(msIdTenantCurrentUser, accessToken);
-
-        foreach(var workspace  in dbContext.Workspaces.Where(e => e.TenantNavigation.MsId == msIdTenantCurrentUser).ToList())
+        public TabularModelService(ILogger<TabularModelService> logger, PortalDbContext dbContext, PowerBiService powerBiService)
         {
-            var remoteDatasets = await powerBiService.LoadDataset(powerBiToken, workspace.MsId);
-            List<TabularModel> tabularModels = new List<TabularModel>();
+            this.logger = logger;
+            this.dbContext = dbContext;
+            this.powerBiService = powerBiService;
+        }
 
-            foreach (var remoteDataset in remoteDatasets)
+        public async Task PullDatasetsFromPowerBi(Guid msIdTenantCurrentUser, string accessToken)
+        {
+            logger.LogDebug($"Begin: TabularModelService PullDatasetsFromPowerBi(msIdTenantCurrentUser: {msIdTenantCurrentUser})");
+
+            var powerBiToken = await powerBiService.GetTokenOnBehalfOf(msIdTenantCurrentUser, accessToken);
+
+            foreach (var workspace in dbContext.Workspaces.Where(e => e.TenantNavigation.MsId == msIdTenantCurrentUser).ToList())
             {
-                var tabularModel = new TabularModel
-                {
-                    MsId = remoteDataset["id"].ToObject<Guid>(),
-                    Name = remoteDataset["name"].ToString(),
-                    Workspace = workspace.Id
-                };
-                tabularModels.Add(tabularModel);
-            }
+                var remoteDatasets = await powerBiService.LoadDataset(powerBiToken, workspace.MsId);
+                List<TabularModel> tabularModels = new List<TabularModel>();
 
-            tabularModels.ForEach(e =>
-            {
-                var dbTabularModel = this.dbContext.TabularModels.FirstOrDefault(t => t.MsId == t.MsId);
-
-                if (dbTabularModel == null)
+                foreach (var remoteDataset in remoteDatasets)
                 {
-                    this.dbContext.TabularModels.Add(e);
+                    var tabularModel = new TabularModel
+                    {
+                        MsId = remoteDataset["id"].ToObject<Guid>(),
+                        Name = remoteDataset["name"].ToString(),
+                        Workspace = workspace.Id
+                    };
+                    tabularModels.Add(tabularModel);
                 }
-                else
+
+                tabularModels.ForEach(e =>
                 {
-                    dbTabularModel.Name = e.Name;
-                    dbTabularModel.Workspace = e.Workspace;
-                    dbContext.Update(dbTabularModel);
-                }
-            });
-        };
+                    var dbTabularModel = this.dbContext.TabularModels.FirstOrDefault(t => t.MsId == t.MsId);
 
-        await dbContext.SaveChangesAsync();
+                    if (dbTabularModel == null)
+                    {
+                        this.dbContext.TabularModels.Add(e);
+                    }
+                    else
+                    {
+                        dbTabularModel.Name = e.Name;
+                        dbTabularModel.Workspace = e.Workspace;
+                        dbContext.Update(dbTabularModel);
+                    }
+                });
+            };
 
-        logger.LogDebug($"End: TabularModelService PullDatasetsFromPowerBi(msIdTenantCurrentUser: {msIdTenantCurrentUser})");
+            await dbContext.SaveChangesAsync();
+
+            logger.LogDebug($"End: TabularModelService PullDatasetsFromPowerBi(msIdTenantCurrentUser: {msIdTenantCurrentUser})");
+        }
     }
 }

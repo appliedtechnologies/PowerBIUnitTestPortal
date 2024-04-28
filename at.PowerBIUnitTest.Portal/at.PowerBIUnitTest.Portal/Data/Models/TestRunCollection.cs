@@ -11,7 +11,7 @@ namespace at.PowerBIUnitTest.Portal.Data.Models
     {
         public int Id {get; set;}
         public DateTime TimeStamp {get; set;}
-        public string WasPassed {get; set;}
+        public bool WasPassed {get; set;}
 
         public int? CreatedBy { get; set; }
         public DateTime? CreatedOn { get; set; }

@@ -4,7 +4,7 @@ import { TestRun } from "./test-run.model";
 export interface TestRunCollection {
     Id?: number;
     TimeStamp?: string;
-    WasPassed?: string;
+    WasPassed?: boolean;
     CreatedBy?: number | null;
     CreatedOn?: string | null;
     ModifiedBy?: number | null;

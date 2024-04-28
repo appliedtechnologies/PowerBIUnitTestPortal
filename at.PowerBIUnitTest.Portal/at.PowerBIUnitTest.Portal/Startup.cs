@@ -16,10 +16,10 @@ using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
 using Microsoft.Net.Http.Headers;
 using Microsoft.AspNetCore.Http;
-using at.PowerBIUnitTest.Portal.Services;
 using System.Globalization;
 using Microsoft.AspNetCore.Localization;
 using System.Collections.Generic;
+using at.PowerBIUnitTest.Portal.Services;
 
 namespace at.PowerBIUnitTest.Portal
 {
@@ -45,8 +45,9 @@ namespace at.PowerBIUnitTest.Portal
             builder.EntitySet<TestRun>("ResultTypes");
             builder.EntitySet<TestRunCollection>("TestRunCollections");
             builder.EntityType<User>().Collection.Action("Login");
-            builder.EntityType<UnitTest>().Collection.Action("Execute");
             builder.EntityType<Workspace>().Collection.Action("Pull");
+
+            builder.EntityType<UnitTest>().Collection.Action("Execute").CollectionParameter<int>("unitTestIds");
 
             var copyUserStory = builder.EntityType<UserStory>().Action("Copy");
             copyUserStory.Parameter<int>("targetTabularModelId");
@@ -85,6 +86,7 @@ namespace at.PowerBIUnitTest.Portal
             services.AddScoped<PowerBiService>();
             services.AddScoped<WorkspaceService>();
             services.AddScoped<TabularModelService>();
+            services.AddScoped<UnitTestService>();
         }
 
 

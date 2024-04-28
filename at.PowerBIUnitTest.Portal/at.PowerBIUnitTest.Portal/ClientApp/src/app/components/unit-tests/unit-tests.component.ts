@@ -45,6 +45,7 @@ export class UnitTestsComponent implements OnInit {
         private workspaceService: WorkspaceService,
         private layoutService: LayoutService
     ) {
+        this.onClickExecuteUnitTest = this.onClickExecuteUnitTest.bind(this);
         this.onClickAddUserStory = this.onClickAddUserStory.bind(this);
         this.onClickEditUserStory = this.onClickEditUserStory.bind(this);
         this.onClickDeleteUserStory = this.onClickDeleteUserStory.bind(this);
@@ -61,6 +62,7 @@ export class UnitTestsComponent implements OnInit {
                     loadOptions.expand.push("TabularModels");
                     loadOptions.expand.push("TabularModels.UserStories");
                     loadOptions.expand.push("TabularModels.UserStories.UnitTests");
+                    loadOptions.expand.push("TabularModels.UserStories.UnitTests.TestRuns($top=1;$orderby=TimeStamp desc)");
                     return (this.workspaceService.getStore().load(loadOptions)).then((data) => {
                         data.forEach(e => {
                             delete Object.assign(e, { ["items"]: e["TabularModels"] })["TabularModels"]
@@ -117,9 +119,47 @@ export class UnitTestsComponent implements OnInit {
             options: {
                 icon: "refresh",
                 stylingMode: "contained",
-                type: "success",
+                type: "normal",
                 hint: "Refresh Applications",
                 onClick: this.onClickRefresh.bind(this),
+            },
+            location: "after",
+        });
+
+        toolbarItems.unshift({
+            widget: "dxButton",
+            options: {
+                icon: "clear",
+                stylingMode: "contained",
+                type: "normal",
+                hint: "Clear Selection",
+                onClick: this.onClickClearSelection.bind(this),
+            },
+            location: "after",
+        });
+
+        toolbarItems.unshift({
+            widget: "dxButton",
+            options: {
+                icon: "trash",
+                stylingMode: "contained",
+                type: "danger",
+                hint: "Delete Unit Tests",
+                text: "Delete Unit Tests",
+                onClick: this.onClickDeleteMultipleUnitTests.bind(this),
+            },
+            location: "after",
+        });
+
+        toolbarItems.unshift({
+            widget: "dxButton",
+            options: {
+                icon: "runner",
+                stylingMode: "contained",
+                type: "success",
+                hint: "Execute Unit Tests",
+                text: "Execute Unit Tests",
+                onClick: this.onClickExecuteMultipleUnitTests.bind(this),
             },
             location: "after",
         });
@@ -137,6 +177,48 @@ export class UnitTestsComponent implements OnInit {
         });
     }
 
+    public onCellPreparedTreeList(e: any): void {
+        if (e.rowType === "data" && e.row.data.type == "Unit Test" && e.column.dataField === "TestRuns[0].Result") {
+            e.cellElement.style.color = e.row.data.TestRuns[0].WasPassed ? "green" : "red";
+        }
+    }
+
+    public onRowDbClickTreeList(e: any): void {
+        if (e.rowType === "data" && e.data.type == "Unit Test") {
+            this.openEditUnitTestPopup(e.data);
+        }
+        else if (e.rowType == "data" && e.data.type == "User Story") {
+            this.openEditUserStoryPopup(e.data);
+        }
+    }
+
+    public onRowPreparedTreeList(e: any): void {
+        if (e.rowType == "data" && e.data.type != "Unit Test" || e.rowType == "header") {
+            e.rowElement.classList.add("hide-checkbox");
+        }
+    }
+
+    public onClickClearSelection(e: any): void {
+        this.treeList.instance.clearSelection();
+    }
+
+    public onClickExecuteMultipleUnitTests(e: any): void {
+        let data = this.treeList.instance.getSelectedRowsData();
+        let unitTestIds = data.filter((e: any) => e.type == "Unit Test").map((e: any) => e.Id);
+        if (unitTestIds.length == 0) {
+            this.layoutService.notify({
+                type: NotificationType.Info,
+                message: "No unit tests selected for execution."
+            });
+            return;
+        }
+        this.executeUnitTest(unitTestIds);
+    }
+
+    public onClickExecuteUnitTest(e: any): void {
+        this.executeUnitTest([e.row.data.Id]);
+    }
+
     public onClickRefresh(e: ClickEvent): void {
         this.treeList.instance.refresh();
     }
@@ -149,9 +231,7 @@ export class UnitTestsComponent implements OnInit {
     }
 
     public onClickEditUnitTest(e: any): void {
-        this.popupTitle = "Edit Unit Test";
-        this.unitTestToEdit = structuredClone(e.row.data);
-        this.isVisibleEditUnitTest = true;
+        this.openEditUnitTestPopup(e.row.data);
     }
 
     public onClickAddUserStory(e: any): void {
@@ -162,9 +242,7 @@ export class UnitTestsComponent implements OnInit {
     }
 
     public onClickEditUserStory(e: any): void {
-        this.popupTitle = "Edit User Story";
-        this.userStoryToEdit = structuredClone(e.row.data);
-        this.isVisibleEditUserStory = true;
+        this.openEditUserStoryPopup(e.row.data);
     }
 
     public onClickDeleteUserStory(e: any): void {
@@ -180,6 +258,42 @@ export class UnitTestsComponent implements OnInit {
                     .catch((error: Error) => this.layoutService.notify({
                         type: NotificationType.Error,
                         message: error.message ? `The user story could not be deleted: ${error.message}` : "The user story could not be deleted."
+                    }))
+                    .then(() => {
+                        this.treeList.instance.refresh();
+                        this.layoutService.change(LayoutParameter.ShowLoading, false);
+                    });
+            }
+        });
+    }
+
+    public onClickDeleteMultipleUnitTests(e: any): void {
+        let data = this.treeList.instance.getSelectedRowsData();
+        let unitTestIds = data.filter((e: any) => e.type == "Unit Test").map((e: any) => e.Id);
+        if (unitTestIds.length == 0) {
+            this.layoutService.notify({
+                type: NotificationType.Info,
+                message: "No unit tests selected for deletion."
+            });
+            return;
+        }
+
+        let result = confirm("Are you sure you want to delete these unit tests?", "Delete Unit Tests");
+        result.then((dialogResult) => {
+            if (dialogResult) {
+                this.layoutService.change(LayoutParameter.ShowLoading, true);
+                let promises = [];
+                unitTestIds.forEach((e: any) => {
+                    promises.push(this.unitTestService.remove(e));
+                });
+                Promise.all(promises)
+                    .then(() => this.layoutService.notify({
+                        type: NotificationType.Success,
+                        message: "The unit tests were deleted successfully."
+                    }))
+                    .catch((error: Error) => this.layoutService.notify({
+                        type: NotificationType.Error,
+                        message: error.message ? `One or more unit tests could not be deleted: ${error.message}` : "One or more unit tests could not be deleted"
                     }))
                     .then(() => {
                         this.treeList.instance.refresh();
@@ -217,7 +331,7 @@ export class UnitTestsComponent implements OnInit {
             this.layoutService.change(LayoutParameter.ShowLoading, true);
             let editPromise;
             if (this.unitTestToEdit.Id != null) {
-                editPromise = this.unitTestService.update(this.unitTestToEdit.Id, { Name: this.unitTestToEdit.Name, DAX: this.unitTestToEdit.DAX, ExpectedResult: this.unitTestToEdit.ExpectedResult, ResultType: this.unitTestToEdit.ResultType, DateTimeFormat: this.unitTestToEdit.DateTimeFormat, FloatSeparators: this.unitTestToEdit.FloatSeparators, DecimalPlaces: this.unitTestToEdit.DecimalPlaces})
+                editPromise = this.unitTestService.update(this.unitTestToEdit.Id, { Name: this.unitTestToEdit.Name, DAX: this.unitTestToEdit.DAX, ExpectedResult: this.unitTestToEdit.ExpectedResult, ResultType: this.unitTestToEdit.ResultType, DateTimeFormat: this.unitTestToEdit.DateTimeFormat, FloatSeparators: this.unitTestToEdit.FloatSeparators, DecimalPlaces: this.unitTestToEdit.DecimalPlaces })
                     .then(() => {
                         this.layoutService.notify({
                             type: NotificationType.Success,
@@ -324,4 +438,32 @@ export class UnitTestsComponent implements OnInit {
         return false;
     }
 
+    private openEditUnitTestPopup(unitTest: UnitTest): void {
+        this.popupTitle = "Edit Unit Test";
+        this.unitTestToEdit = structuredClone(unitTest);
+        this.isVisibleEditUnitTest = true;
+    }
+
+    private openEditUserStoryPopup(userStory: UserStory): void {
+        this.popupTitle = "Edit User Story";
+        this.userStoryToEdit = structuredClone(userStory);
+        this.isVisibleEditUserStory = true;
+    }
+
+    private executeUnitTest(ids: number[]): void {
+        this.layoutService.change(LayoutParameter.ShowLoading, true);
+        this.unitTestService.executeMultiple(ids)
+            .then(() => {
+                this.layoutService.notify({
+                    type: NotificationType.Success,
+                    message: "Unit test(s) executed successfully."
+                });
+                this.treeList.instance.refresh();
+            })
+            .catch((error: Error) => this.layoutService.notify({
+                type: NotificationType.Error,
+                message: error.message ? `Unit tests could not be executed: ${error.message}` : "Unit tests could not be executed."
+            }))
+            .then(() => { this.layoutService.change(LayoutParameter.ShowLoading, false); });
+    }
 }

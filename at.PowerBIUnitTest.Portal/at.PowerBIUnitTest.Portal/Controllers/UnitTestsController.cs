@@ -15,13 +15,13 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.AspNetCore.OData.Formatter;
 using Microsoft.AspNet.OData.Routing;
 using Newtonsoft.Json;
-using at.PowerBIUnitTest.Portal.Services;
 using Microsoft.AspNetCore.OData.Deltas;
 using Microsoft.AspNetCore.Routing;
 using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OData;
+using at.PowerBIUnitTest.Portal.Services;
 
 namespace at.PowerBIUnitTest.Portal.Controllers
 {
@@ -62,7 +62,7 @@ namespace at.PowerBIUnitTest.Portal.Controllers
                 return Forbid();
 
             if (base.dbContext.UnitTests.Any(e => e.Name == unitTest.Name && e.UserStory == unitTest.UserStory))
-                return BadRequest(new ODataError { ErrorCode =  "400", Message = "Unit test with the same name already exists in the user story."});
+                return BadRequest(new ODataError { ErrorCode = "400", Message = "Unit test with the same name already exists in the user story." });
 
             this.dbContext.UnitTests.Add(unitTest);
             await this.dbContext.SaveChangesAsync();
@@ -113,7 +113,7 @@ namespace at.PowerBIUnitTest.Portal.Controllers
             unitTest.Patch(entity);
 
             if (base.dbContext.UnitTests.Any(e => e.Name == entity.Name && e.UserStory == entity.UserStory && e.Id != entity.Id))
-                return BadRequest(new ODataError { ErrorCode =  "400", Message = "Unit test with the same name already exists in the user story."});
+                return BadRequest(new ODataError { ErrorCode = "400", Message = "Unit test with the same name already exists in the user story." });
 
             await base.dbContext.SaveChangesAsync();
 
@@ -122,175 +122,188 @@ namespace at.PowerBIUnitTest.Portal.Controllers
             return Updated(entity);
         }
 
+        [HttpPost]
+        public async Task<IActionResult> Execute([FromBody] ODataActionParameters parmeters, [FromServices] UnitTestService unitTestService)
+        {
+            logger.LogDebug($"Begin: UnitTestsController Execute()");
+
+            var unitTestIds = parmeters["unitTestIds"] as IEnumerable<int>;
+
+            var accessToken = httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+            await unitTestService.ExecuteMultipe(msIdTenantCurrentUser, accessToken,unitTestIds);
+
+            logger.LogDebug($"End: UnitTestsController Execute()");
+            return Ok();
+        }
 
         // [HttpPost]
         // public UnitTestExecutionResult Execute([FromBody] object unitTestObject, [FromServices] PowerBiService powerBiService)
         // {
-            // logger.LogDebug($"Begin: UnitTestController Execute()");
-            // try
-            // {
-            //     logger.LogDebug("Executing UnitTest.....");
-            //     var unitTestExecutionResult = new UnitTestExecutionResult();
+        // logger.LogDebug($"Begin: UnitTestController Execute()");
+        // try
+        // {
+        //     logger.LogDebug("Executing UnitTest.....");
+        //     var unitTestExecutionResult = new UnitTestExecutionResult();
 
-            //     var structur = JsonConvert.DeserializeObject<Structur>(unitTestObject.ToString());
+        //     var structur = JsonConvert.DeserializeObject<Structur>(unitTestObject.ToString());
 
-            //     var unitTestUpdate = JsonConvert.DeserializeObject<UnitTest>(unitTestObject.ToString());
+        //     var unitTestUpdate = JsonConvert.DeserializeObject<UnitTest>(unitTestObject.ToString());
 
-            //     Console.WriteLine($"Unit Test {structur.Name} wird ausgeführt");
+        //     Console.WriteLine($"Unit Test {structur.Name} wird ausgeführt");
 
-            //     var accessToken = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
-            //     string authToken = powerBiService.GetTokenOnBehalfOf(base.msIdTenantCurrentUser, accessToken).Result;
-            //     Guid datasetId = new Guid(structur.DatasetPbId);//new Guid("1272907a-888e-446f-b89e-037cfaf3f8b5");
-            //                                                     //DatasetId Variable                 
-            //     TestRun HistoryAdd = new TestRun();
+        //     var accessToken = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+        //     string authToken = powerBiService.GetTokenOnBehalfOf(base.msIdTenantCurrentUser, accessToken).Result;
+        //     Guid datasetId = new Guid(structur.DatasetPbId);//new Guid("1272907a-888e-446f-b89e-037cfaf3f8b5");
+        //                                                     //DatasetId Variable                 
+        //     TestRun HistoryAdd = new TestRun();
 
-            //     string jsonResponse;
-            //     if (powerBiService.QueryDataset(datasetId, structur.DAX, authToken, out jsonResponse))
-            //     {
-
-
-            //         unitTestExecutionResult.UnitTestExecuted = true;
-
-            //         dynamic TestRersultArray = JsonConvert.DeserializeObject(jsonResponse);
-            //         var TestResult = ((TestRersultArray.results[0].tables[0].rows[0] as JObject).First as JProperty).Value.ToString();
-
-            //         logger.LogDebug($"TestResult: {TestResult}");
+        //     string jsonResponse;
+        //     if (powerBiService.QueryDataset(datasetId, structur.DAX, authToken, out jsonResponse))
+        //     {
 
 
-            //         if (double.TryParse(TestResult, out double testResultDouble))
-            //         {
-            //             TestResult = Math.Round(testResultDouble, 4).ToString();
-            //             logger.LogDebug($"rounded TestResult: {TestResult}");
-            //         }
+        //         unitTestExecutionResult.UnitTestExecuted = true;
 
-            //         if (TestResult == structur.ExpectedResult)
-            //         {
-            //             unitTestExecutionResult.UnitTestSucceeded = true;
-            //         }
+        //         dynamic TestRersultArray = JsonConvert.DeserializeObject(jsonResponse);
+        //         var TestResult = ((TestRersultArray.results[0].tables[0].rows[0] as JObject).First as JProperty).Value.ToString();
 
-            //         else
-            //         {
-            //             unitTestExecutionResult.UnitTestSucceeded = false;
-            //         }
-
-            //         logger.LogDebug($"unitTestExecutionResult: {unitTestExecutionResult}");
-
-            //         //unitTestUpdate.LastResult = TestResult;
-            //         UnitTest UnitTestNeu = base.dbContext.UnitTests.Where(p => p.Id == unitTestUpdate.Id).FirstOrDefault();
-            //         UnitTestNeu.LastResult = TestResult;
-
-            //         if(UnitTestNeu.ResultType == "Float")
-            //         {
-            //             float FloatResult;
-            //             FloatResult = float.Parse(TestResult);
-            //             //UnitTestNeu.LastResult = Math.Round(FloatResult, int.Parse(UnitTestNeu.DecimalPlaces)).ToString();
+        //         logger.LogDebug($"TestResult: {TestResult}");
 
 
-            //             float roundedValue = (float)Math.Round(FloatResult, int.Parse(UnitTestNeu.DecimalPlaces));
-            //             float round = FloatResult - roundedValue;
+        //         if (double.TryParse(TestResult, out double testResultDouble))
+        //         {
+        //             TestResult = Math.Round(testResultDouble, 4).ToString();
+        //             logger.LogDebug($"rounded TestResult: {TestResult}");
+        //         }
 
-            //                     if (FloatResult - roundedValue >= 0.05)
-            //                         {   
-            //                             roundedValue += (float)Math.Pow(0.1, int.Parse(UnitTestNeu.DecimalPlaces));
-            //                         }   
+        //         if (TestResult == structur.ExpectedResult)
+        //         {
+        //             unitTestExecutionResult.UnitTestSucceeded = true;
+        //         }
 
-            //                     UnitTestNeu.LastResult = roundedValue.ToString();
-            //                     UnitTestNeu.LastResult = Math.Round(roundedValue, int.Parse(UnitTestNeu.DecimalPlaces)).ToString();
+        //         else
+        //         {
+        //             unitTestExecutionResult.UnitTestSucceeded = false;
+        //         }
 
+        //         logger.LogDebug($"unitTestExecutionResult: {unitTestExecutionResult}");
 
-            //             if(UnitTestNeu.FloatSeparators == "Use Seperators")
-            //             {
-            //                 //UnitTestNeu.LastResult.ToString("N");
-                            
-            //                 double number = float.Parse(UnitTestNeu.LastResult);
-            //                 UnitTestNeu.LastResult = number.ToString("N");
-            //             }
-            //         }
+        //         //unitTestUpdate.LastResult = TestResult;
+        //         UnitTest UnitTestNeu = base.dbContext.UnitTests.Where(p => p.Id == unitTestUpdate.Id).FirstOrDefault();
+        //         UnitTestNeu.LastResult = TestResult;
 
-            //         if(UnitTestNeu.ResultType == "Date")
-            //         {
-            //             DateTime DateResult;
-            //             if(UnitTestNeu.DateTimeFormat == "UTC")
-            //             {
-            //                 DateResult = DateTime.Parse(TestResult).ToUniversalTime();
-            //                 UnitTestNeu.LastResult = DateResult.ToString();
-
-                            
-
-            //             }
-
-            //             if(UnitTestNeu.DateTimeFormat == "CET")
-            //             {
-            //                 DateResult = DateTime.Parse(TestResult).ToLocalTime();
-            //                 UnitTestNeu.LastResult = DateResult.ToString();
-            //             }
-
-            //         }
-
-            //         if(UnitTestNeu.ResultType == "Percentage")
-            //         {
-            //             double number = float.Parse(TestResult);
-            //             UnitTestNeu.LastResult = number.ToString("#0.###%");
-
-            //         }
-
-                    
-            //         UnitTestNeu.Timestamp = DateTime.Now.ToString();
-
-            //         HistoryAdd.Result = UnitTestNeu.LastResult;
-            //         HistoryAdd.ExpectedResult = UnitTestNeu.ExpectedResult;
-            //         HistoryAdd.UnitTest = UnitTestNeu.Id;
-            //         HistoryAdd.WasPassed = unitTestExecutionResult.UnitTestSucceeded.ToString();
-            //         HistoryAdd.TimeStamp = UnitTestNeu.Timestamp;
-            //         HistoriesForTestRun.Add(HistoryAdd);
-                    
-
-            //         base.dbContext.Add(HistoryAdd);
-            //         base.dbContext.SaveChanges();
-
-            //         base.dbContext.Update(UnitTestNeu);
-            //         base.dbContext.SaveChanges();
-            //     }
-
-            //     //TODO
-            //     /* else if (powerBiService.QueryDataset(datasetId, structur.DAX, authToken, out jsonResponse)){
-            //          unitTestExecutionResult.UnitTestExecuted = false;
-            //          Root2 TestValue;
-            //          TestValue = JsonConvert.DeserializeObject<Root2>(jsonResponse);
-
-            //          unitTestUpdate.LastResult = TestValue.results[0].tables[0].rows[0].ActualValue.ToString();
-            //          UnitTest UnitTestNeu = new UnitTest();
-            //          UnitTestNeu = base.dbContext.UnitTests.Where(p => p.Name == unitTestUpdate.Name).FirstOrDefault();
-            //          UnitTestNeu.LastResult = unitTestUpdate.LastResult;
-
-            //          DateTime Timestamp = new DateTime();
-            //          Timestamp = DateTime.Now;
-            //          UnitTestNeu.Timestamp = Timestamp.ToString();
-
-            //          HistoryAdd.LastRun = UnitTestNeu.LastResult;
-            //          HistoryAdd.ExpectedRun = UnitTestNeu.ExpectedResult;
-            //          HistoryAdd.UnitTest = UnitTestNeu.Id;
-            //          HistoryAdd.TimeStamp = UnitTestNeu.Timestamp;
-            //          HistoryAdd.Result = "False";
-
-            //          base.dbContext.Add(HistoryAdd);
-            //          base.dbContext.SaveChanges();
+        //         if(UnitTestNeu.ResultType == "Float")
+        //         {
+        //             float FloatResult;
+        //             FloatResult = float.Parse(TestResult);
+        //             //UnitTestNeu.LastResult = Math.Round(FloatResult, int.Parse(UnitTestNeu.DecimalPlaces)).ToString();
 
 
-            //          base.dbContext.Update(UnitTestNeu);
-            //          base.dbContext.SaveChanges();
-            //      }*/
+        //             float roundedValue = (float)Math.Round(FloatResult, int.Parse(UnitTestNeu.DecimalPlaces));
+        //             float round = FloatResult - roundedValue;
+
+        //                     if (FloatResult - roundedValue >= 0.05)
+        //                         {   
+        //                             roundedValue += (float)Math.Pow(0.1, int.Parse(UnitTestNeu.DecimalPlaces));
+        //                         }   
+
+        //                     UnitTestNeu.LastResult = roundedValue.ToString();
+        //                     UnitTestNeu.LastResult = Math.Round(roundedValue, int.Parse(UnitTestNeu.DecimalPlaces)).ToString();
+
+
+        //             if(UnitTestNeu.FloatSeparators == "Use Seperators")
+        //             {
+        //                 //UnitTestNeu.LastResult.ToString("N");
+
+        //                 double number = float.Parse(UnitTestNeu.LastResult);
+        //                 UnitTestNeu.LastResult = number.ToString("N");
+        //             }
+        //         }
+
+        //         if(UnitTestNeu.ResultType == "Date")
+        //         {
+        //             DateTime DateResult;
+        //             if(UnitTestNeu.DateTimeFormat == "UTC")
+        //             {
+        //                 DateResult = DateTime.Parse(TestResult).ToUniversalTime();
+        //                 UnitTestNeu.LastResult = DateResult.ToString();
 
 
 
-            //     logger.LogDebug($"End: UnitTestController Execute(Return: {unitTestExecutionResult})");
-            //     return unitTestExecutionResult;
-            // }
-            // catch (Exception ex)
-            // {
-            //     logger.LogDebug(ex, "An error occured while Executing the UnitTest(Controller)");
-            //     throw;
-            // }
+        //             }
+
+        //             if(UnitTestNeu.DateTimeFormat == "CET")
+        //             {
+        //                 DateResult = DateTime.Parse(TestResult).ToLocalTime();
+        //                 UnitTestNeu.LastResult = DateResult.ToString();
+        //             }
+
+        //         }
+
+        //         if(UnitTestNeu.ResultType == "Percentage")
+        //         {
+        //             double number = float.Parse(TestResult);
+        //             UnitTestNeu.LastResult = number.ToString("#0.###%");
+
+        //         }
+
+
+        //         UnitTestNeu.Timestamp = DateTime.Now.ToString();
+
+        //         HistoryAdd.Result = UnitTestNeu.LastResult;
+        //         HistoryAdd.ExpectedResult = UnitTestNeu.ExpectedResult;
+        //         HistoryAdd.UnitTest = UnitTestNeu.Id;
+        //         HistoryAdd.WasPassed = unitTestExecutionResult.UnitTestSucceeded.ToString();
+        //         HistoryAdd.TimeStamp = UnitTestNeu.Timestamp;
+        //         HistoriesForTestRun.Add(HistoryAdd);
+
+
+        //         base.dbContext.Add(HistoryAdd);
+        //         base.dbContext.SaveChanges();
+
+        //         base.dbContext.Update(UnitTestNeu);
+        //         base.dbContext.SaveChanges();
+        //     }
+
+        //     //TODO
+        //     /* else if (powerBiService.QueryDataset(datasetId, structur.DAX, authToken, out jsonResponse)){
+        //          unitTestExecutionResult.UnitTestExecuted = false;
+        //          Root2 TestValue;
+        //          TestValue = JsonConvert.DeserializeObject<Root2>(jsonResponse);
+
+        //          unitTestUpdate.LastResult = TestValue.results[0].tables[0].rows[0].ActualValue.ToString();
+        //          UnitTest UnitTestNeu = new UnitTest();
+        //          UnitTestNeu = base.dbContext.UnitTests.Where(p => p.Name == unitTestUpdate.Name).FirstOrDefault();
+        //          UnitTestNeu.LastResult = unitTestUpdate.LastResult;
+
+        //          DateTime Timestamp = new DateTime();
+        //          Timestamp = DateTime.Now;
+        //          UnitTestNeu.Timestamp = Timestamp.ToString();
+
+        //          HistoryAdd.LastRun = UnitTestNeu.LastResult;
+        //          HistoryAdd.ExpectedRun = UnitTestNeu.ExpectedResult;
+        //          HistoryAdd.UnitTest = UnitTestNeu.Id;
+        //          HistoryAdd.TimeStamp = UnitTestNeu.Timestamp;
+        //          HistoryAdd.Result = "False";
+
+        //          base.dbContext.Add(HistoryAdd);
+        //          base.dbContext.SaveChanges();
+
+
+        //          base.dbContext.Update(UnitTestNeu);
+        //          base.dbContext.SaveChanges();
+        //      }*/
+
+
+
+        //     logger.LogDebug($"End: UnitTestController Execute(Return: {unitTestExecutionResult})");
+        //     return unitTestExecutionResult;
+        // }
+        // catch (Exception ex)
+        // {
+        //     logger.LogDebug(ex, "An error occured while Executing the UnitTest(Controller)");
+        //     throw;
+        // }
         // }
     }
 }

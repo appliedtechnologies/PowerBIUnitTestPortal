@@ -1,17 +1,25 @@
 <h1>Unit Tests</h1>
 
 <dx-tree-list #treeList [dataSource]="dataSourceWorkspaces" dataStructure="tree" [showRowLines]="true" [hoverStateEnabled]="true"
-  [showBorders]="true" height="100%" (onToolbarPreparing)="onToolbarPreparingTreeList($event)">
+  [showBorders]="true" height="100%" (onToolbarPreparing)="onToolbarPreparingTreeList($event)" (onCellPrepared)="onCellPreparedTreeList($event)"
+  (onRowDblClick)="onRowDbClickTreeList($event)"
+  (onRowPrepared)="onRowPreparedTreeList($event)">
   <dxo-search-panel [visible]="true" [width]="250"></dxo-search-panel>
+  <dxo-selection mode="multiple"></dxo-selection> 
   <dxo-state-storing [enabled]="true" storageKey="atPowerBiUnitTestPortal_UnitTests_TreeListState"></dxo-state-storing>
 
   <dxi-column dataField="type"></dxi-column>
   <dxi-column dataField="Name"></dxi-column>
+  <dxi-column dataField="TestRuns[0].TimeStamp" caption="Last Execution" format="dd.MM.yyyy HH:mm:ss"></dxi-column>
+  <dxi-column dataField="TestRuns[0].Result" caption="Last Result"></dxi-column>
   <dxi-column dataField="ExpectedResult"></dxi-column>
   <dxi-column dataField="DAX"></dxi-column>
 
-  <dxi-column type="buttons" caption="Actions" alignment="left">
-    <dxi-button [visible]="isTabularModelRow" icon="add" text="Add UserStory" type="default"
+  <dxi-column type="buttons" caption="Actions" alignment="left" width="200">
+    <dxi-button [visible]="isUnitTestRow" icon="runner" text="Execute Unit Test" type="default"
+      [onClick]="onClickExecuteUnitTest">
+    </dxi-button>
+    <dxi-button [visible]="isTabularModelRow" icon="add" text="Add User Story" type="default"
       [onClick]="onClickAddUserStory">
     </dxi-button>
     <dxi-button [visible]="isUserStoryRow" icon="add" text="Add Unit Test" type="default"

@@ -12,7 +12,7 @@ import { map } from "rxjs/operators";
 import notify from "devextreme/ui/notify";
 
 @Injectable()
-export class UnitTestService extends CrudBaseService<UnitTest>{
+export class UnitTestService extends CrudBaseService<UnitTest> {
   constructor(
     private odataService: ODataService,
     private http: HttpClient
@@ -22,5 +22,16 @@ export class UnitTestService extends CrudBaseService<UnitTest>{
 
   getStore(): ODataStore {
     return this.odataService.context["UnitTests"];
+  }
+
+  public executeMultiple(ids: number[]): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
+      let request = this.http
+        .post(`${AppConfig.settings.api.url}/UnitTests/Execute`, { unitTestIds: ids })
+        .subscribe({
+          next: () => resolve(),
+          error: (error: Error) => reject(error["error"]["error"])
+        });
+    });
   }
 }
