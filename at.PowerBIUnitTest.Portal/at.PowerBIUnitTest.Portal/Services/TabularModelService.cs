@@ -46,7 +46,7 @@ namespace at.PowerBIUnitTest.Portal.Services
 
                 tabularModels.ForEach(e =>
                 {
-                    var dbTabularModel = this.dbContext.TabularModels.FirstOrDefault(t => t.MsId == t.MsId);
+                    var dbTabularModel = this.dbContext.TabularModels.FirstOrDefault(t => t.MsId == e.MsId);
 
                     if (dbTabularModel == null)
                     {
