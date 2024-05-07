@@ -65,6 +65,12 @@ export class SideNavigationMenuComponent {
         routerLink: "/unittests",
         visible: this.userService.isLogggedIn
       },
+      {
+        text: "History",
+        icon: "clock",
+        routerLink: "/history",
+        visible: this.userService.isLogggedIn
+      },
     ];
 
     this.navigationEntries.forEach(e => {

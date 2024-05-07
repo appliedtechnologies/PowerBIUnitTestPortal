@@ -72,6 +72,8 @@ import { DxoHideEventModule } from "devextreme-angular/ui/nested";
 import { SideNavigationMenuComponent } from "./components/side-navigation-menu/side-navigation-menu.component";
 import { UnitTestsComponent } from "./components/unit-tests/unit-tests.component";
 import { GetFirstElementPipe } from "./shared/pipes/get-first-element.pipe";
+import { HistoryComponent } from "./components/history/history.component";
+import { TestRunCollectionService } from "./shared/services/test-run-collection.service";
 
 export function initializeAppConfig(appConfig: AppConfig, router: Router) {
   return () => appConfig.load();
@@ -85,6 +87,7 @@ export function initializeAppConfig(appConfig: AppConfig, router: Router) {
     UserComponent,
     UnitTestsComponent,
     SideNavigationMenuComponent,
+    HistoryComponent,
     GetFirstElementPipe
   ],
   imports: [
@@ -116,7 +119,6 @@ export function initializeAppConfig(appConfig: AppConfig, router: Router) {
     DxoHideEventModule,
     DxToolbarModule,
     DxHtmlEditorModule,
-    
   ],
   providers: [
     AppConfig,
@@ -156,6 +158,7 @@ export function initializeAppConfig(appConfig: AppConfig, router: Router) {
     UserStoryService,
     WorkspaceService,
     TabularModelService,
+    TestRunCollectionService
   ],
   bootstrap: [AppComponent, MsalRedirectComponent],
 })
