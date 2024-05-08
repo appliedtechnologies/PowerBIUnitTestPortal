@@ -1,6 +1,5 @@
 import { BrowserModule } from "@angular/platform-browser";
 import { APP_INITIALIZER, NgModule } from "@angular/core";
-import { FormsModule } from "@angular/forms";
 import {
   HttpClient,
   HttpClientModule,
@@ -9,21 +8,15 @@ import {
 import {
   DxDataGridModule,
   DxDrawerModule,
-  DxListModule,
   DxLoadPanelModule,
   DxToolbarModule,
   DxSelectBoxModule,
   DxFormModule,
-  DxLookupModule,
   DxPopupModule,
-  DxTextBoxModule,
   DxButtonModule,
   DxTreeViewModule,
-  DxSortableModule,
   DxTextAreaModule,
   DxScrollViewModule,
-  DxHtmlEditorModule,
-
 } from "devextreme-angular";
 
 //import {DxRichTextEditorModule } from 'devextreme-angular';
@@ -68,7 +61,6 @@ import { UnitTestService } from "./shared/services/unit-test.service";
 import { UserStoryService } from "./shared/services/user-story.service";
 import { WorkspaceService } from "./shared/services/workspace.service";
 import { TabularModelService } from "./shared/services/tabular-model.service";
-import { DxoHideEventModule } from "devextreme-angular/ui/nested";
 import { SideNavigationMenuComponent } from "./components/side-navigation-menu/side-navigation-menu.component";
 import { UnitTestsComponent } from "./components/unit-tests/unit-tests.component";
 import { GetFirstElementPipe } from "./shared/pipes/get-first-element.pipe";
@@ -90,32 +82,20 @@ export function initializeAppConfig(appConfig: AppConfig, router: Router) {
   imports: [
     BrowserModule.withServerTransition({ appId: "ng-cli-universal" }),
     HttpClientModule,
-    FormsModule,
     MsalModule,
+    RouterModule,
     DxDataGridModule,
     DxDrawerModule,
-    DxListModule,
     DxToolbarModule,
     DxLoadPanelModule,
-    DxSelectBoxModule,
     DxTreeListModule,
-    DxSortableModule,
     DxTreeViewModule,
     DxButtonModule,
     DxSelectBoxModule,
     DxFormModule,
-    DxLookupModule,
     DxPopupModule,
-    DxTextBoxModule,
-    DxTreeViewModule,
-    DxSortableModule,
-    DxTextBoxModule,
-    DxTextAreaModule,
     DxScrollViewModule,
-    DxoHideEventModule,
-    DxToolbarModule,
-    DxHtmlEditorModule,
-    RouterModule
+    DxTextAreaModule
   ],
   providers: [
     provideRouter(routes),
