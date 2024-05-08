@@ -9,13 +9,15 @@ import ODataContext from "devextreme/data/odata/context";
 import { map } from "rxjs/operators";
 import { Workspace } from "../models/workspace.model";
 import { UserStoryService } from "./user-story.service";
+import { CrudBaseService } from "./crud-base.service";
 @Injectable()
-export class WorkspaceService {
+export class WorkspaceService extends CrudBaseService<Workspace>{
   constructor(
     private odataService: ODataService,
-    private userStoryService: UserStoryService,
     private http: HttpClient
-  ) {}
+  ) {
+    super();
+  }
 
   public getStore(): ODataStore {
     return this.odataService.context["Workspaces"];
