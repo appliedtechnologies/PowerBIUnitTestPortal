@@ -88,6 +88,11 @@ namespace at.PowerBIUnitTest.Portal.Data.Models
             {
                 entity.ToTable("TestRun");
 
+                entity.Property(e => e.UniqueIdentifier)
+                 .HasDefaultValueSql("NEWID()")
+                 .IsRequired()
+                 .HasColumnName("Unique Identifier");
+
                 entity.Property(e => e.WasPassed)
                  .IsRequired()
                  .HasColumnName("WasPassed");
@@ -139,6 +144,11 @@ namespace at.PowerBIUnitTest.Portal.Data.Models
             modelBuilder.Entity<TestRunCollection>(entity =>
             {
                 entity.ToTable("TestRunCollection");
+
+                entity.Property(e => e.UniqueIdentifier)
+                 .HasDefaultValueSql("NEWID()")
+                 .IsRequired()
+                 .HasColumnName("Unique Identifier");
 
                 entity.Property(e => e.WasPassed)
                  .IsRequired()

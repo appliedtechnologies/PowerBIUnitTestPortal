@@ -64,6 +64,8 @@ import { UnitTestsComponent } from "./components/unit-tests/unit-tests.component
 import { GetFirstElementPipe } from "./shared/pipes/get-first-element.pipe";
 import { licenseKey } from "src/devextreme-license";
 import config from "devextreme/core/config";
+import { HistoryComponent } from "./components/history/history.component";
+import { TestRunCollectionService } from "./shared/services/test-run-collection.service";
 
 export function initializeAppConfig(appConfig: AppConfig, router: Router) {
   return () => appConfig.load();
@@ -79,6 +81,7 @@ config({ licenseKey });
     UserComponent,
     UnitTestsComponent,
     SideNavigationMenuComponent,
+    HistoryComponent,
     GetFirstElementPipe
   ],
   imports: [
@@ -138,6 +141,7 @@ config({ licenseKey });
     UserStoryService,
     WorkspaceService,
     TabularModelService,
+    TestRunCollectionService
   ],
   bootstrap: [AppComponent, MsalRedirectComponent],
 })

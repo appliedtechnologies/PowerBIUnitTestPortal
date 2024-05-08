@@ -1,7 +1,8 @@
 using System.Linq;
 using at.PowerBIUnitTest.Portal.Data.Models;
-using Microsoft.AspNet.OData;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.OData.Formatter;
+using Microsoft.AspNetCore.OData.Query;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Identity.Web;
