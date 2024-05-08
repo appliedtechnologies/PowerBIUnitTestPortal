@@ -53,5 +53,25 @@ namespace at.PowerBIUnitTest.Portal.Controllers
             logger.LogDebug($"End: WorkspacesController Pull()");
             return Ok();
         }
+
+        [HttpDelete]
+        public async Task<IActionResult> Delete([FromODataUri] int key)
+        {
+            logger.LogDebug($"Begin: WorkspacesController Delete(key: {key}");
+
+            var workspace = await this.dbContext.Workspaces.FindAsync(key);
+
+            if (workspace == null)
+                return NotFound();
+
+            if (workspace.TenantNavigation.MsId != this.msIdTenantCurrentUser)
+                return Forbid();
+
+            this.dbContext.Workspaces.Remove(workspace);
+            await base.dbContext.SaveChangesAsync();
+
+            logger.LogDebug($"End: WorkspacesController Delete(key: {key}");
+            return Ok();
+        }
     }
 }
