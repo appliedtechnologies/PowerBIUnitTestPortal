@@ -53,6 +53,8 @@ export class UnitTestsComponent implements OnInit {
     ) {
         this.onClickExecuteUnitTests = this.onClickExecuteUnitTests.bind(this);
         this.onClickAddUserStory = this.onClickAddUserStory.bind(this);
+        this.onClickDeleteWorkspace = this.onClickDeleteWorkspace.bind(this);
+        this.onClickDeleteTabularModel = this.onClickDeleteTabularModel.bind(this);
         this.onClickEditUserStory = this.onClickEditUserStory.bind(this);
         this.onClickDeleteUserStory = this.onClickDeleteUserStory.bind(this);
         this.onClickAddUnitTest = this.onClickAddUnitTest.bind(this);
@@ -304,6 +306,50 @@ export class UnitTestsComponent implements OnInit {
 
     public onClickEditUserStory(e: any): void {
         this.openEditUserStoryPopup(e.row.data);
+    }
+
+    public onClickDeleteWorkspace(e: any): void {
+        let result = confirm("Are you sure you want to delete this workspace (including all tabular models, user stories and unit tests)? If it continues to exist in Power BI, it will be created again with the next pull action.", "Delete Workspace");
+        result.then((dialogResult) => {
+            if (dialogResult) {
+                this.layoutService.change(LayoutParameter.ShowLoading, true);
+                this.workspaceService.remove(e.row.data.Id)
+                    .then(() => this.layoutService.notify({
+                        type: NotificationType.Success,
+                        message: "The workspace was deleted successfully."
+                    }))
+                    .catch((error: Error) => this.layoutService.notify({
+                        type: NotificationType.Error,
+                        message: error?.message ? `The workspace could not be deleted: ${error.message}` : "The workspace could not be deleted."
+                    }))
+                    .then(() => {
+                        this.treeList.instance.refresh();
+                        this.layoutService.change(LayoutParameter.ShowLoading, false);
+                    });
+            }
+        });
+    }
+
+    public onClickDeleteTabularModel(e: any): void {
+        let result = confirm("Are you sure you want to delete this tabular model (including all user stories and unit tests)? If it continues to exist in Power BI, it will be created again with the next pull action.", "Delete Tabular Model");
+        result.then((dialogResult) => {
+            if (dialogResult) {
+                this.layoutService.change(LayoutParameter.ShowLoading, true);
+                this.tabularModelService.remove(e.row.data.Id)
+                    .then(() => this.layoutService.notify({
+                        type: NotificationType.Success,
+                        message: "The tabular model was deleted successfully."
+                    }))
+                    .catch((error: Error) => this.layoutService.notify({
+                        type: NotificationType.Error,
+                        message: error?.message ? `The tabular model could not be deleted: ${error.message}` : "The user story could not be deleted."
+                    }))
+                    .then(() => {
+                        this.treeList.instance.refresh();
+                        this.layoutService.change(LayoutParameter.ShowLoading, false);
+                    });
+            }
+        });
     }
 
     public onClickDeleteUserStory(e: any): void {
