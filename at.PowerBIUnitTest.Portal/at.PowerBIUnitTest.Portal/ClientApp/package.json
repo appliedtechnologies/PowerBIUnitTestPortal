@@ -1,5 +1,5 @@
 {
-  "name": "at.d365.powercid.portal",
+  "name": "at.powerbiunittest.portal",
   "version": "1.1.2405.0716",
   "scripts": {
     "ng": "ng",
