@@ -51,7 +51,7 @@ import {
   MSALInstanceFactory,
   MSALInterceptorConfigFactory,
 } from "./shared/config/auth-config";
-import { AppRoutingModule } from "./app-routing.module";
+import { routes } from "./app-routing.module";
 import { UserService } from "./shared/services/user.service";
 import { LogService } from "./shared/services/log.service";
 import { TenantService } from "./shared/services/tenant.service";
@@ -63,7 +63,7 @@ import { sendRequestFactory } from "./shared/helper/ng-http-client-helper";
 import { LayoutService } from "./shared/services/layout.service";
 import { DxTreeListModule } from "devextreme-angular";
 import { RoleGuard } from "./shared/guards/role.guard";
-import { Router } from "@angular/router";
+import { Router, RouterModule, provideRouter } from "@angular/router";
 import { UnitTestService } from "./shared/services/unit-test.service";
 import { UserStoryService } from "./shared/services/user-story.service";
 import { WorkspaceService } from "./shared/services/workspace.service";
@@ -91,7 +91,6 @@ export function initializeAppConfig(appConfig: AppConfig, router: Router) {
     BrowserModule.withServerTransition({ appId: "ng-cli-universal" }),
     HttpClientModule,
     FormsModule,
-    AppRoutingModule,
     MsalModule,
     DxDataGridModule,
     DxDrawerModule,
@@ -116,9 +115,10 @@ export function initializeAppConfig(appConfig: AppConfig, router: Router) {
     DxoHideEventModule,
     DxToolbarModule,
     DxHtmlEditorModule,
-    
+    RouterModule
   ],
   providers: [
+    provideRouter(routes),
     AppConfig,
     LogService,
     {
