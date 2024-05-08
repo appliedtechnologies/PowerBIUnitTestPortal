@@ -19,8 +19,6 @@ import {
   DxScrollViewModule,
 } from "devextreme-angular";
 
-//import {DxRichTextEditorModule } from 'devextreme-angular';
-
 import {
   MsalModule,
   MsalInterceptor,
@@ -64,10 +62,14 @@ import { TabularModelService } from "./shared/services/tabular-model.service";
 import { SideNavigationMenuComponent } from "./components/side-navigation-menu/side-navigation-menu.component";
 import { UnitTestsComponent } from "./components/unit-tests/unit-tests.component";
 import { GetFirstElementPipe } from "./shared/pipes/get-first-element.pipe";
+import { licenseKey } from "src/devextreme-license";
+import config from "devextreme/core/config";
 
 export function initializeAppConfig(appConfig: AppConfig, router: Router) {
   return () => appConfig.load();
 }
+
+config({ licenseKey });  
 
 @NgModule({
   declarations: [

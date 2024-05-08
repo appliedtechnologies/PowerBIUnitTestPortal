@@ -231,3 +231,4 @@ _Pvt_Extensions
 # FAKE - F# Make
 .fake/
 at.PowerBIUnitTest.Portal/at.PowerBIUnitTest.Portal/appsettings.Development.json
+at.PowerBIUnitTest.Portal/at.PowerBIUnitTest.Portal/ClientApp/src/devextreme-license.ts
