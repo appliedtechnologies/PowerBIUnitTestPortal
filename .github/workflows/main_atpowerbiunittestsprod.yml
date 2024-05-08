@@ -13,6 +13,9 @@ jobs:
     runs-on: windows-latest
     env: 
             DEVEXTREME_KEY: ${{ secrets.DevExtremeKey }} 
+    defaults:
+      run:
+        working-directory: ./at.PowerBIUnitTest.Portal
             
     steps:
       - uses: actions/checkout@v2
