@@ -46,6 +46,10 @@ export class ODataService {
         ResultTypes: {
           key: "Id",
           keyType: "Int32",
+        },
+        TestRunCollections: {
+          key: "Id",
+          keyType: "Int32",
         }
       },
     });
