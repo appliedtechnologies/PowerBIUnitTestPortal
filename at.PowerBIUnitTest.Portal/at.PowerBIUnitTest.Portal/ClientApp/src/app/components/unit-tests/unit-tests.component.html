@@ -46,6 +46,9 @@
     <dxi-button [visible]="isUserStoryRow" icon="copy" text="Copy User Story" type="default"
       [onClick]="onClickCopyUserStory">
     </dxi-button>
+    <dxi-button [visible]="isUnitTestRow" icon="clock" text="Show Run History" type="default"
+      [onClick]="onClickShowRunHistory">
+    </dxi-button>
   </dxi-column>
 
   <div *dxTemplate="let data of 'cellTemplateLastResult'">
@@ -122,4 +125,10 @@
       onClick: this.onClickSaveCopyUserStory.bind(this),
       width: '100%'
     }"></dxi-item></dx-form>
+</dx-popup>
+
+<dx-popup *ngIf="isVisibleTestRunHistory" width="90%" height="90%" [showTitle]="true" [title]="popupTitle"
+  [hideOnOutsideClick]="true" [(visible)]="isVisibleTestRunHistory">
+
+  <app-history [unitTestId]="unitTestToEdit.Id"></app-history>
 </dx-popup>
