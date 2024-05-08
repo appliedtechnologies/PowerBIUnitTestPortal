@@ -10,6 +10,8 @@ namespace at.PowerBIUnitTest.Portal.Data.Models
     public partial class TestRunCollection : ITrackModified
     {
         public int Id {get; set;}
+        public Guid UniqueIdentifier { get; set; }
+
         public DateTime TimeStamp {get; set;}
         public bool WasPassed {get; set;}
 

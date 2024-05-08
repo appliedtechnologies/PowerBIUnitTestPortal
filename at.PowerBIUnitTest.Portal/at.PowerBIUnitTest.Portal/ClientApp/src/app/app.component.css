@@ -25,12 +25,11 @@
     color: white;
 }
 
-::ng-deep .dx-toolbar {
-    padding: 5px 10px;
-}
-
 ::ng-deep .dx-toolbar:not(#header-toolbar) {
     background-color: rgba(191,191,191,.15);
+}
+
+::ng-deep .dx-toolbar:not(.dx-popup-title) {
     padding: 5px 10px;
 }
 

@@ -33,6 +33,7 @@ export class UnitTestsComponent implements OnInit {
     public isVisibleEditUnitTest: boolean = false;
     public isVisibleEditUserStory: boolean = false;
     public isVisibleCopyUserStory: boolean = false;
+    public isVisibleTestRunHistory: boolean = false;
     public popupTitle: string = "";
 
     public userStoryToEdit: UserStory = {};
@@ -61,6 +62,7 @@ export class UnitTestsComponent implements OnInit {
         this.onClickEditUnitTest = this.onClickEditUnitTest.bind(this);
         this.onClickDeleteUnitTest = this.onClickDeleteUnitTest.bind(this);
         this.onClickCopyUserStory = this.onClickCopyUserStory.bind(this);
+        this.onClickShowRunHistory = this.onClickShowRunHistory.bind(this);
 
         this.dataSourceWorkspaces = new DataSource({
             store: new CustomStore({
@@ -210,6 +212,12 @@ export class UnitTestsComponent implements OnInit {
         if (e.rowType == "data" && e.data.type != "Unit Test" || e.rowType == "header") {
             e.rowElement.classList.add("hide-checkbox");
         }
+    }
+
+    public onClickShowRunHistory(e: any): void {
+        this.popupTitle = "Test Run History: " + e.row.data.Name;
+        this.unitTestToEdit = e.row.data;
+        this.isVisibleTestRunHistory = true;
     }
 
     public onClickCopyUserStory(e: any): void {

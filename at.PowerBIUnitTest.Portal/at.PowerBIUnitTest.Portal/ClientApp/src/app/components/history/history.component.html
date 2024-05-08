@@ -1,4 +1,20 @@
-<h1>History</h1>
+<h1 *ngIf="unitTestId == null">History</h1>
 
-<dx-tree-list #treeList [dataSource]="dataSourceTestRunCollections" dataStructure="tree" [showRowLines]="true" itemsExpr="TestRuns">
+<dx-tree-list #treeList [dataSource]="dataSourceTestRunCollections" dataStructure="tree" [showRowLines]="true" height="100%" (onCellPrepared)="onCellPreparedTreeList($event)">
+
+    <dxi-column dataField="type"></dxi-column>
+    <dxi-column dataField="TimeStamp" caption="Last Execution" format="dd.MM.yyyy HH:mm:ss"></dxi-column>
+    <dxi-column dataField="UnitTestNavigation.Name" caption="Unit Test Name"></dxi-column>
+    <dxi-column dataField="WasPassed"></dxi-column>
+    <dxi-column dataField="Result" cellTemplate="cellTemplateResult"></dxi-column>
+    <dxi-column dataField="ExpectedResult"></dxi-column>
+    <dxi-column dataField="JsonResponse"></dxi-column>
+
+    <div *dxTemplate="let data of 'cellTemplateResult'">
+        <div *ngIf="data.data?.type == 'Test Run'">
+            <span *ngIf="data.data?.ExecutedSuccessfully">{{ data.value }}</span>
+            <span *ngIf="!data.data?.ExecutedSuccessfully"><i>error durring
+                execution</i></span>
+        </div>
+    </div>
 </dx-tree-list>
