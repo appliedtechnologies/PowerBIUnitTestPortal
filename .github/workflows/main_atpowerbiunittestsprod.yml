@@ -4,15 +4,20 @@
 name: Build and deploy - atPowerBiUnitTests-Prod
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - main
+ 
 
 jobs:
   build:
     runs-on: windows-latest
     env: 
             DEVEXTREME_KEY: ${{ secrets.DevExtremeKey }} 
+    defaults:
+      run:
+        working-directory: ./at.PowerBIUnitTest.Portal
             
     steps:
       - uses: actions/checkout@v2
