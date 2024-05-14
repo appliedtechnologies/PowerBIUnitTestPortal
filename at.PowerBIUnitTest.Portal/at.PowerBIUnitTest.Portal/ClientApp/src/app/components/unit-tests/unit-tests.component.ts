@@ -73,6 +73,9 @@ export class UnitTestsComponent {
                     loadOptions.expand.push("TabularModels.UserStories");
                     loadOptions.expand.push("TabularModels.UserStories.UnitTests");
                     loadOptions.expand.push("TabularModels.UserStories.UnitTests.TestRuns($top=1;$orderby=TimeStamp desc)");
+
+                    loadOptions.filter = ["IsVisible eq true"];
+
                     return (this.workspaceService.getStore().load(loadOptions)).then((data) => {
                         data.forEach(e => {
                             delete Object.assign(e, { ["items"]: e["TabularModels"] })["TabularModels"]

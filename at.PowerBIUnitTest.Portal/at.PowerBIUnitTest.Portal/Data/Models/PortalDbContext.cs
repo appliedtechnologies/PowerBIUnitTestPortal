@@ -311,6 +311,11 @@ namespace at.PowerBIUnitTest.Portal.Data.Models
                 .IsRequired()
                 .HasColumnName("Ms Id");
 
+                entity.Property(e => e.IsVisible)
+                .IsRequired()
+                .HasDefaultValue(false)
+                .HasColumnName("Is Visible");
+
                 entity.HasOne(d => d.TenantNavigation)
                  .WithMany(p => p.Workspaces)
                  .HasForeignKey(d => d.Tenant)
