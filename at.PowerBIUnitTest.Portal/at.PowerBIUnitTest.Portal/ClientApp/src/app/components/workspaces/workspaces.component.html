@@ -1,1 +1,21 @@
 <h1>Workspaces</h1>
+
+<dx-data-grid #dataGrid
+  [dataSource]="dataSourceWorkspaces"
+  [hoverStateEnabled]="true"
+  [showBorders]="true"
+  [showRowLines]="true"
+  height="100%"
+  (onToolbarPreparing)="onToolbarPreparingTreeList($event)"
+>
+  <dxo-editing
+    mode="row"
+    [allowUpdating]="true"
+    [allowDeleting]="true"
+    [useIcons]="true"
+    [texts]="{ confirmDeleteMessage: 'Are you sure you want to delete this workspace (including all tabular models, user stories and unit tests)? If it continues to exist in Power BI, it will be created again with the next pull action.' }"
+  >
+  </dxo-editing>
+  <dxi-column dataField="Name" sortOrder="asc" [sortIndex]="0"></dxi-column>
+  <dxi-column type="buttons" caption="Actions"> </dxi-column>
+</dx-data-grid>
