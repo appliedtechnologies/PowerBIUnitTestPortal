@@ -23,7 +23,7 @@ import { TabularModelService } from "src/app/shared/services/tabular-model.servi
     templateUrl: "./unit-tests.component.html",
     styleUrls: ["./unit-tests.component.css"],
 })
-export class UnitTestsComponent implements OnInit {
+export class UnitTestsComponent {
     public dataSourceWorkspaces: DataSource;
     public dataSourceWorkspacesOdata: DataSource;
     public dataSourceTabularModels: DataSource;
@@ -54,7 +54,6 @@ export class UnitTestsComponent implements OnInit {
     ) {
         this.onClickExecuteUnitTests = this.onClickExecuteUnitTests.bind(this);
         this.onClickAddUserStory = this.onClickAddUserStory.bind(this);
-        this.onClickDeleteWorkspace = this.onClickDeleteWorkspace.bind(this);
         this.onClickDeleteTabularModel = this.onClickDeleteTabularModel.bind(this);
         this.onClickEditUserStory = this.onClickEditUserStory.bind(this);
         this.onClickDeleteUserStory = this.onClickDeleteUserStory.bind(this);
@@ -74,6 +73,9 @@ export class UnitTestsComponent implements OnInit {
                     loadOptions.expand.push("TabularModels.UserStories");
                     loadOptions.expand.push("TabularModels.UserStories.UnitTests");
                     loadOptions.expand.push("TabularModels.UserStories.UnitTests.TestRuns($top=1;$orderby=TimeStamp desc)");
+
+                    loadOptions.filter = ["IsVisible eq true"];
+
                     return (this.workspaceService.getStore().load(loadOptions)).then((data) => {
                         data.forEach(e => {
                             delete Object.assign(e, { ["items"]: e["TabularModels"] })["TabularModels"]
@@ -103,28 +105,6 @@ export class UnitTestsComponent implements OnInit {
             store: this.workspaceService.getStore(),
             sort: [{ selector: "Name", desc: false }]
         });
-    }
-
-    ngOnInit(): void { }
-
-    public onClickPullWorkspaces(e: ClickEvent): void {
-        this.layoutService.change(LayoutParameter.ShowLoading, true);
-        this.workspaceService
-            .pullWorkspaces()
-            .then(() => {
-                this.treeList.instance.refresh();
-                this.layoutService.notify({
-                    message: "Workspaces pulled successfully",
-                    type: NotificationType.Success,
-                });
-            })
-            .catch((error: Error) => this.layoutService.notify({
-                message: error.message ? `Can not pull workspaces: ${error.message}` : "Error while pulling workspaces",
-                type: NotificationType.Error,
-            }))
-            .finally(() =>
-                this.layoutService.change(LayoutParameter.ShowLoading, false)
-            );
     }
 
     public onToolbarPreparingTreeList(e: ToolbarPreparingEvent): void {
@@ -178,18 +158,6 @@ export class UnitTestsComponent implements OnInit {
                 onClick: this.onClickExecuteMultipleUnitTests.bind(this),
             },
             location: "after",
-        });
-
-        toolbarItems.unshift({
-            widget: "dxButton",
-            options: {
-                icon: "download",
-                text: "Pull Workspaces",
-                stylingMode: "contained",
-                type: "normal",
-                onClick: this.onClickPullWorkspaces.bind(this),
-            },
-            location: "before",
         });
     }
 
@@ -314,28 +282,6 @@ export class UnitTestsComponent implements OnInit {
 
     public onClickEditUserStory(e: any): void {
         this.openEditUserStoryPopup(e.row.data);
-    }
-
-    public onClickDeleteWorkspace(e: any): void {
-        let result = confirm("Are you sure you want to delete this workspace (including all tabular models, user stories and unit tests)? If it continues to exist in Power BI, it will be created again with the next pull action.", "Delete Workspace");
-        result.then((dialogResult) => {
-            if (dialogResult) {
-                this.layoutService.change(LayoutParameter.ShowLoading, true);
-                this.workspaceService.remove(e.row.data.Id)
-                    .then(() => this.layoutService.notify({
-                        type: NotificationType.Success,
-                        message: "The workspace was deleted successfully."
-                    }))
-                    .catch((error: Error) => this.layoutService.notify({
-                        type: NotificationType.Error,
-                        message: error?.message ? `The workspace could not be deleted: ${error.message}` : "The workspace could not be deleted."
-                    }))
-                    .then(() => {
-                        this.treeList.instance.refresh();
-                        this.layoutService.change(LayoutParameter.ShowLoading, false);
-                    });
-            }
-        });
     }
 
     public onClickDeleteTabularModel(e: any): void {

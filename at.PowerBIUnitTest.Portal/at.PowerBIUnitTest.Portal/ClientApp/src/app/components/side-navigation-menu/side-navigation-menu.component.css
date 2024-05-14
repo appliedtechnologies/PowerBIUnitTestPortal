@@ -52,6 +52,7 @@
   left: auto;
   height: 42px;
   transform: scaleX(-1);
+  position: absolute;
 }
 
 :host ::ng-deep .dx-scrollable-content{
