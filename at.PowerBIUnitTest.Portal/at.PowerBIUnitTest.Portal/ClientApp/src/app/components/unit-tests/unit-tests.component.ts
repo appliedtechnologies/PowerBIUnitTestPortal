@@ -40,10 +40,10 @@ export class UnitTestsComponent implements OnInit {
     public unitTestToEdit: UnitTest = {};
     public copyUserStoryConfig: { workspaceId?: number, tabularModelId?: number, userStoryId?: number, tabularModelToExclude?: number } = {};
 
-    public resultTypeItems: string[] = ["String", "Float", "Date", "Percentage"];
+    public resultTypeItems: string[] = ["String", "Number", "Date", "Percentage"];
     public dateTimeFormatItems: string[] = ["UTC", "CET"];
     public floatSeparatorItems: string[] = ["Use Seperators", "Dont use Sperators"];
-    public decimalPlacesItems: string[] = ["1", "2", "3", "4", "5"];
+    public decimalPlacesItems: string[] = ["0", "1", "2", "3", "4", "5"];
 
     constructor(
         private unitTestService: UnitTestService,
