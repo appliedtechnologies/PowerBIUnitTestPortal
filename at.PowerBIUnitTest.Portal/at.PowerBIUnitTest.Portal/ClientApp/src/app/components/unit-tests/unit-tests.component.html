@@ -73,7 +73,7 @@
     <dxi-item dataField="Name" [label]="{ text: 'Name' }" isRequired="true"></dxi-item>
     <dxi-item dataField="ResultType" [label]="{ text: 'Result Type' }" editorType="dxSelectBox"
       [editorOptions]="{ items: resultTypeItems }" isRequired="true"></dxi-item>
-    <dxi-item *ngIf="unitTestToEdit.ResultType == 'Float'" dataField="DecimalPlaces"
+    <dxi-item *ngIf="unitTestToEdit.ResultType == 'Float'|| unitTestToEdit.ResultType == 'Percentage' " dataField="DecimalPlaces"
       [label]="{ text: 'Decimal Places' }" editorType="dxSelectBox"
       [editorOptions]="{  items: decimalPlacesItems }"></dxi-item>
     <dxi-item *ngIf="unitTestToEdit.ResultType == 'Float'" dataField="FloatSeparators"

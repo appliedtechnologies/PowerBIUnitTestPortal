@@ -89,8 +89,16 @@ namespace at.PowerBIUnitTest.Portal.Services
                 }
                 else if (unitTest.ResultType == "Percentage")
                 {
+                    float floatResult = float.Parse(testResult);
                     double number = float.Parse(testResult);
-                    testResult = number.ToString("#0.###%");
+                    if (unitTest.DecimalPlaces != null)
+                    {
+                        testResult = Math.Round(floatResult, int.Parse(unitTest.DecimalPlaces) + 2).ToString();
+                        string formatString = "P" + (unitTest.DecimalPlaces ?? "0");
+                        testResult = number.ToString(formatString);
+                    }
+                    else { testResult = number.ToString("#0.##%"); }
+
                 }
             }
             catch (Exception ex)
