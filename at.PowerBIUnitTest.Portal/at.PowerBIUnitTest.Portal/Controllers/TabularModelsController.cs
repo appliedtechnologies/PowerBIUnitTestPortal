@@ -37,6 +37,26 @@ namespace at.PowerBIUnitTest.Portal.Controllers
         {
             logger.LogDebug($"Begin & End: TabularModelsController Get()");
             return base.dbContext.TabularModels.Where(e => e.WorkspaceNavigation.TenantNavigation.MsId == this.msIdTenantCurrentUser);
-        }  
+        } 
+
+        [HttpDelete]
+        public async Task<IActionResult> Delete([FromODataUri] int key)
+        {
+            logger.LogDebug($"Begin: TabularModelsController Delete(key: {key}");
+
+            var tabularModel = await this.dbContext.TabularModels.FindAsync(key);
+
+            if (tabularModel == null)
+                return NotFound();
+
+            if (tabularModel.WorkspaceNavigation.TenantNavigation.MsId != this.msIdTenantCurrentUser)
+                return Forbid();
+
+            this.dbContext.TabularModels.Remove(tabularModel);
+            await base.dbContext.SaveChangesAsync();
+
+            logger.LogDebug($"End: TabularModelsController Delete(key: {key}");
+            return Ok();
+        } 
     }
 }

@@ -1,6 +1,5 @@
 import { BrowserModule } from "@angular/platform-browser";
 import { APP_INITIALIZER, NgModule } from "@angular/core";
-import { FormsModule } from "@angular/forms";
 import {
   HttpClient,
   HttpClientModule,
@@ -9,24 +8,16 @@ import {
 import {
   DxDataGridModule,
   DxDrawerModule,
-  DxListModule,
   DxLoadPanelModule,
   DxToolbarModule,
   DxSelectBoxModule,
   DxFormModule,
-  DxLookupModule,
   DxPopupModule,
-  DxTextBoxModule,
   DxButtonModule,
   DxTreeViewModule,
-  DxSortableModule,
   DxTextAreaModule,
   DxScrollViewModule,
-  DxHtmlEditorModule,
-
 } from "devextreme-angular";
-
-//import {DxRichTextEditorModule } from 'devextreme-angular';
 
 import {
   MsalModule,
@@ -51,7 +42,7 @@ import {
   MSALInstanceFactory,
   MSALInterceptorConfigFactory,
 } from "./shared/config/auth-config";
-import { AppRoutingModule } from "./app-routing.module";
+import { routes } from "./app-routing.module";
 import { UserService } from "./shared/services/user.service";
 import { LogService } from "./shared/services/log.service";
 import { TenantService } from "./shared/services/tenant.service";
@@ -63,19 +54,25 @@ import { sendRequestFactory } from "./shared/helper/ng-http-client-helper";
 import { LayoutService } from "./shared/services/layout.service";
 import { DxTreeListModule } from "devextreme-angular";
 import { RoleGuard } from "./shared/guards/role.guard";
-import { Router } from "@angular/router";
+import { Router, RouterModule, provideRouter } from "@angular/router";
 import { UnitTestService } from "./shared/services/unit-test.service";
 import { UserStoryService } from "./shared/services/user-story.service";
 import { WorkspaceService } from "./shared/services/workspace.service";
 import { TabularModelService } from "./shared/services/tabular-model.service";
-import { DxoHideEventModule } from "devextreme-angular/ui/nested";
 import { SideNavigationMenuComponent } from "./components/side-navigation-menu/side-navigation-menu.component";
 import { UnitTestsComponent } from "./components/unit-tests/unit-tests.component";
 import { GetFirstElementPipe } from "./shared/pipes/get-first-element.pipe";
+import { licenseKey } from "src/devextreme-license";
+import config from "devextreme/core/config";
+import { HistoryComponent } from "./components/history/history.component";
+import { TestRunCollectionService } from "./shared/services/test-run-collection.service";
+import { WorkspacesComponent } from "./components/workspaces/workspaces.component";
 
 export function initializeAppConfig(appConfig: AppConfig, router: Router) {
   return () => appConfig.load();
 }
+
+config({ licenseKey });  
 
 @NgModule({
   declarations: [
@@ -85,40 +82,30 @@ export function initializeAppConfig(appConfig: AppConfig, router: Router) {
     UserComponent,
     UnitTestsComponent,
     SideNavigationMenuComponent,
-    GetFirstElementPipe
+    HistoryComponent,
+    GetFirstElementPipe,
+    WorkspacesComponent
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: "ng-cli-universal" }),
     HttpClientModule,
-    FormsModule,
-    AppRoutingModule,
     MsalModule,
+    RouterModule,
     DxDataGridModule,
     DxDrawerModule,
-    DxListModule,
     DxToolbarModule,
     DxLoadPanelModule,
-    DxSelectBoxModule,
     DxTreeListModule,
-    DxSortableModule,
     DxTreeViewModule,
     DxButtonModule,
     DxSelectBoxModule,
     DxFormModule,
-    DxLookupModule,
     DxPopupModule,
-    DxTextBoxModule,
-    DxTreeViewModule,
-    DxSortableModule,
-    DxTextBoxModule,
-    DxTextAreaModule,
     DxScrollViewModule,
-    DxoHideEventModule,
-    DxToolbarModule,
-    DxHtmlEditorModule,
-    
+    DxTextAreaModule
   ],
   providers: [
+    provideRouter(routes),
     AppConfig,
     LogService,
     {
@@ -156,6 +143,7 @@ export function initializeAppConfig(appConfig: AppConfig, router: Router) {
     UserStoryService,
     WorkspaceService,
     TabularModelService,
+    TestRunCollectionService
   ],
   bootstrap: [AppComponent, MsalRedirectComponent],
 })

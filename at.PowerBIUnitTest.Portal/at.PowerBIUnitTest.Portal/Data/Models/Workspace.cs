@@ -16,6 +16,8 @@ namespace at.PowerBIUnitTest.Portal.Data.Models
 
         public Guid UniqueIdentifier { get; set; }
 
+        public bool IsVisible { get; set; }
+
         public int? Tenant { get; set; }
 
         public virtual Tenant TenantNavigation { get; set; }

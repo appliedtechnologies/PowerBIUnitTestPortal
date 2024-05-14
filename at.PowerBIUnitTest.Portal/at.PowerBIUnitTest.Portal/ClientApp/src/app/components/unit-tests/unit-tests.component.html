@@ -31,6 +31,9 @@
     <dxi-button [visible]="isUnitTestRow" icon="edit" text="Edit Unit Test" type="default"
       [onClick]="onClickEditUnitTest">
     </dxi-button>
+    <dxi-button [visible]="isTabularModelRow" icon="trash" text="Delete Tabular Model" type="default"
+      [onClick]="onClickDeleteTabularModel">
+    </dxi-button>
     <dxi-button [visible]="isUserStoryRow" icon="trash" text="Delete User Story" type="default"
       [onClick]="onClickDeleteUserStory">
     </dxi-button>
@@ -39,6 +42,9 @@
     </dxi-button>
     <dxi-button [visible]="isUserStoryRow" icon="copy" text="Copy User Story" type="default"
       [onClick]="onClickCopyUserStory">
+    </dxi-button>
+    <dxi-button [visible]="isUnitTestRow" icon="clock" text="Show Run History" type="default"
+      [onClick]="onClickShowRunHistory">
     </dxi-button>
   </dxi-column>
 
@@ -73,10 +79,10 @@
     <dxi-item dataField="Name" [label]="{ text: 'Name' }" isRequired="true"></dxi-item>
     <dxi-item dataField="ResultType" [label]="{ text: 'Result Type' }" editorType="dxSelectBox"
       [editorOptions]="{ items: resultTypeItems }" isRequired="true"></dxi-item>
-    <dxi-item *ngIf="unitTestToEdit.ResultType == 'Float'|| unitTestToEdit.ResultType == 'Percentage' " dataField="DecimalPlaces"
+    <dxi-item *ngIf="unitTestToEdit.ResultType == 'Number'|| unitTestToEdit.ResultType == 'Percentage' " dataField="DecimalPlaces"
       [label]="{ text: 'Decimal Places' }" editorType="dxSelectBox"
       [editorOptions]="{  items: decimalPlacesItems }"></dxi-item>
-    <dxi-item *ngIf="unitTestToEdit.ResultType == 'Float'" dataField="FloatSeparators"
+    <dxi-item *ngIf="unitTestToEdit.ResultType == 'Number'" dataField="FloatSeparators"
       [label]="{ text: 'Float Separators' }" editorType="dxSelectBox"
       [editorOptions]="{  items: floatSeparatorItems }"></dxi-item>
     <dxi-item *ngIf="unitTestToEdit.ResultType == 'Date'" dataField="DateTimeFormat"
@@ -116,4 +122,10 @@
       onClick: this.onClickSaveCopyUserStory.bind(this),
       width: '100%'
     }"></dxi-item></dx-form>
+</dx-popup>
+
+<dx-popup *ngIf="isVisibleTestRunHistory" width="90%" height="90%" [showTitle]="true" [title]="popupTitle"
+  [hideOnOutsideClick]="true" [(visible)]="isVisibleTestRunHistory">
+
+  <app-history [unitTestId]="unitTestToEdit.Id"></app-history>
 </dx-popup>

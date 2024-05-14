@@ -59,9 +59,12 @@ namespace at.PowerBIUnitTest.Portal.Services
             string testResult = null;
             try
             {
-                testResult = ((result.jObject["results"][0]["tables"][0]["rows"][0] as JObject).First as JProperty).Value.ToString();
+                if(result.jObject["results"][0]["tables"][0]["rows"][0].ToString() == "{}")
+                    testResult = "0";
+                else
+                    testResult = ((result.jObject["results"][0]["tables"][0]["rows"][0] as JObject).First as JProperty).Value.ToString();
 
-                if (unitTest.ResultType == "Float")
+                if (unitTest.ResultType == "Number")
                 {
                     float floatResult = float.Parse(testResult);
 

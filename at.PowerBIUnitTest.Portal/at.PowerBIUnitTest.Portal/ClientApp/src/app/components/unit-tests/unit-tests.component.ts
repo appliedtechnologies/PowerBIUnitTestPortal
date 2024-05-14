@@ -23,7 +23,7 @@ import { TabularModelService } from "src/app/shared/services/tabular-model.servi
     templateUrl: "./unit-tests.component.html",
     styleUrls: ["./unit-tests.component.css"],
 })
-export class UnitTestsComponent implements OnInit {
+export class UnitTestsComponent {
     public dataSourceWorkspaces: DataSource;
     public dataSourceWorkspacesOdata: DataSource;
     public dataSourceTabularModels: DataSource;
@@ -33,16 +33,17 @@ export class UnitTestsComponent implements OnInit {
     public isVisibleEditUnitTest: boolean = false;
     public isVisibleEditUserStory: boolean = false;
     public isVisibleCopyUserStory: boolean = false;
+    public isVisibleTestRunHistory: boolean = false;
     public popupTitle: string = "";
 
     public userStoryToEdit: UserStory = {};
     public unitTestToEdit: UnitTest = {};
     public copyUserStoryConfig: { workspaceId?: number, tabularModelId?: number, userStoryId?: number, tabularModelToExclude?: number } = {};
 
-    public resultTypeItems: string[] = ["String", "Float", "Date", "Percentage"];
+    public resultTypeItems: string[] = ["String", "Number", "Date", "Percentage"];
     public dateTimeFormatItems: string[] = ["UTC", "CET"];
     public floatSeparatorItems: string[] = ["Use Seperators", "Dont use Sperators"];
-    public decimalPlacesItems: string[] = ["1", "2", "3", "4", "5"];
+    public decimalPlacesItems: string[] = ["0", "1", "2", "3", "4", "5"];
 
     constructor(
         private unitTestService: UnitTestService,
@@ -53,12 +54,14 @@ export class UnitTestsComponent implements OnInit {
     ) {
         this.onClickExecuteUnitTests = this.onClickExecuteUnitTests.bind(this);
         this.onClickAddUserStory = this.onClickAddUserStory.bind(this);
+        this.onClickDeleteTabularModel = this.onClickDeleteTabularModel.bind(this);
         this.onClickEditUserStory = this.onClickEditUserStory.bind(this);
         this.onClickDeleteUserStory = this.onClickDeleteUserStory.bind(this);
         this.onClickAddUnitTest = this.onClickAddUnitTest.bind(this);
         this.onClickEditUnitTest = this.onClickEditUnitTest.bind(this);
         this.onClickDeleteUnitTest = this.onClickDeleteUnitTest.bind(this);
         this.onClickCopyUserStory = this.onClickCopyUserStory.bind(this);
+        this.onClickShowRunHistory = this.onClickShowRunHistory.bind(this);
 
         this.dataSourceWorkspaces = new DataSource({
             store: new CustomStore({
@@ -70,6 +73,9 @@ export class UnitTestsComponent implements OnInit {
                     loadOptions.expand.push("TabularModels.UserStories");
                     loadOptions.expand.push("TabularModels.UserStories.UnitTests");
                     loadOptions.expand.push("TabularModels.UserStories.UnitTests.TestRuns($top=1;$orderby=TimeStamp desc)");
+
+                    loadOptions.filter = ["IsVisible eq true"];
+
                     return (this.workspaceService.getStore().load(loadOptions)).then((data) => {
                         data.forEach(e => {
                             delete Object.assign(e, { ["items"]: e["TabularModels"] })["TabularModels"]
@@ -99,28 +105,6 @@ export class UnitTestsComponent implements OnInit {
             store: this.workspaceService.getStore(),
             sort: [{ selector: "Name", desc: false }]
         });
-    }
-
-    ngOnInit(): void { }
-
-    public onClickPullWorkspaces(e: ClickEvent): void {
-        this.layoutService.change(LayoutParameter.ShowLoading, true);
-        this.workspaceService
-            .pullWorkspaces()
-            .then(() => {
-                this.treeList.instance.refresh();
-                this.layoutService.notify({
-                    message: "Workspaces pulled successfully",
-                    type: NotificationType.Success,
-                });
-            })
-            .catch((error: Error) => this.layoutService.notify({
-                message: error.message ? `Can not pull workspaces: ${error.message}` : "Error while pulling workspaces",
-                type: NotificationType.Error,
-            }))
-            .finally(() =>
-                this.layoutService.change(LayoutParameter.ShowLoading, false)
-            );
     }
 
     public onToolbarPreparingTreeList(e: ToolbarPreparingEvent): void {
@@ -175,18 +159,6 @@ export class UnitTestsComponent implements OnInit {
             },
             location: "after",
         });
-
-        toolbarItems.unshift({
-            widget: "dxButton",
-            options: {
-                icon: "download",
-                text: "Pull Workspaces",
-                stylingMode: "contained",
-                type: "normal",
-                onClick: this.onClickPullWorkspaces.bind(this),
-            },
-            location: "before",
-        });
     }
 
     public onCellPreparedTreeList(e: any): void {
@@ -208,6 +180,12 @@ export class UnitTestsComponent implements OnInit {
         if (e.rowType == "data" && e.data.type != "Unit Test" || e.rowType == "header") {
             e.rowElement.classList.add("hide-checkbox");
         }
+    }
+
+    public onClickShowRunHistory(e: any): void {
+        this.popupTitle = "Test Run History: " + e.row.data.Name;
+        this.unitTestToEdit = e.row.data;
+        this.isVisibleTestRunHistory = true;
     }
 
     public onClickCopyUserStory(e: any): void {
@@ -304,6 +282,28 @@ export class UnitTestsComponent implements OnInit {
 
     public onClickEditUserStory(e: any): void {
         this.openEditUserStoryPopup(e.row.data);
+    }
+
+    public onClickDeleteTabularModel(e: any): void {
+        let result = confirm("Are you sure you want to delete this tabular model (including all user stories and unit tests)? If it continues to exist in Power BI, it will be created again with the next pull action.", "Delete Tabular Model");
+        result.then((dialogResult) => {
+            if (dialogResult) {
+                this.layoutService.change(LayoutParameter.ShowLoading, true);
+                this.tabularModelService.remove(e.row.data.Id)
+                    .then(() => this.layoutService.notify({
+                        type: NotificationType.Success,
+                        message: "The tabular model was deleted successfully."
+                    }))
+                    .catch((error: Error) => this.layoutService.notify({
+                        type: NotificationType.Error,
+                        message: error?.message ? `The tabular model could not be deleted: ${error.message}` : "The user story could not be deleted."
+                    }))
+                    .then(() => {
+                        this.treeList.instance.refresh();
+                        this.layoutService.change(LayoutParameter.ShowLoading, false);
+                    });
+            }
+        });
     }
 
     public onClickDeleteUserStory(e: any): void {
