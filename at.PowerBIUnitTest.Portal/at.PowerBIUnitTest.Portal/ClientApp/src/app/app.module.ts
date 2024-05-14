@@ -66,6 +66,7 @@ import { licenseKey } from "src/devextreme-license";
 import config from "devextreme/core/config";
 import { HistoryComponent } from "./components/history/history.component";
 import { TestRunCollectionService } from "./shared/services/test-run-collection.service";
+import { WorkspacesComponent } from "./components/workspaces/workspaces.component";
 
 export function initializeAppConfig(appConfig: AppConfig, router: Router) {
   return () => appConfig.load();
@@ -82,7 +83,8 @@ config({ licenseKey });
     UnitTestsComponent,
     SideNavigationMenuComponent,
     HistoryComponent,
-    GetFirstElementPipe
+    GetFirstElementPipe,
+    WorkspacesComponent
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: "ng-cli-universal" }),

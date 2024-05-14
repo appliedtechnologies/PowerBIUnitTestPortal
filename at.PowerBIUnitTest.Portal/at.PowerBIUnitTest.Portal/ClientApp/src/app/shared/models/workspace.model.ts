@@ -9,4 +9,5 @@ export interface Workspace {
     Tenant?: number | null;
     TenantNavigation?: Tenant;
     TabularModels?: TabularModel[];
+    IsVisible?: boolean;
 }
