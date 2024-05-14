@@ -61,7 +61,7 @@ namespace at.PowerBIUnitTest.Portal.Services
             {
                 testResult = ((result.jObject["results"][0]["tables"][0]["rows"][0] as JObject).First as JProperty).Value.ToString();
 
-                if (unitTest.ResultType == "Float")
+                if (unitTest.ResultType == "Number")
                 {
                     float floatResult = float.Parse(testResult);
 
