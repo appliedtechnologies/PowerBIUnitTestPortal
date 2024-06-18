@@ -30,6 +30,9 @@ export class ODataService {
         Workspaces: {
           key: "Id",
           keyType: "Int32",
+          fieldTypes: {
+            MsId: "Guid"
+          }
         },
         TabularModels:{
           key: "Id",
