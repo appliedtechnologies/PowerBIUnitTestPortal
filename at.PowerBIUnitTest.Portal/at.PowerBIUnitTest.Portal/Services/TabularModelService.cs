@@ -30,35 +30,42 @@ namespace at.PowerBIUnitTest.Portal.Services
 
             foreach (var workspace in dbContext.Workspaces.Where(e => e.TenantNavigation.MsId == msIdTenantCurrentUser).ToList())
             {
-                var remoteDatasets = await powerBiService.LoadDataset(powerBiToken, workspace.MsId);
-                List<TabularModel> tabularModels = new List<TabularModel>();
+                try{
+                    var remoteDatasets = await powerBiService.LoadDataset(powerBiToken, workspace.MsId);
+                    List<TabularModel> tabularModels = new List<TabularModel>();
 
-                foreach (var remoteDataset in remoteDatasets)
-                {
-                    var tabularModel = new TabularModel
+                    foreach (var remoteDataset in remoteDatasets)
                     {
-                        MsId = remoteDataset["id"].ToObject<Guid>(),
-                        Name = remoteDataset["name"].ToString(),
-                        Workspace = workspace.Id
-                    };
-                    tabularModels.Add(tabularModel);
+                        var tabularModel = new TabularModel
+                        {
+                            MsId = remoteDataset["id"].ToObject<Guid>(),
+                            Name = remoteDataset["name"].ToString(),
+                            Workspace = workspace.Id
+                        };
+                        tabularModels.Add(tabularModel);
+                    }
+
+                    tabularModels.ForEach(e =>
+                    {
+                        var dbTabularModel = this.dbContext.TabularModels.FirstOrDefault(t => t.MsId == e.MsId);
+
+                        if (dbTabularModel == null)
+                        {
+                            this.dbContext.TabularModels.Add(e);
+                        }
+                        else
+                        {
+                            dbTabularModel.Name = e.Name;
+                            dbTabularModel.Workspace = e.Workspace;
+                            dbContext.Update(dbTabularModel);
+                        }
+                    });
                 }
-
-                tabularModels.ForEach(e =>
+                catch (Exception ex)
                 {
-                    var dbTabularModel = this.dbContext.TabularModels.FirstOrDefault(t => t.MsId == e.MsId);
-
-                    if (dbTabularModel == null)
-                    {
-                        this.dbContext.TabularModels.Add(e);
-                    }
-                    else
-                    {
-                        dbTabularModel.Name = e.Name;
-                        dbTabularModel.Workspace = e.Workspace;
-                        dbContext.Update(dbTabularModel);
-                    }
-                });
+                    logger.LogError(ex, $"An error occured while pulling datasets from PowerBi for workspace {workspace.Id} - continuing with next workspace.");
+                    continue;
+                }
             };
 
             await dbContext.SaveChangesAsync();
