@@ -63,6 +63,12 @@ export class SideNavigationMenuComponent {
         visible: this.userService.isLogggedIn
       },
       {
+        text: "Reports",
+        icon: "runner",
+        routerLink: "/reports",
+        visible: this.userService.isLogggedIn
+      },
+      {
         text: "History",
         icon: "clock",
         routerLink: "/history",

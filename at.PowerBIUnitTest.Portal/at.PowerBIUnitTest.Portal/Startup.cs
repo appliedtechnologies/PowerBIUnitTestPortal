@@ -146,7 +146,7 @@ namespace at.PowerBIUnitTest.Portal
 
                 if (env.IsDevelopment())
                 {
-                    var currentUri = "http://localhost:4222/";
+                    var currentUri = "http://localhost:5005/";
                     var envUri = System.Environment.GetEnvironmentVariable("ASPNETCORE_ANGULAR_URL");
                     if (!string.IsNullOrWhiteSpace(envUri))
                     {
