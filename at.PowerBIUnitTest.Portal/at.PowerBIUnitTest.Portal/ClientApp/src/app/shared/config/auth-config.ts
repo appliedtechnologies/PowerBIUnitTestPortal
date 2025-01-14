@@ -54,7 +54,7 @@ export function MSALInstanceFactory(): IPublicClientApplication {
 export function MSALInterceptorConfigFactory(): MsalInterceptorConfiguration {
   const protectedResourceMap = new Map<string, Array<string>>();
   protectedResourceMap.set("https://graph.microsoft.com/v1.0/*", ["user.read"]);
-  protectedResourceMap.set("https://api.powerbi.com/v1.0/*", []);
+  protectedResourceMap.set("https://api.powerbi.com/v1.0/*", ["https://analysis.windows.net/powerbi/api/Report.Read.All"]);
 
   protectedResourceMap.set(location.origin + "/odata/*", [
     `api://${AppConfig.settings.azure.applicationId}/access_as_user`,  //  <--- insert client id here

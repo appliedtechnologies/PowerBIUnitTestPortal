@@ -22,12 +22,36 @@ export class PowerbiService {
    public getEmbedToken(): Promise<string> {
     return new Promise<string>((resolve, reject) => {
       this.http
-        .post<{ token: string }>('https://api.powerbi.com/v1.0/myorg/groups/980c21bf-18c4-4210-8e66-027a5cea0e97/reports/e91f92b4-7566-4f75-b171-cd0590b15060/GenerateToken`,', {
-        accessLevel: 'View'})
+        .post<{ token: string }>('https://api.powerbi.com/v1.0/myorg/groups/980c21bf-18c4-4210-8e66-027a5cea0e97/reports/e91f92b4-7566-4f75-b171-cd0590b15060/GenerateToken', {
+        accessLevel: 'View',})
         .subscribe({
           next: (response) => resolve(response.token),
           error: (error: any) => reject(error?.error?.error),
         });
     });
   }
+
+  public getEmbedToken2(): Promise<string> {
+    return new Promise<string>((resolve, reject) => {
+      let request = this.http
+        .get(`${AppConfig.settings.api.url}/GetEmbedToken`)
+        .subscribe({
+          next: (response) => resolve(response.toString()),
+          error: (error: any) => reject(error?.error?.error)
+        });
+    });
+  }
+
+  public getEmbedToken3(): Promise<string> {
+    return new Promise<string>((resolve, reject) => {
+      const testParam = "test";
+      const url = `${AppConfig.settings.api.url}/GetEmbedToken?test=${encodeURIComponent(testParam)}`;
+  
+      this.http.get(url).subscribe({
+        next: (response) => resolve(response.toString()),
+        error: (error: any) => reject(error?.error?.error)
+      });
+    });
+  }
+  
 }

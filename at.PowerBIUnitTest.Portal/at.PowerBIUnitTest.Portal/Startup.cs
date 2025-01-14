@@ -21,6 +21,8 @@ using Microsoft.AspNetCore.Localization;
 using System.Collections.Generic;
 using at.PowerBIUnitTest.Portal.Services;
 
+
+
 namespace at.PowerBIUnitTest.Portal
 {
     public class Startup
@@ -46,6 +48,7 @@ namespace at.PowerBIUnitTest.Portal
             builder.EntitySet<TestRunCollection>("TestRunCollections");
             builder.EntityType<User>().Collection.Action("Login");
             builder.EntityType<Workspace>().Collection.Action("Pull");
+            builder.Function("GetEmbedToken").Returns<string>();
 
             builder.EntityType<UnitTest>().Collection.Action("Execute").CollectionParameter<int>("unitTestIds");
 
@@ -63,6 +66,7 @@ namespace at.PowerBIUnitTest.Portal
                 .EnableTokenAcquisitionToCallDownstreamApi()
                 .AddDownstreamWebApi("GraphApi", Configuration.GetSection("DownstreamApis:GraphApi"))
                 .AddDownstreamWebApi("AzureManagementApi", Configuration.GetSection("DownstreamApis:AzureManagementApi"))
+                .AddDownstreamWebApi("PowerBiApi", Configuration.GetSection("DownstreamApis:PowerBiApi"))
                 .AddInMemoryTokenCaches();
             // In production, the Angular files will be served from this directory
             services.AddSpaStaticFiles(configuration =>
@@ -135,6 +139,8 @@ namespace at.PowerBIUnitTest.Portal
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+               // endpoints.MapODataRoute("odata", "odata", GetEdmModel());
+                
             });
 
             app.UseSpa(spa =>

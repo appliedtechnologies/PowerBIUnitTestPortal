@@ -16,19 +16,12 @@ namespace at.PowerBIUnitTest.Portal
             CreateHostBuilder(args).Build().Run();
         }
 
-       public static IHostBuilder CreateHostBuilder(string[] args) =>
-    Host.CreateDefaultBuilder(args)
-        .ConfigureWebHostDefaults(webBuilder =>
-        {
-            webBuilder.ConfigureKestrel((context, options) =>
-            {
-                options.ConfigureEndpointDefaults(listenOptions =>
+        public static IHostBuilder CreateHostBuilder(string[] args) =>
+            Host.CreateDefaultBuilder(args)
+                .ConfigureWebHostDefaults(webBuilder =>
                 {
-                    listenOptions.Protocols = HttpProtocols.Http1; // Disable HTTP2
+                    webBuilder.UseStartup<Startup>();
                 });
-            });
-            webBuilder.UseStartup<Startup>();
-        });
 
 
                   public static int Add(int x, int y)

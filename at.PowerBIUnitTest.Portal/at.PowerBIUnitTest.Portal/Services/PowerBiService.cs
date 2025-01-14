@@ -8,6 +8,7 @@ using at.PowerBIUnitTest.Portal.Data.Models;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Identity.Client;
+using Microsoft.Identity.Web;
 using Newtonsoft.Json.Linq;
 
 namespace at.PowerBIUnitTest.Portal.Services
@@ -49,6 +50,44 @@ namespace at.PowerBIUnitTest.Portal.Services
                 throw;
 
             }
+        }
+
+        public async Task<string> GetEmbedToken(IDownstreamWebApi client, Guid tenantId)
+        {
+             // Define the API URL
+            string url = "/groups/980c21bf-18c4-4210-8e66-027a5cea0e97/reports/e91f92b4-7566-4f75-b171-cd0590b15060/GenerateToken";
+
+             
+            var payload = new
+            {
+                accessLevel = "View"
+            };
+
+            string jsonPayload = JsonSerializer.Serialize(payload);
+            
+            using var requestContent = new StringContent(jsonPayload, Encoding.UTF8, "application/json");
+             var response = await client.CallWebApiForUserAsync(
+                "PowerBiApi",
+                options =>
+                {
+                    options.Tenant = tenantId.ToString();
+                    options.RelativePath = url;
+                    options.HttpMethod = HttpMethod.Post;
+                    
+                },
+                content : requestContent
+                );
+
+            
+            response.EnsureSuccessStatusCode();
+
+            
+            string responseBody = await response.Content.ReadAsStringAsync();
+            var responseJson = JsonSerializer.Deserialize<JsonDocument>(responseBody);
+
+            
+            return responseJson?.RootElement.GetProperty("token").GetString();
+            
         }
 
         public async Task<JToken> LoadWorkspace(string authToken)
