@@ -66,7 +66,7 @@ namespace at.PowerBIUnitTest.Portal.Services
             string jsonPayload = JsonSerializer.Serialize(payload);
             
             using var requestContent = new StringContent(jsonPayload, Encoding.UTF8, "application/json");
-             var response = await client.CallWebApiForUserAsync(
+             var response = await client.CallWebApiForAppAsync(
                 "PowerBiApi",
                 options =>
                 {

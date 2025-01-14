@@ -36,7 +36,7 @@ export class PowerbiService {
       let request = this.http
         .get(`${AppConfig.settings.api.url}/GetEmbedToken`)
         .subscribe({
-          next: (response) => resolve(response.toString()),
+          next: (response) => resolve(response["value"].toString()),
           error: (error: any) => reject(error?.error?.error)
         });
     });

@@ -25,16 +25,12 @@ namespace at.PowerBIUnitTest.Portal.Controllers
         {
         }
 
-        [EnableQuery]
-        [HttpGet]
-        [ODataRoute("GetEmbedToken()")]
+        [HttpGet("odata/GetEmbedToken")]
         public async Task<string> GetEmbedToken([FromServices] PowerBiService powerBiService)
         {
             
             string token = await powerBiService.GetEmbedToken(downstreamWebApi, msIdTenantCurrentUser);
             return token;
         }
-
-   
     }
 }
