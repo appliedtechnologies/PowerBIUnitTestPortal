@@ -9,6 +9,7 @@ import { MsalGuard } from "@azure/msal-angular";
 import { HistoryComponent } from "./components/history/history.component";
 import { WorkspacesComponent } from "./components/workspaces/workspaces.component";
 import { PowerbiReportComponent } from "./components/powerbi-report/powerbi-report.component";
+import { ReportListComponent } from "./components/ReportList/ReportList.Component";
 
 export const routes: Routes = [
   { path: "", pathMatch: "full", redirectTo: "/unittests" },
@@ -16,5 +17,10 @@ export const routes: Routes = [
   { path: "unittests", component: UnitTestsComponent, canActivate: [MsalGuard] },
   { path: "history", component: HistoryComponent, canActivate: [MsalGuard] },
   { path: "workspaces", component: WorkspacesComponent, canActivate: [MsalGuard] },
-  { path: "reports", component: PowerbiReportComponent, canActivate: [MsalGuard] },
+  { 
+    path: 'reports/:workspaceId/:reportId',
+    component: PowerbiReportComponent,
+    canActivate: [MsalGuard]
+  },
+  { path: "reportlist", component: ReportListComponent, canActivate: [MsalGuard]  },
 ];

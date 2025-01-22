@@ -20,6 +20,7 @@ using System.Globalization;
 using Microsoft.AspNetCore.Localization;
 using System.Collections.Generic;
 using at.PowerBIUnitTest.Portal.Services;
+using System;
 
 
 
@@ -45,10 +46,14 @@ namespace at.PowerBIUnitTest.Portal
             builder.EntitySet<TabularModel>("TabularModels");
             builder.EntitySet<TestRun>("TestRuns");
             builder.EntitySet<TestRun>("ResultTypes");
+            builder.EntitySet<Report>("Reports");
             builder.EntitySet<TestRunCollection>("TestRunCollections");
             builder.EntityType<User>().Collection.Action("Login");
             builder.EntityType<Workspace>().Collection.Action("Pull");
-            builder.Function("GetEmbedToken").Returns<string>();
+            
+            var GetEmbedToken = builder.Function("GetEmbedToken").Returns<string>();
+            GetEmbedToken.Parameter<Guid>("reportId");
+            GetEmbedToken.Parameter<Guid>("workspaceId");
 
             builder.EntityType<UnitTest>().Collection.Action("Execute").CollectionParameter<int>("unitTestIds");
 
@@ -139,7 +144,7 @@ namespace at.PowerBIUnitTest.Portal
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
-               // endpoints.MapODataRoute("odata", "odata", GetEdmModel());
+                //endpoints.MapODataRoute("odata", "odata", GetEdmModel());
                 
             });
 

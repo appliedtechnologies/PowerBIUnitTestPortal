@@ -52,10 +52,10 @@ namespace at.PowerBIUnitTest.Portal.Services
             }
         }
 
-        public async Task<string> GetEmbedToken(IDownstreamWebApi client, Guid tenantId)
+        public async Task<string> GetEmbedToken(IDownstreamWebApi client, Guid tenantId, Guid workspaceId, Guid reportId)
         {
-             // Define the API URL
-            string url = "/groups/980c21bf-18c4-4210-8e66-027a5cea0e97/reports/e91f92b4-7566-4f75-b171-cd0590b15060/GenerateToken";
+             
+            string url = $"/groups/{workspaceId}/reports/{reportId}/GenerateToken";
 
              
             var payload = new

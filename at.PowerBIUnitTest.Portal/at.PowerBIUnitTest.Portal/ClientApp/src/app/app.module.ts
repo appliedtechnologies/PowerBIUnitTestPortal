@@ -53,6 +53,7 @@ import devextremeAjax from "devextreme/core/utils/ajax";
 import { sendRequestFactory } from "./shared/helper/ng-http-client-helper";
 import { LayoutService } from "./shared/services/layout.service";
 import { DxTreeListModule } from "devextreme-angular";
+//import { DxDataGridModule } from "devextreme-angular";
 import { RoleGuard } from "./shared/guards/role.guard";
 import { Router, RouterModule, provideRouter } from "@angular/router";
 import { UnitTestService } from "./shared/services/unit-test.service";
@@ -67,6 +68,9 @@ import config from "devextreme/core/config";
 import { HistoryComponent } from "./components/history/history.component";
 import { TestRunCollectionService } from "./shared/services/test-run-collection.service";
 import { WorkspacesComponent } from "./components/workspaces/workspaces.component";
+import { PowerbiReportComponent } from "./components/powerbi-report/powerbi-report.component";
+import { ReportListComponent } from "./components/ReportList/ReportList.Component";
+import { PowerbiService } from "./shared/services/report.service";
 
 export function initializeAppConfig(appConfig: AppConfig, router: Router) {
   return () => appConfig.load();
@@ -84,7 +88,9 @@ config({ licenseKey });
     SideNavigationMenuComponent,
     HistoryComponent,
     GetFirstElementPipe,
-    WorkspacesComponent
+    WorkspacesComponent,
+    PowerbiReportComponent,
+    ReportListComponent
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: "ng-cli-universal" }),
@@ -102,7 +108,8 @@ config({ licenseKey });
     DxFormModule,
     DxPopupModule,
     DxScrollViewModule,
-    DxTextAreaModule
+    DxTextAreaModule,
+    DxDataGridModule
   ],
   providers: [
     provideRouter(routes),
@@ -143,7 +150,8 @@ config({ licenseKey });
     UserStoryService,
     WorkspaceService,
     TabularModelService,
-    TestRunCollectionService
+    TestRunCollectionService,
+    PowerbiService,
   ],
   bootstrap: [AppComponent, MsalRedirectComponent],
 })

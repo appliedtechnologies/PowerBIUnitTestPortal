@@ -3,55 +3,38 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { ODataService } from "./odata.service";
 import { AppConfig } from "../config/app.config";
+import ODataStore from 'devextreme/data/odata/store';
+import { CrudBaseService } from './crud-base.service';
+import { Report } from '../models/report.model';
 
 @Injectable({
   providedIn: 'root'
 })
-export class PowerbiService {
-  private tokenUrl = 'https://your-backend.com/api/powerbi-token'; // Backend-Endpunkt
+export class PowerbiService extends CrudBaseService<Report> { 
 
-  constructor(private http: HttpClient) {}
+  constructor(
+    private odataService: ODataService,
+    private http: HttpClient) {super()}
 
-  
-   /**
-   * Generate Embed Token
-   * @param tenantId - Azure AD Tenant ID
-   * @param accessToken - User's Azure AD Access Token
-   * @returns Promise<string> - Embed token as string
-   */
-   public getEmbedToken(): Promise<string> {
+   getEmbedToken(reportId: string, workspaceId: string): Promise<string> {
+    const url = `${AppConfig.settings.api.url}/GetEmbedToken(workspaceId=${encodeURIComponent(workspaceId)},reportId=${encodeURIComponent(reportId)})`;
+
     return new Promise<string>((resolve, reject) => {
-      this.http
-        .post<{ token: string }>('https://api.powerbi.com/v1.0/myorg/groups/980c21bf-18c4-4210-8e66-027a5cea0e97/reports/e91f92b4-7566-4f75-b171-cd0590b15060/GenerateToken', {
-        accessLevel: 'View',})
-        .subscribe({
-          next: (response) => resolve(response.token),
-          error: (error: any) => reject(error?.error?.error),
-        });
-    });
-  }
-
-  public getEmbedToken2(): Promise<string> {
-    return new Promise<string>((resolve, reject) => {
-      let request = this.http
-        .get(`${AppConfig.settings.api.url}/GetEmbedToken`)
-        .subscribe({
-          next: (response) => resolve(response["value"].toString()),
-          error: (error: any) => reject(error?.error?.error)
-        });
-    });
-  }
-
-  public getEmbedToken3(): Promise<string> {
-    return new Promise<string>((resolve, reject) => {
-      const testParam = "test";
-      const url = `${AppConfig.settings.api.url}/GetEmbedToken?test=${encodeURIComponent(testParam)}`;
-  
       this.http.get(url).subscribe({
-        next: (response) => resolve(response.toString()),
-        error: (error: any) => reject(error?.error?.error)
+        next: (response) => resolve(response["value"].toString()),
+        error: (error: any) => reject(error?.error?.error),
       });
     });
   }
   
+
+    getStore(): ODataStore {
+      return this.odataService.context["Reports"];
+    }
+    
+    getReports(): Observable<any[]> {
+      const url = `${AppConfig.settings.api.url}/Reports`;
+      return this.http.get<any[]>(url);
+    }
+
 }

@@ -1,4 +1,5 @@
-import { Component, ElementRef, ViewChild, AfterViewInit } from '@angular/core';
+import { Component, ElementRef, ViewChild, AfterViewInit, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import * as pbi from 'powerbi-client';
 import { PowerbiService } from 'src/app/shared/services/report.service';
 
@@ -7,43 +8,55 @@ import { PowerbiService } from 'src/app/shared/services/report.service';
   templateUrl: './powerbi-report.component.html',
   styleUrls: ['./powerbi-report.component.css']
 })
-export class PowerbiReportComponent implements AfterViewInit {
+export class PowerbiReportComponent implements OnInit {
   @ViewChild('reportContainer', { static: false }) reportContainer!: ElementRef;
+  private reportId!: string;
+  private workspaceId!: string;
 
-  constructor(private powerbiService: PowerbiService) {}
+  constructor(
+    private powerbiService: PowerbiService,
+    private route: ActivatedRoute
+  ) {}
 
-  ngAfterViewInit() {
-    // Hole den Token vom Backend
-    this.powerbiService.getEmbedToken2().then(
+  ngOnInit() : void {
+    this.route.params.subscribe((params) => {
+      this.reportId = params['reportId'];
+      this.workspaceId = params['workspaceId'];
+
+      if (this.reportId && this.workspaceId) {
+        this.loadReport();
+      } else {
+        console.error('Report ID or Workspace ID is missing in the route parameters.');
+      }
+    });
+  }
+
+  private loadReport() {
+    this.powerbiService.getEmbedToken(this.reportId, this.workspaceId).then(
       (accessToken) => {
         const embedConfig: pbi.IEmbedConfiguration = {
           type: 'report',
-          id: 'e91f92b4-7566-4f75-b171-cd0590b15060',
+          id: this.reportId,
           embedUrl: 'https://app.powerbi.com/reportEmbed',
-          accessToken: accessToken, // Dynamischer Token
+          accessToken: accessToken,
           tokenType: pbi.models.TokenType.Embed,
           settings: {
             filterPaneEnabled: false,
             navContentPaneEnabled: true,
           },
         };
-  
-        // Power BI Dienst instanziieren
+
         const powerbi = new pbi.service.Service(
           pbi.factories.hpmFactory,
           pbi.factories.wpmpFactory,
           pbi.factories.routerFactory
         );
-  
-        // Bericht einbetten
+        
         powerbi.embed(this.reportContainer.nativeElement, embedConfig);
       },
       (error) => {
-        console.error('Fehler beim Abrufen des Embed Tokens:', error);
+        console.error('Error fetching Embed Token:', error);
       }
     );
   }
-  
 }
-
-

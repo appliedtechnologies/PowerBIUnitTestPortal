@@ -25,12 +25,49 @@ namespace at.PowerBIUnitTest.Portal.Controllers
         {
         }
 
-        [HttpGet("odata/GetEmbedToken")]
-        public async Task<string> GetEmbedToken([FromServices] PowerBiService powerBiService)
+         public IQueryable<Report> Get()
         {
-            
-            string token = await powerBiService.GetEmbedToken(downstreamWebApi, msIdTenantCurrentUser);
-            return token;
+            logger.LogDebug($"Begin & End: ReportController Get()");
+            return base.dbContext.Reports.Where(p => p.TenantNavigation.MsId == msIdTenantCurrentUser);
         }
+        
+        [HttpGet("odata/GetEmbedToken(workspaceId={workspaceId},reportId={reportId})")]
+        public async Task<IActionResult> GetEmbedToken([FromODataUri] Guid workspaceId,  [FromODataUri] Guid reportId,  [FromServices] PowerBiService powerBiService)
+        {
+            try
+            {
+
+                if (reportId == Guid.Empty || workspaceId == Guid.Empty)
+                {
+                    return BadRequest("Report ID or Workspace ID cannot be empty.");
+                }
+
+                var workspaceExists = this.dbContext.Workspaces.Any(e =>
+                e.TenantNavigation.MsId == msIdTenantCurrentUser && e.MsId == workspaceId);
+
+                if (!workspaceExists)
+                {
+                    return NotFound("Workspace not found or access is denied.");
+                }
+
+                string token = await powerBiService.GetEmbedToken(downstreamWebApi, msIdTenantCurrentUser, workspaceId, reportId);
+
+                if (string.IsNullOrEmpty(token))
+                {
+                    return StatusCode(StatusCodes.Status500InternalServerError, "Failed to generate embed token.");
+                }
+
+                return Ok(token);
+            }
+            catch (Exception ex)
+            {
+                
+                logger.LogError(ex, "An error occurred while generating the embed token.");
+
+                
+                return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred.");
+            }
+        }
+       
     }
 }
