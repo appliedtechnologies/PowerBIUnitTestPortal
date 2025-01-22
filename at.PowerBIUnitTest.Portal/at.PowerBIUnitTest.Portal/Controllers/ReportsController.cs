@@ -99,6 +99,26 @@ namespace at.PowerBIUnitTest.Portal.Controllers
             }
         }
 
+        [HttpDelete]
+        public async Task<IActionResult> Delete([FromODataUri] int key)
+        {
+            logger.LogDebug($"Begin: ReportController Delete(key: {key}");
+
+            var reports = await this.dbContext.Reports.FindAsync(key);
+
+            if (reports == null)
+                return NotFound();
+
+            if (reports.TenantNavigation.MsId != this.msIdTenantCurrentUser)
+                return Forbid();
+
+            this.dbContext.Reports.Remove(reports);
+            await base.dbContext.SaveChangesAsync();
+
+            logger.LogDebug($"End: ReportController Delete(key: {key}");
+            return Ok();
+        }
+
         [HttpGet("odata/GetEmbedToken(workspaceId={workspaceId},reportId={reportId})")]
         public async Task<IActionResult> GetEmbedToken([FromODataUri] Guid workspaceId, [FromODataUri] Guid reportId, [FromServices] PowerBiService powerBiService)
         {
