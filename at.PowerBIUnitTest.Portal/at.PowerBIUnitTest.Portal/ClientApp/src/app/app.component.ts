@@ -80,7 +80,7 @@ export class AppComponent {
           },
         },
         {
-          html: "<strong>Power BI Unit Test Portal</strong>",
+          html: "<strong>Power BI Portal</strong>",
           location: "center",
         },
         {    

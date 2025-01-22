@@ -30,6 +30,7 @@ namespace at.PowerBIUnitTest.Portal.Data.Models
         public virtual DbSet<User> Users { get; set; }
         public virtual DbSet<UserStory> UserStories { get; set; }
         public virtual DbSet<Workspace> Workspaces { get; set; }
+        public virtual DbSet<Report> Reports { get; set; }
 
         public Guid MsIdCurrentUser { get; set; }
 
@@ -82,6 +83,30 @@ namespace at.PowerBIUnitTest.Portal.Data.Models
                 entity.Property(e => e.Name)
                     .IsRequired()
                     .HasMaxLength(100);
+            });
+
+            modelBuilder.Entity<Report>(entity =>
+            {
+                entity.ToTable("Report");
+
+                entity.Property(e => e.ReportId)
+                    .IsRequired()
+                    .HasColumnName("ReportId");
+
+                entity.Property(e => e.WorkspaceId)
+                    .IsRequired()
+                    .HasColumnName("WorkspaceId");
+
+                entity.Property(e => e.Name)
+                    .IsRequired()
+                    .HasMaxLength(100);
+
+                entity.HasOne(d => d.TenantNavigation)
+                 .WithMany(p => p.Reports)
+                 .HasForeignKey(d => d.Tenant)
+                 .OnDelete(DeleteBehavior.ClientSetNull)
+                 .HasConstraintName("FK_Report_Tenant")
+                 .IsRequired(false);
             });
 
             modelBuilder.Entity<TestRun>(entity =>

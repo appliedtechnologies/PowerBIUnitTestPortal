@@ -1,0 +1,26 @@
+<h1>Reports</h1>
+
+<dx-data-grid
+  #dataGrid
+  [dataSource]="dataSourceReports"
+  [hoverStateEnabled]="true"
+  [showBorders]="true"
+  [showRowLines]="true"
+  height="100%"
+  
+>
+  <dxo-editing
+    mode="row"
+    [allowUpdating]="true"
+    [allowDeleting]="true"
+    [allowAdding]="true"
+    [useIcons]="true"
+  >
+  </dxo-editing>
+  <dxo-search-panel [visible]="true" [width]="250"></dxo-search-panel>
+  
+  <dxi-column dataField="Name" [allowEditing]="true"></dxi-column>
+  <dxi-column dataField="ReportId"[allowEditing]="true"></dxi-column>
+  <dxi-column dataField="WorkspaceId"></dxi-column>
+  
+</dx-data-grid>

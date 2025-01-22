@@ -25,10 +25,6 @@ export function loggerCallback(logLevel: LogLevel, message: string) {
 
 export function MSALInstanceFactory(): IPublicClientApplication {
   return new PublicClientApplication({
-    
-
-   
-
     auth: {
       
       //howto create azure app registration: https://docs.microsoft.com/en-us/azure/active-directory/develop/scenario-spa-app-registration
