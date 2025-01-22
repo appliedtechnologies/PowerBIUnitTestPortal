@@ -1,7 +1,7 @@
 import { Component, ElementRef, ViewChild, AfterViewInit, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import * as pbi from 'powerbi-client';
-import { PowerbiService } from 'src/app/shared/services/report.service';
+import { ReportService } from 'src/app/shared/services/report.service';
 
 @Component({
   selector: 'app-powerbi-report',
@@ -14,11 +14,11 @@ export class PowerbiReportComponent implements OnInit {
   private workspaceId!: string;
 
   constructor(
-    private powerbiService: PowerbiService,
+    private powerbiService: ReportService,
     private route: ActivatedRoute
-  ) {}
+  ) { }
 
-  ngOnInit() : void {
+  ngOnInit(): void {
     this.route.params.subscribe((params) => {
       this.reportId = params['reportId'];
       this.workspaceId = params['workspaceId'];
@@ -51,7 +51,7 @@ export class PowerbiReportComponent implements OnInit {
           pbi.factories.wpmpFactory,
           pbi.factories.routerFactory
         );
-        
+
         powerbi.embed(this.reportContainer.nativeElement, embedConfig);
       },
       (error) => {

@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
-import { PowerbiService } from 'src/app/shared/services/report.service';
+import { ReportService } from 'src/app/shared/services/report.service';
 import { UserService } from 'src/app/shared/services/user.service';
 import { AppConfig } from 'src/app/shared/config/app.config';
 import { filter } from 'rxjs/operators';
@@ -20,10 +20,10 @@ export class SideNavigationMenuComponent {
   constructor(
     private router: Router,
     private userService: UserService,
-    private reportsService: PowerbiService
-    
+    private reportsService: ReportService
+
   ) {
-    
+
     this.router.events
       .pipe(filter((event) => event instanceof NavigationEnd))
       .subscribe(() => {
@@ -70,75 +70,71 @@ export class SideNavigationMenuComponent {
       }
     }
 
-    const reports = this.reportsCache;
-
-    //this.reportsService.getStore().load().then(reports) => 
-      this.navigationEntries = [
-        {
-          text: 'Profile',
-          icon: 'at-icon powercid-icon-benutzer',
-          routerLink: '/profile',
-          visible: this.userService.isLogggedIn,
-        },
-        {
-          text: 'Unit Tests',
-          icon: 'runner',
-          routerLink: '/unittests',
-          visible: this.userService.isLogggedIn,
-        },
-        {
-          text: 'Reports',
+    this.navigationEntries = [
+      {
+        text: 'Profile',
+        icon: 'at-icon powercid-icon-benutzer',
+        routerLink: '/profile',
+        visible: this.userService.isLogggedIn,
+      },
+      {
+        text: 'Unit Tests',
+        icon: 'runner',
+        routerLink: '/unittests',
+        visible: this.userService.isLogggedIn,
+      },
+      {
+        text: 'Reports',
+        icon: 'chart',
+        visible: this.userService.isLogggedIn && this.reportsCache.length > 0,
+        items: this.reportsCache.map((report: Report) => ({
+          text: report.Name,
           icon: 'chart',
-          routerLink: '/reports',
+          routerLink: `/reports/${report.WorkspaceId}/${report.ReportId}`,
           visible: this.userService.isLogggedIn,
-          items: reports.map((report : Report) => ({
-            text: report.Name,
-            icon: 'chart',
-            routerLink: `/reports/${report.WorkspaceId}/${report.ReportId}`,
+        })),
+      },
+      {
+        text: 'History',
+        icon: 'clock',
+        routerLink: '/history',
+        visible: this.userService.isLogggedIn,
+      },
+      {
+        text: 'App Settings',
+        icon: 'at-icon powercid-icon-einstellungen',
+        expanded: expanded,
+        visible: this.userService.isLogggedIn,
+        items: [
+          {
+            text: 'Workspaces',
+            icon: 'activefolder',
+            routerLink: '/workspaces',
             visible: this.userService.isLogggedIn,
-          })),
-        },
-        {
-          text: 'History',
-          icon: 'clock',
-          routerLink: '/history',
-          visible: this.userService.isLogggedIn,
-        },
-        {
-          text: 'App Settings',
-          icon: 'at-icon powercid-icon-einstellungen',
-          expanded: expanded,
-          visible: this.userService.isLogggedIn,
-          items: [
-            {
-              text: 'Workspaces',
-              icon: 'activefolder',
-              routerLink: '/workspaces',
-              visible: this.userService.isLogggedIn,
-            },
-            {
-              text: "Reports",
-              icon: 'activefolder',
-              routerLink: '/reportlist',
-              visible: this.userService.isLogggedIn
-            }
-          ],
-        },
-      ];
-
-      this.navigationEntries.forEach((e) => {
-        this.checkNavigationEntry(e);
-        e.items?.forEach((ee) => {
-          this.checkNavigationEntry(ee);
-          if (ee.selected) {
-            localStorage.setItem(
-              'atPowerBiUnitTestPortal_ExpandedSideNavigation',
-              String(true)
-            );
-            e.expanded = true;
+          },
+          {
+            text: "Reports",
+            icon: 'columnproperties',
+            routerLink: '/reportlist',
+            visible: this.userService.isLogggedIn
           }
-        });
+        ],
+      },
+    ];
+
+    this.navigationEntries.forEach((e) => {
+      this.checkNavigationEntry(e);
+      e.items?.forEach((ee) => {
+        this.checkNavigationEntry(ee);
+        if (ee.selected) {
+          localStorage.setItem(
+            'atPowerBiUnitTestPortal_ExpandedSideNavigation',
+            String(true)
+          );
+          e.expanded = true;
+        }
       });
+    });
     ;
   }
 

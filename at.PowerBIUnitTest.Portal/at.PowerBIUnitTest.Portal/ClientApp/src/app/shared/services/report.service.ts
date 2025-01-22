@@ -10,13 +10,13 @@ import { Report } from '../models/report.model';
 @Injectable({
   providedIn: 'root'
 })
-export class PowerbiService extends CrudBaseService<Report> { 
+export class ReportService extends CrudBaseService<Report> {
 
   constructor(
     private odataService: ODataService,
-    private http: HttpClient) {super()}
+    private http: HttpClient) { super() }
 
-   getEmbedToken(reportId: string, workspaceId: string): Promise<string> {
+  getEmbedToken(reportId: string, workspaceId: string): Promise<string> {
     const url = `${AppConfig.settings.api.url}/GetEmbedToken(workspaceId=${encodeURIComponent(workspaceId)},reportId=${encodeURIComponent(reportId)})`;
 
     return new Promise<string>((resolve, reject) => {
@@ -26,15 +26,13 @@ export class PowerbiService extends CrudBaseService<Report> {
       });
     });
   }
-  
 
-    getStore(): ODataStore {
-      return this.odataService.context["Reports"];
-    }
-    
-    getReports(): Observable<any[]> {
-      const url = `${AppConfig.settings.api.url}/Reports`;
-      return this.http.get<any[]>(url);
-    }
+  getStore(): ODataStore {
+    return this.odataService.context["Reports"];
+  }
 
+  getReports(): Observable<any[]> {
+    const url = `${AppConfig.settings.api.url}/Reports`;
+    return this.http.get<any[]>(url);
+  }
 }

@@ -19,6 +19,5 @@ namespace at.PowerBIUnitTest.Portal.Data.Models
         public string Name { get; set; }
 
         public virtual Tenant TenantNavigation { get; set; }
-
     }
 }

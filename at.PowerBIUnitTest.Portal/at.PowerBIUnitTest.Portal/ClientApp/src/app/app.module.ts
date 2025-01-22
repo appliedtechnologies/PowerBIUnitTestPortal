@@ -69,8 +69,8 @@ import { HistoryComponent } from "./components/history/history.component";
 import { TestRunCollectionService } from "./shared/services/test-run-collection.service";
 import { WorkspacesComponent } from "./components/workspaces/workspaces.component";
 import { PowerbiReportComponent } from "./components/powerbi-report/powerbi-report.component";
-import { ReportListComponent } from "./components/ReportList/ReportList.Component";
-import { PowerbiService } from "./shared/services/report.service";
+import { ReportListComponent } from "./components/report-list/report-list.component";
+import { ReportService } from "./shared/services/report.service";
 
 export function initializeAppConfig(appConfig: AppConfig, router: Router) {
   return () => appConfig.load();
@@ -108,8 +108,7 @@ config({ licenseKey });
     DxFormModule,
     DxPopupModule,
     DxScrollViewModule,
-    DxTextAreaModule,
-    DxDataGridModule
+    DxTextAreaModule
   ],
   providers: [
     provideRouter(routes),
@@ -151,7 +150,7 @@ config({ licenseKey });
     WorkspaceService,
     TabularModelService,
     TestRunCollectionService,
-    PowerbiService,
+    ReportService,
   ],
   bootstrap: [AppComponent, MsalRedirectComponent],
 })

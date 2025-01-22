@@ -85,7 +85,7 @@ namespace at.PowerBIUnitTest.Portal.Data.Models
                     .HasMaxLength(100);
             });
 
-             modelBuilder.Entity<Report>(entity =>
+            modelBuilder.Entity<Report>(entity =>
             {
                 entity.ToTable("Report");
 

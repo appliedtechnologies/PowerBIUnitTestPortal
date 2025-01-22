@@ -13,7 +13,6 @@ namespace at.PowerBIUnitTest.Portal.Data.Models
 
         public virtual ICollection<User> Users { get; set; }
         public virtual ICollection<Workspace> Workspaces { get; set; }
-
         public virtual ICollection<Report> Reports{ get; set; }
     }
 }

@@ -9,7 +9,7 @@ import { MsalGuard } from "@azure/msal-angular";
 import { HistoryComponent } from "./components/history/history.component";
 import { WorkspacesComponent } from "./components/workspaces/workspaces.component";
 import { PowerbiReportComponent } from "./components/powerbi-report/powerbi-report.component";
-import { ReportListComponent } from "./components/ReportList/ReportList.Component";
+import { ReportListComponent } from "./components/report-list/report-list.component";
 
 export const routes: Routes = [
   { path: "", pathMatch: "full", redirectTo: "/unittests" },

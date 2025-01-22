@@ -22,8 +22,6 @@ using System.Collections.Generic;
 using at.PowerBIUnitTest.Portal.Services;
 using System;
 
-
-
 namespace at.PowerBIUnitTest.Portal
 {
     public class Startup
@@ -143,9 +141,7 @@ namespace at.PowerBIUnitTest.Portal
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapControllers();
-                //endpoints.MapODataRoute("odata", "odata", GetEdmModel());
-                
+                endpoints.MapControllers();               
             });
 
             app.UseSpa(spa =>
