@@ -20,6 +20,7 @@ using System.Globalization;
 using Microsoft.AspNetCore.Localization;
 using System.Collections.Generic;
 using at.PowerBIUnitTest.Portal.Services;
+using System;
 
 namespace at.PowerBIUnitTest.Portal
 {
@@ -43,9 +44,14 @@ namespace at.PowerBIUnitTest.Portal
             builder.EntitySet<TabularModel>("TabularModels");
             builder.EntitySet<TestRun>("TestRuns");
             builder.EntitySet<TestRun>("ResultTypes");
+            builder.EntitySet<Report>("Reports");
             builder.EntitySet<TestRunCollection>("TestRunCollections");
             builder.EntityType<User>().Collection.Action("Login");
             builder.EntityType<Workspace>().Collection.Action("Pull");
+            
+            var GetEmbedToken = builder.Function("GetEmbedToken").Returns<string>();
+            GetEmbedToken.Parameter<Guid>("reportId");
+            GetEmbedToken.Parameter<Guid>("workspaceId");
 
             builder.EntityType<UnitTest>().Collection.Action("Execute").CollectionParameter<int>("unitTestIds");
 
@@ -63,6 +69,7 @@ namespace at.PowerBIUnitTest.Portal
                 .EnableTokenAcquisitionToCallDownstreamApi()
                 .AddDownstreamWebApi("GraphApi", Configuration.GetSection("DownstreamApis:GraphApi"))
                 .AddDownstreamWebApi("AzureManagementApi", Configuration.GetSection("DownstreamApis:AzureManagementApi"))
+                .AddDownstreamWebApi("PowerBiApi", Configuration.GetSection("DownstreamApis:PowerBiApi"))
                 .AddInMemoryTokenCaches();
             // In production, the Angular files will be served from this directory
             services.AddSpaStaticFiles(configuration =>
@@ -134,7 +141,7 @@ namespace at.PowerBIUnitTest.Portal
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapControllers();
+                endpoints.MapControllers();               
             });
 
             app.UseSpa(spa =>
@@ -146,7 +153,7 @@ namespace at.PowerBIUnitTest.Portal
 
                 if (env.IsDevelopment())
                 {
-                    var currentUri = "http://localhost:4222/";
+                    var currentUri = "http://localhost:5005/";
                     var envUri = System.Environment.GetEnvironmentVariable("ASPNETCORE_ANGULAR_URL");
                     if (!string.IsNullOrWhiteSpace(envUri))
                     {

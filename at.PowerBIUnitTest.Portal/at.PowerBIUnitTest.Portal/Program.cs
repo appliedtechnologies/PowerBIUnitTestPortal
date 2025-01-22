@@ -23,6 +23,7 @@ namespace at.PowerBIUnitTest.Portal
                     webBuilder.UseStartup<Startup>();
                 });
 
+
                   public static int Add(int x, int y)
 {
     return x+y;  

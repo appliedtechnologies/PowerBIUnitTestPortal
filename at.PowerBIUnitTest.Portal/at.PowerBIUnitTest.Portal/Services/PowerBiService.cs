@@ -8,6 +8,7 @@ using at.PowerBIUnitTest.Portal.Data.Models;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Identity.Client;
+using Microsoft.Identity.Web;
 using Newtonsoft.Json.Linq;
 
 namespace at.PowerBIUnitTest.Portal.Services
@@ -49,6 +50,38 @@ namespace at.PowerBIUnitTest.Portal.Services
                 throw;
 
             }
+        }
+
+        public async Task<string> GetEmbedToken(IDownstreamWebApi client, Guid tenantId, Guid workspaceId, Guid reportId)
+        {
+            string url = $"/groups/{workspaceId}/reports/{reportId}/GenerateToken";
+
+            var payload = new
+            {
+                accessLevel = "View"
+            };
+
+            string jsonPayload = JsonSerializer.Serialize(payload);
+
+            using var requestContent = new StringContent(jsonPayload, Encoding.UTF8, "application/json");
+            var response = await client.CallWebApiForAppAsync(
+               "PowerBiApi",
+               options =>
+               {
+                   options.Tenant = tenantId.ToString();
+                   options.RelativePath = url;
+                   options.HttpMethod = HttpMethod.Post;
+
+               },
+               content: requestContent
+               );
+
+            response.EnsureSuccessStatusCode();
+
+            string responseBody = await response.Content.ReadAsStringAsync();
+            var responseJson = JsonSerializer.Deserialize<JsonDocument>(responseBody);
+
+            return responseJson?.RootElement.GetProperty("token").GetString();
         }
 
         public async Task<JToken> LoadWorkspace(string authToken)
@@ -123,7 +156,7 @@ namespace at.PowerBIUnitTest.Portal.Services
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "An error occurred while querying the dataset."); 
+                logger.LogError(ex, "An error occurred while querying the dataset.");
                 throw;
             }
         }

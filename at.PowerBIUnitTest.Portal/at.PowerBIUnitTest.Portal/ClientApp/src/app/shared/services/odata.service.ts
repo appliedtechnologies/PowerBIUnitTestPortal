@@ -53,6 +53,15 @@ export class ODataService {
         TestRunCollections: {
           key: "Id",
           keyType: "Int32",
+        },
+        Reports: {
+          key: "Id",
+          keyType: "Int32",
+          fieldTypes: {
+            Name: "String",
+            ReportId: "Guid",
+            WorkspaceId: "Guid"
+          }
         }
       },
     });

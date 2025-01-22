@@ -1,0 +1,6 @@
+html, body, app-powerbi-report, .report-container {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+  }
+  
