@@ -136,7 +136,7 @@ namespace at.PowerBIUnitTest.Portal.Controllers
                     return NotFound("Workspace not found or access is denied.");
                 }
 
-                string token = await powerBiService.GetEmbedToken(downstreamWebApi, msIdTenantCurrentUser, workspaceId, reportId);
+                string token = await powerBiService.GetEmbedToken(downstreamWebApi, msIdTenantCurrentUser, workspaceId, reportId, msUserNameCurrentUser);
 
                 if (string.IsNullOrEmpty(token))
                 {

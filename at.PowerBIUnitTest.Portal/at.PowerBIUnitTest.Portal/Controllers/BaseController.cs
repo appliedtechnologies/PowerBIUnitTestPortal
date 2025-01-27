@@ -18,6 +18,7 @@ namespace at.PowerBIUnitTest.Portal.Controllers
 
         protected Guid msIdTenantCurrentUser;
         protected Guid msIdCurrentUser;
+        protected string msUserNameCurrentUser;
         protected IHttpContextAccessor httpContextAccessor;
 
 
@@ -29,6 +30,7 @@ namespace at.PowerBIUnitTest.Portal.Controllers
             this.logger = logger;
             this.msIdTenantCurrentUser = Guid.Parse(httpContextAccessor.HttpContext.User.FindFirst(ClaimConstants.TenantId).Value);
             this.msIdCurrentUser = Guid.Parse(httpContextAccessor.HttpContext.User.FindFirst(ClaimConstants.ObjectId).Value);
+            this.msUserNameCurrentUser = httpContextAccessor.HttpContext.User.Identity.Name;
             this.dbContext.MsIdCurrentUser = this.msIdCurrentUser;
         }
     }
