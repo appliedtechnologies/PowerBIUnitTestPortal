@@ -52,31 +52,51 @@ namespace at.PowerBIUnitTest.Portal.Services
             }
         }
 
-        public async Task<string> GetEmbedToken(IDownstreamWebApi client, Guid tenantId, Guid workspaceId, Guid reportId)
+        public async Task<string> GetEmbedToken(IDownstreamWebApi client, Guid tenantId, Guid workspaceId, Guid reportId, string username)
         {
-            string url = $"/groups/{workspaceId}/reports/{reportId}/GenerateToken";
+            Guid datasetId = await GetDatasetIdForReport(client, reportId, workspaceId, tenantId);
+            bool isEffectiveIdentityRequired = await IsEffectiveIdentityRequired(client, datasetId, workspaceId, tenantId);
 
-            var payload = new
+            string payload = "";
+
+            if (isEffectiveIdentityRequired)
             {
-                accessLevel = "View"
-            };
+                payload = @"
+                    {
+                        'accessLevel': 'View',
+                        'identities': [{
+                            'username': '{"+ username + @"}',
+                            'datasets': ['"+ datasetId + @"'],
+                            'roles': ['Member']
+                        }]  
+                    }";
+            }
+            else
+            {
+                payload = @"
+                    {
+                        'accessLevel': 'View', 
+                    }";
+            }
 
-            string jsonPayload = JsonSerializer.Serialize(payload);
-
-            using var requestContent = new StringContent(jsonPayload, Encoding.UTF8, "application/json");
+            using var requestContent = new StringContent(payload, Encoding.UTF8, "application/json");
             var response = await client.CallWebApiForAppAsync(
                "PowerBiApi",
                options =>
                {
                    options.Tenant = tenantId.ToString();
-                   options.RelativePath = url;
+                   options.RelativePath = $"/groups/{workspaceId}/reports/{reportId}/GenerateToken";
                    options.HttpMethod = HttpMethod.Post;
 
                },
                content: requestContent
                );
 
-            response.EnsureSuccessStatusCode();
+            if (!response.IsSuccessStatusCode)
+            {
+                logger.LogDebug(await response.Content.ReadAsStringAsync());
+                throw new Exception("Could not get embed token");
+            }
 
             string responseBody = await response.Content.ReadAsStringAsync();
             var responseJson = JsonSerializer.Deserialize<JsonDocument>(responseBody);
@@ -159,6 +179,48 @@ namespace at.PowerBIUnitTest.Portal.Services
                 logger.LogError(ex, "An error occurred while querying the dataset.");
                 throw;
             }
+        }
+
+        private async Task<Guid> GetDatasetIdForReport(IDownstreamWebApi client, Guid reportId, Guid workspaceId, Guid tenantId){
+            var response = await client.CallWebApiForAppAsync(
+                "PowerBiApi",
+                options =>
+                {
+                    options.Tenant = tenantId.ToString();
+                    options.RelativePath = $"/groups/{workspaceId}/reports/{reportId}";
+                    options.HttpMethod = HttpMethod.Get;
+                });
+
+            if (!response.IsSuccessStatusCode)
+            {
+                logger.LogDebug(await response.Content.ReadAsStringAsync());
+                throw new Exception("Could not get Report");
+            }
+
+            JToken report = (await response.Content.ReadAsAsync<JObject>());
+
+            return Guid.Parse((string)report["datasetId"]);
+        }
+
+        private async Task<bool> IsEffectiveIdentityRequired (IDownstreamWebApi client, Guid datasetId, Guid workspaceId, Guid tenantId){
+            var response = await client.CallWebApiForAppAsync(
+                "PowerBiApi",
+                options =>
+                {
+                    options.Tenant = tenantId.ToString();
+                    options.RelativePath = $"/groups/{workspaceId}/datasets/{datasetId}";
+                    options.HttpMethod = HttpMethod.Get;
+                });
+
+            if (!response.IsSuccessStatusCode)
+            {
+                logger.LogDebug(await response.Content.ReadAsStringAsync());
+                throw new Exception("Could not get Dataset");
+            }
+
+            JToken dataset = (await response.Content.ReadAsAsync<JObject>());
+
+            return (bool)dataset["isEffectiveIdentityRequired"];
         }
     }
 }
