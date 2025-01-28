@@ -3,6 +3,7 @@ import { ActivatedRoute } from '@angular/router';
 import { IEmbedConfiguration, IReportEmbedConfiguration } from 'embed';
 import { ReportService } from 'src/app/shared/services/report.service';
 import { DisplayOption, TokenType } from 'powerbi-models';
+import { LayoutParameter, LayoutService, NotificationType } from 'src/app/shared/services/layout.service';
 
 @Component({
   selector: 'app-powerbi-report',
@@ -17,6 +18,7 @@ export class PowerbiReportComponent implements OnInit {
 
   constructor(
     private powerbiService: ReportService,
+    private layoutService: LayoutService,
     private route: ActivatedRoute
   ) { }
 
@@ -34,6 +36,7 @@ export class PowerbiReportComponent implements OnInit {
   }
 
   private loadReport() {
+    this.layoutService.change(LayoutParameter.ShowLoading, true);
     this.powerbiService.getEmbedToken(this.reportId, this.workspaceId).then(
       (accessToken) => {
         this.embedConfig = {
@@ -45,15 +48,16 @@ export class PowerbiReportComponent implements OnInit {
           settings: {
             filterPaneEnabled: false,
             navContentPaneEnabled: true,
-            customLayout: {
-              displayOption: DisplayOption.FitToPage
-            }
           },
         };
-      },
-      (error) => {
-        console.error('Error fetching Embed Token:', error);
       }
-    );
+    )
+    .catch((error) => {
+      this.layoutService.notify({type: NotificationType.Error, message: 'Error getting report'});
+      this.embedConfig = null;
+    })
+    .finally(() => {
+      this.layoutService.change(LayoutParameter.ShowLoading, false);
+    });
   }
 }
