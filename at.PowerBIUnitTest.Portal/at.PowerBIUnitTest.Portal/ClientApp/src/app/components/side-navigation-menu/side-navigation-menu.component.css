@@ -15,6 +15,11 @@
   background-color: #a3cc54 !important;
 }
 
+:host ::ng-deep .dx-treeview-item-without-checkbox.dx-state-selected > .dx-treeview-item {
+  color:white !important;
+  background-color: #a3cc54 !important;
+}
+
 :host ::ng-deep .dx-treeview-item-without-checkbox.dx-state-focused > .dx-treeview-item{
   background-color: unset;
   color: unset;

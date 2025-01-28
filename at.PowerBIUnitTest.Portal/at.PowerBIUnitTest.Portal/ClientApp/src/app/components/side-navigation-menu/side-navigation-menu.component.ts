@@ -5,6 +5,7 @@ import { UserService } from 'src/app/shared/services/user.service';
 import { AppConfig } from 'src/app/shared/config/app.config';
 import { filter } from 'rxjs/operators';
 import { Report } from 'src/app/shared/models/report.model';
+import { ItemCollapsedEvent, ItemExpandedEvent } from 'devextreme/ui/tree_view';
 
 @Component({
   selector: 'app-side-navigation-menu',
@@ -41,26 +42,25 @@ export class SideNavigationMenuComponent {
     if (e.itemData.routerLink) {
       this.router.navigate([e.itemData.routerLink]);
     } else {
-      this.setNavigationEntries(!e.itemData.expanded);
+      this.setNavigationEntries();
     }
   }
 
-  onItemExpanded(e): void {
-    this.setNavigationEntries();
+  onItemExpanded(e: ItemExpandedEvent): void {
+    localStorage.setItem(
+      `atPowerBiUnitTestPortal_ExpandedSideNavigation_${e.itemData.text}`,
+      String(true)
+    )
   }
 
-  async setNavigationEntries(expanded: boolean = undefined): Promise<void> {
-    if (expanded === undefined) {
-      expanded = localStorage.getItem(
-        'atPowerBiUnitTestPortal_ExpandedSideNavigation'
-      ) == 'true';
-    } else {
-      localStorage.setItem(
-        'atPowerBiUnitTestPortal_ExpandedSideNavigation',
-        String(expanded)
-      );
-    }
+  onItemCollapsed(e: ItemCollapsedEvent): void {
+    localStorage.setItem(
+      `atPowerBiUnitTestPortal_ExpandedSideNavigation_${e.itemData.text}`,
+      String(false)
+    )
+  }
 
+  async setNavigationEntries(): Promise<void> {
     if (!this.reportsCache) {
       try {
         this.reportsCache = await this.reportsService.getStore().load();
@@ -82,11 +82,19 @@ export class SideNavigationMenuComponent {
         icon: 'runner',
         routerLink: '/unittests',
         visible: this.userService.isLogggedIn,
+        expanded: localStorage.getItem(`atPowerBiUnitTestPortal_ExpandedSideNavigation_Unit Tests`) === 'true',
+        items: [{
+          text: 'History',
+          icon: 'clock',
+          routerLink: '/history',
+          visible: this.userService.isLogggedIn,
+        }],
       },
       {
         text: 'Reports',
         icon: 'chart',
         visible: this.userService.isLogggedIn && this.reportsCache.length > 0,
+        expanded: localStorage.getItem(`atPowerBiUnitTestPortal_ExpandedSideNavigation_Reports`) === 'true',
         items: this.reportsCache.map((report: Report) => ({
           text: report.Name,
           icon: 'chart',
@@ -95,16 +103,10 @@ export class SideNavigationMenuComponent {
         })),
       },
       {
-        text: 'History',
-        icon: 'clock',
-        routerLink: '/history',
-        visible: this.userService.isLogggedIn,
-      },
-      {
         text: 'App Settings',
         icon: 'at-icon powercid-icon-einstellungen',
-        expanded: expanded,
         visible: this.userService.isLogggedIn,
+        expanded: localStorage.getItem(`atPowerBiUnitTestPortal_ExpandedSideNavigation_App Settings`) === 'true',
         items: [
           {
             text: 'Workspaces',
@@ -125,23 +127,22 @@ export class SideNavigationMenuComponent {
     this.navigationEntries.forEach((e) => {
       this.checkNavigationEntry(e);
       e.items?.forEach((ee) => {
-        this.checkNavigationEntry(ee);
-        if (ee.selected) {
-          localStorage.setItem(
-            'atPowerBiUnitTestPortal_ExpandedSideNavigation',
-            String(true)
-          );
+        let seleted = this.checkNavigationEntry(ee);
+        if(seleted && e.expanded === false){
           e.expanded = true;
-        }
+          localStorage.setItem(`atPowerBiUnitTestPortal_ExpandedSideNavigation_${e.text}`, String(true));
+        } ;
       });
     });
     ;
   }
 
-  checkNavigationEntry(entry: NavigationEntry): void {
+  checkNavigationEntry(entry: NavigationEntry): boolean {
     if (entry.visible === undefined) entry.visible = false;
 
     if (entry.routerLink == this.selectedItemRoute) entry.selected = true;
+
+    return entry.selected;
   }
 }
 
@@ -150,7 +151,7 @@ export class NavigationEntry {
   visible: boolean;
   icon: string;
   routerLink?: string;
-  selected?: boolean;
   expanded?: boolean;
+  selected?: boolean;
   items?: NavigationEntry[];
 }
