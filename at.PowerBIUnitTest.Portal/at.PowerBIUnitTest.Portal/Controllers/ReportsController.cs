@@ -44,7 +44,7 @@ namespace at.PowerBIUnitTest.Portal.Controllers
             if ((await this.dbContext.Reports.FirstOrDefaultAsync(e => e.Id == key && e.TenantNavigation.MsId == this.msIdTenantCurrentUser)) == null)
                 return Forbid();
 
-            string[] propertyNamesAllowedToChange = { "Name", "ReportId", "WorkspaceId" };
+            string[] propertyNamesAllowedToChange = { "Name", "ReportId", "WorkspaceId", nameof(Report.RLSRole) };
             if (report.GetChangedPropertyNames().Except(propertyNamesAllowedToChange).Count() == 0)
             {
                 if (!ModelState.IsValid)
@@ -136,7 +136,13 @@ namespace at.PowerBIUnitTest.Portal.Controllers
                     return NotFound("Workspace not found or access is denied.");
                 }
 
-                string token = await powerBiService.GetEmbedToken(downstreamWebApi, msIdTenantCurrentUser, workspaceId, reportId, msUserNameCurrentUser);
+                Report report = this.dbContext.Reports.FirstOrDefault(e => e.TenantNavigation.MsId == msIdTenantCurrentUser && e.ReportId == reportId && e.WorkspaceId == workspaceId);
+                if (!workspaceExists)
+                {
+                    return NotFound("Report not found or access is denied.");
+                }
+
+                string token = await powerBiService.GetEmbedToken(downstreamWebApi, msIdTenantCurrentUser, workspaceId, reportId, msUserNameCurrentUser, report.RLSRole);
 
                 if (string.IsNullOrEmpty(token))
                 {
