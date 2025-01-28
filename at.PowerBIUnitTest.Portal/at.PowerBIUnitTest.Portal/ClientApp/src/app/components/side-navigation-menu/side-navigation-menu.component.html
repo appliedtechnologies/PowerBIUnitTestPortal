@@ -7,6 +7,8 @@
     [items]="navigationEntries"
     [selectByClick]="true"
     (onItemClick)="onItemClickNavigation($event)"
+    (onItemExpanded)="onItemExpanded($event)"
+    (onItemCollapsed)="onItemCollapsed($event)"
     noDataText="Loading...">
   </dx-tree-view>  
 </dx-scroll-view> 
