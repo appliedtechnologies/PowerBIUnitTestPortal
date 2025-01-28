@@ -52,24 +52,43 @@ namespace at.PowerBIUnitTest.Portal.Services
             }
         }
 
-        public async Task<string> GetEmbedToken(IDownstreamWebApi client, Guid tenantId, Guid workspaceId, Guid reportId, string username)
+        public async Task<string> GetEmbedToken(IDownstreamWebApi client, Guid tenantId, Guid workspaceId, Guid reportId, string username, string rlsRole)
         {
             Guid datasetId = await GetDatasetIdForReport(client, reportId, workspaceId, tenantId);
-            bool isEffectiveIdentityRequired = await IsEffectiveIdentityRequired(client, datasetId, workspaceId, tenantId);
+            (bool isEffectiveIdentityRequired, bool isEffectiveIdentityRolesRequired) = await IsEffectiveIdentityRequired(client, datasetId, workspaceId, tenantId);
 
             string payload = "";
 
             if (isEffectiveIdentityRequired)
             {
-                payload = @"
+                if(isEffectiveIdentityRolesRequired && String.IsNullOrEmpty(rlsRole))
+                {
+                    throw new Exception("RLS Role is required for this report");
+                }
+
+                if(!String.IsNullOrEmpty(rlsRole))
+                {
+                    payload = @"
                     {
                         'accessLevel': 'View',
                         'identities': [{
                             'username': '{"+ username + @"}',
                             'datasets': ['"+ datasetId + @"'],
-                            'roles': ['Member']
+                            'roles': ['"+ rlsRole + @"']
                         }]  
                     }";
+                }
+                else
+                {
+                    payload = @"
+                    {
+                        'accessLevel': 'View', 
+                        'identities': [{
+                            'username': '{"+ username + @"}',
+                            'datasets': ['"+ datasetId + @"']
+                        }] 
+                    }";
+                }
             }
             else
             {
@@ -202,7 +221,7 @@ namespace at.PowerBIUnitTest.Portal.Services
             return Guid.Parse((string)report["datasetId"]);
         }
 
-        private async Task<bool> IsEffectiveIdentityRequired (IDownstreamWebApi client, Guid datasetId, Guid workspaceId, Guid tenantId){
+        private async Task<(bool, bool)> IsEffectiveIdentityRequired (IDownstreamWebApi client, Guid datasetId, Guid workspaceId, Guid tenantId){
             var response = await client.CallWebApiForAppAsync(
                 "PowerBiApi",
                 options =>
@@ -220,7 +239,7 @@ namespace at.PowerBIUnitTest.Portal.Services
 
             JToken dataset = (await response.Content.ReadAsAsync<JObject>());
 
-            return (bool)dataset["isEffectiveIdentityRequired"];
+            return ((bool)dataset["isEffectiveIdentityRequired"], (bool)dataset["isEffectiveIdentityRolesRequired"]);
         }
     }
 }
