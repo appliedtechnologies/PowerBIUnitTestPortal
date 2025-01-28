@@ -71,6 +71,7 @@ import { WorkspacesComponent } from "./components/workspaces/workspaces.componen
 import { PowerbiReportComponent } from "./components/powerbi-report/powerbi-report.component";
 import { ReportListComponent } from "./components/report-list/report-list.component";
 import { ReportService } from "./shared/services/report.service";
+import { PowerBIEmbedModule } from 'powerbi-client-angular';
 
 export function initializeAppConfig(appConfig: AppConfig, router: Router) {
   return () => appConfig.load();
@@ -108,7 +109,8 @@ config({ licenseKey });
     DxFormModule,
     DxPopupModule,
     DxScrollViewModule,
-    DxTextAreaModule
+    DxTextAreaModule,
+    PowerBIEmbedModule
   ],
   providers: [
     provideRouter(routes),
