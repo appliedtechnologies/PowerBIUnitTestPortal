@@ -7,4 +7,5 @@ export interface Report {
     Tenant?: number;
     TenantNavigation?: Tenant;
     Name?: string;
+    RLSRole?: string;
 }

@@ -29,7 +29,7 @@
     "devextreme-angular": "23.2.3",
     "devextreme-schematics": "^1.2.19",
     "oidc-client": "^1.11.3",
-    "powerbi-client": "2.10.4",
+    "powerbi-client-angular": "^5.0.0",
     "rxjs": "^7.8.1",
     "tslib": "^2.0.0",
     "zone.js": "~0.14.5"
