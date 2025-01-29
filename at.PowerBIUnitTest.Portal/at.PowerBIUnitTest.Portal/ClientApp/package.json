@@ -1,6 +1,6 @@
 {
   "name": "at.powerbiunittest.portal",
-  "version": "1.2.2501.2317",
+  "version": "1.2.2501.2918",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
