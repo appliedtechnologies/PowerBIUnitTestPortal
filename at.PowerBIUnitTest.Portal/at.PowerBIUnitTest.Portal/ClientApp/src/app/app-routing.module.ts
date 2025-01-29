@@ -12,7 +12,7 @@ import { PowerbiReportComponent } from "./components/powerbi-report/powerbi-repo
 import { ReportListComponent } from "./components/report-list/report-list.component";
 
 export const routes: Routes = [
-  { path: "", pathMatch: "full", redirectTo: "/unittests" },
+  { path: "", pathMatch: "full", redirectTo: "/profile" },
   { path: "profile", component: ProfileComponent, canActivate: [MsalGuard] },
   { path: "unittests", component: UnitTestsComponent, canActivate: [MsalGuard] },
   { path: "history", component: HistoryComponent, canActivate: [MsalGuard] },

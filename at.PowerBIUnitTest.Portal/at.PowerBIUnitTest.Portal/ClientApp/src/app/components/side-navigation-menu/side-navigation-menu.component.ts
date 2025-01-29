@@ -78,6 +78,18 @@ export class SideNavigationMenuComponent {
         visible: this.userService.isLogggedIn,
       },
       {
+        text: 'Reports',
+        icon: 'chart',
+        visible: this.userService.isLogggedIn && this.reportsCache.length > 0,
+        expanded: localStorage.getItem(`atPowerBiUnitTestPortal_ExpandedSideNavigation_Reports`) === 'true',
+        items: this.reportsCache.map((report: Report) => ({
+          text: report.Name,
+          icon: 'chart',
+          routerLink: `/reports/${report.WorkspaceId}/${report.ReportId}`,
+          visible: this.userService.isLogggedIn,
+        })),
+      },
+      {
         text: 'Unit Tests',
         icon: 'runner',
         routerLink: '/unittests',
@@ -89,18 +101,6 @@ export class SideNavigationMenuComponent {
           routerLink: '/history',
           visible: this.userService.isLogggedIn,
         }],
-      },
-      {
-        text: 'Reports',
-        icon: 'chart',
-        visible: this.userService.isLogggedIn && this.reportsCache.length > 0,
-        expanded: localStorage.getItem(`atPowerBiUnitTestPortal_ExpandedSideNavigation_Reports`) === 'true',
-        items: this.reportsCache.map((report: Report) => ({
-          text: report.Name,
-          icon: 'chart',
-          routerLink: `/reports/${report.WorkspaceId}/${report.ReportId}`,
-          visible: this.userService.isLogggedIn,
-        })),
       },
       {
         text: 'App Settings',
