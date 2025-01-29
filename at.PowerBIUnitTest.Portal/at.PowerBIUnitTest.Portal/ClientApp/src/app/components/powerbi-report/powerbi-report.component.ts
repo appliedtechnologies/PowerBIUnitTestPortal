@@ -47,10 +47,7 @@ export class PowerbiReportComponent implements OnInit {
           tokenType: TokenType.Embed,
           settings: {
             filterPaneEnabled: false,
-            navContentPaneEnabled: true,
-            customLayout: {
-              displayOption: DisplayOption.FitToWidth,
-            }
+            navContentPaneEnabled: true
           },
         };
       }
