@@ -48,6 +48,9 @@ export class PowerbiReportComponent implements OnInit {
           settings: {
             filterPaneEnabled: false,
             navContentPaneEnabled: true,
+            customLayout: {
+              displayOption: DisplayOption.FitToWidth,
+            }
           },
         };
       }
