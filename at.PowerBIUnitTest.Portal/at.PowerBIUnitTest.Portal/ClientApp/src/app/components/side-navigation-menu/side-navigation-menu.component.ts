@@ -93,13 +93,13 @@ export class SideNavigationMenuComponent {
         text: 'Unit Tests',
         icon: 'runner',
         routerLink: '/unittests',
-        visible: this.userService.isLogggedIn,
+        visible: false,
         expanded: localStorage.getItem(`atPowerBiUnitTestPortal_ExpandedSideNavigation_Unit Tests`) === 'true',
         items: [{
           text: 'History',
           icon: 'clock',
           routerLink: '/history',
-          visible: this.userService.isLogggedIn,
+          visible: false,
         }],
       },
       {
